@@ -8,6 +8,7 @@ class iZiCodeEditor : Window {
     SourceBuffer buffer ;
     string fileName ;
     string fileLocation ;
+    bool unsaved = true ;
 
     iZiCodeEditor () {
 
@@ -23,38 +24,10 @@ class iZiCodeEditor : Window {
         set_titlebar (header) ;
 
         var label = new Label (null) ;
-        label.set_label ("Untitled") ;
+        label.set_label ("Untitled 1") ;
 
         var leftIcons = new Box (Orientation.HORIZONTAL, 0) ;
         var rightIcons = new Box (Orientation.HORIZONTAL, 0) ;
-
-        var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
-        openButton.clicked.connect (() => {
-            if( on_open () == true ){
-                header.set_title (fileName) ;
-                header.set_subtitle (fileLocation) ;
-                label.set_label (fileName) ;
-            }
-        }) ;
-
-        var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
-        newButton.clicked.connect (() => {
-        }) ;
-
-        var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
-
-        var menuButton = new Button.from_icon_name ("open-menu-symbolic", IconSize.BUTTON) ;
-
-        leftIcons.pack_start (openButton, false, false, 0) ;
-        leftIcons.pack_start (newButton, false, false, 0) ;
-        leftIcons.get_style_context ().add_class ("linked") ;
-
-        rightIcons.pack_start (saveButton, false, false, 0) ;
-        rightIcons.pack_start (menuButton, false, false, 0) ;
-        rightIcons.get_style_context ().add_class ("linked") ;
-
-        header.pack_start (leftIcons) ;
-        header.pack_end (rightIcons) ;
 
         var notebook = new Notebook () ;
         this.add (notebook) ;
@@ -85,6 +58,104 @@ class iZiCodeEditor : Window {
 
         notebook.append_page (vbox, label) ;
 
+        var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
+        openButton.clicked.connect (() => {
+            if( on_open () == true ){
+                header.set_title (fileName) ;
+                header.set_subtitle (fileLocation) ;
+                label.set_label (fileName) ;
+            }
+        }) ;
+
+        var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
+        newButton.clicked.connect (() => {
+        }) ;
+
+        var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
+        saveButton.clicked.connect (() => {
+            save () ;
+            header.set_title (fileName) ;
+            header.set_subtitle (fileLocation) ;
+            label.set_label (fileName) ;
+        }) ;
+
+        var menuButton = new Button.from_icon_name ("open-menu-symbolic", IconSize.BUTTON) ;
+
+        var grid = new Grid () ;
+
+        grid.set_column_spacing (10) ;
+        grid.set_margin_top (10) ;
+        grid.set_margin_end (10) ;
+        grid.set_margin_bottom (10) ;
+        grid.set_margin_start (10) ;
+
+        var saveas_button = new Button.with_label ("Save as") ;
+        saveas_button.get_style_context ().add_class (STYLE_CLASS_FLAT) ;
+        saveas_button.clicked.connect (saveas) ;
+        saveas_button.get_child ().set_halign (Gtk.Align.START) ;
+
+        grid.attach (saveas_button, 0, 0, 1, 1) ;
+        grid.show_all () ;
+
+        var popover = new Popover (menuButton) ;
+        popover.add (grid) ;
+
+        menuButton.clicked.connect (() => {
+            popover.set_visible (true) ;
+        }) ;
+
+        leftIcons.pack_start (openButton, false, false, 0) ;
+        leftIcons.pack_start (newButton, false, false, 0) ;
+        leftIcons.get_style_context ().add_class ("linked") ;
+
+        rightIcons.pack_start (saveButton, false, false, 0) ;
+        rightIcons.pack_start (menuButton, false, false, 0) ;
+        rightIcons.get_style_context ().add_class ("linked") ;
+
+        header.pack_start (leftIcons) ;
+        header.pack_end (rightIcons) ;
+    }
+
+    public void saveas() {
+        var chooser = new FileChooserDialog ("Save As",
+                                             (Window) this.get_toplevel (),
+                                             FileChooserAction.SAVE,
+                                             "_Cancel",
+                                             ResponseType.CANCEL,
+                                             "_Save",
+                                             ResponseType.ACCEPT) ;
+        chooser.select_multiple = false ;
+        if( chooser.run () == ResponseType.ACCEPT ){
+            file = new SourceFile () ;
+            file.location = chooser.get_file () ;
+            fileLocation = file.location.get_path () ;
+            fileName = file.location.get_basename () ;
+            chooser.destroy () ;
+            unsaved = false ;
+            save () ;
+        } else {
+            chooser.destroy () ;
+            return ;
+        }
+    }
+
+    public void save() {
+        if( unsaved ){
+            saveas () ;
+            return ;
+        }
+        var source_file_saver = new SourceFileSaver (buffer, file) ;
+        buffer.set_modified (false) ;
+        source_file_saver.save_async.begin (Priority.DEFAULT, null, () => {
+            var lm = new SourceLanguageManager () ;
+            var language = lm.guess_language (file.location.get_path (), null) ;
+            if( language != null ){
+                buffer.language = language ;
+                buffer.highlight_syntax = true ;
+            } else {
+                buffer.highlight_syntax = false ;
+            }
+        }) ;
     }
 
     bool on_open() {
@@ -95,16 +166,19 @@ class iZiCodeEditor : Window {
             "_Open",
             ResponseType.ACCEPT) ;
         chooser.set_select_multiple (false) ;
-        chooser.run () ;
-        chooser.close () ;
-
-        if( chooser.get_file () != null ){
+        if( chooser.run () == ResponseType.ACCEPT ){
             file = new SourceFile () ;
             file.location = chooser.get_file () ;
-
             fileLocation = file.location.get_path () ;
             fileName = file.location.get_basename () ;
+            chooser.destroy () ;
+        } else {
+            chooser.destroy () ;
+            return false ;
+        }
 
+        var file_loader = new SourceFileLoader (source_view.buffer as SourceBuffer, file) ;
+        file_loader.load_async.begin (Priority.DEFAULT, null, () => {
             var lm = new SourceLanguageManager () ;
             var language = lm.guess_language (file.location.get_path (), null) ;
 
@@ -114,16 +188,9 @@ class iZiCodeEditor : Window {
             } else {
                 buffer.highlight_syntax = false ;
             }
+        }) ;
 
-            var file_loader = new SourceFileLoader (source_view.buffer as SourceBuffer, file) ;
-            try {
-                file_loader.load_async.begin (Priority.DEFAULT, null, null) ;
-            } catch ( Error e ){
-                stderr.printf ("Error: %s\n", e.message) ;
-            }
-            return true ;
-        }
-        return false ;
+        return true ;
     }
 
     static int main(string[] args) {
