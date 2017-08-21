@@ -10,7 +10,14 @@ class iZiCodeEditor : Window {
     string fileLocation ;
     bool unsaved = true ;
 
-    iZiCodeEditor () {
+    private static GLib.Settings _settings = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor") ;
+    public static GLib.Settings settings {
+        get {
+            return _settings ;
+        }
+    }
+
+    public iZiCodeEditor () {
 
         var header = new HeaderBar () ;
         header.set_show_close_button (true) ;
@@ -38,15 +45,39 @@ class iZiCodeEditor : Window {
         source_view.indent = 2 ;
         source_view.monospace = true ;
         source_view.buffer.text = "" ;
-        source_view.auto_indent = true ;
-        source_view.indent_on_tab = true ;
-        source_view.show_line_numbers = true ;
-        source_view.highlight_current_line = true ;
+        // source_view.auto_indent = true ;
+        // source_view.indent_on_tab = true ;
+        // source_view.show_line_numbers = true ;
+        // source_view.highlight_current_line = true ;
+        // source_view.smart_home_end = SourceSmartHomeEndType.BEFORE ;
+        // source_view.auto_indent = true ;
+        // source_view.show_right_margin = false ;
+        // buffer.set_style_scheme (SourceStyleSchemeManager.get_default ().get_scheme ("classic")) ;
+        // buffer.highlight_syntax = true ;
+
+        /* Bind Prefrences */
+        // Bind auto-indent option
+        settings.bind ("auto-indent", source_view, "auto_indent", SettingsBindFlags.DEFAULT) ;
+        settings.changed["indent-width"].connect (() => {
+            source_view.indent_width = (settings.get_int ("indent-width")) ;
+        }) ;                                    // Bind tab indent setting
+        settings.bind ("indent-on-tab", source_view, "indent_on_tab", SettingsBindFlags.DEFAULT) ;
+
+        // Bind the line number margin prefrence
+        settings.bind ("show-line-numbers", source_view, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
+        settings.bind ("highlight-current-line", source_view, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
         source_view.smart_home_end = SourceSmartHomeEndType.BEFORE ;
-        source_view.auto_indent = true ;
-        source_view.show_right_margin = false ;
-        buffer.set_style_scheme (SourceStyleSchemeManager.get_default ().get_scheme ("classic")) ;
-        buffer.highlight_syntax = true ;
+        settings.bind ("show-right-margin", source_view, "show_right_margin", SettingsBindFlags.DEFAULT) ;
+        settings.bind ("spaces-instead-of-tabs", source_view, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
+        buffer.set_style_scheme (SourceStyleSchemeManager.get_default ().get_scheme (settings.get_string ("color-scheme"))) ;
+        settings.changed["color-scheme"].connect (() => {
+            buffer.set_style_scheme (SourceStyleSchemeManager.get_default ().get_scheme (settings.get_string ("color-scheme"))) ;
+        }) ;
+        settings.changed["right-margin-position"].connect (() => {
+            source_view.right_margin_position = (settings.get_int ("right-margin-position")) ;
+        }) ;
+        /* Bind Prefrences */
+
         language_manager = SourceLanguageManager.get_default () ;
 
         var scrolled_window = new ScrolledWindow (null, null) ;

@@ -1,0 +1,61 @@
+<schemalist>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor" path="/com/github/danielpinto8zz6/iZiCodeEditor/" gettext-domain="iZiCodeEditor">
+    <key name='color-scheme' type='s'>
+      <default>'cobalt'</default>
+      <summary>Gtk.SourceView Theme</summary>
+      <description>
+        The name of a GtkSouceView theme to use to style the text area
+      </description>
+    </key>
+    <key name='auto-indent' type='b'>
+      <default>true</default>
+      <summary>Autoindent code</summary>
+      <description>
+        When enabled Ennio will attemp to indent code automatically
+      </description>
+    </key>
+    <key name="indent-width" type="i">
+      <default>4</default>
+      <summary>Tab Size</summary>
+      <description>Specifies the number of spaces that should be displayed instead of Tab characters.</description>
+    </key>
+    <key name='highlight-current-line' type='b'>
+      <default>true</default>
+      <summary>Highlight active line</summary>
+      <description>
+        When enabled Ennio will highlight the current line
+      </description>
+    </key>
+    <key name='show-right-margin' type='b'>
+      <default>true</default>
+      <summary>Show page margin</summary>
+      <description>
+        Display a vertical bar 80 charecters accross Helps with languages such as Python where it's good practice to keep lines less than 80 charecters long
+      </description>
+    </key>
+    <key name="spaces-instead-of-tabs" type="b">
+      <default>true</default>
+      <summary>Use spaces instead of tabs</summary>
+      <description>Whether should replace tabs with spaces</description>
+    </key>
+    <key name='show-line-numbers' type='b'>
+      <default>true</default>
+      <summary>Number lines</summary>
+      <description>
+        Show line numbers down the left of the screen
+      </description>
+    </key>
+    <key name='indent-on-tab' type='b'>
+      <default>true</default>
+      <summary>Multiline Indent</summary>
+      <description>
+        When multiple lines are selected indent them using the tab key
+      </description>
+    </key>
+    <key name="right-margin-position" type="i">
+      <default>80</default>
+      <summary>Right margin position</summary>
+      <description>Specifies the right margin position.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -6,3 +6,4 @@ gtk = dependency('gtk+-3.0')
 sourceview = dependency('gtksourceview-3.0')
 
 subdir('src')
+subdir('data')
