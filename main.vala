@@ -14,21 +14,31 @@ class iZiCodeEditor : Window {
         var header = new HeaderBar () ;
         header.set_show_close_button (true) ;
         header.set_title ("iZiCodeEditor") ;
+        header.set_has_subtitle (true) ;
 
         this.window_position = WindowPosition.CENTER ;
+        this.title = "iZiCodeEditor" ;
+        this.icon_name = "accessories-text-editor" ;
         set_default_size (800, 500) ;
         set_titlebar (header) ;
+
+        var label = new Label (null) ;
+        label.set_label ("Untitled") ;
 
         var leftIcons = new Box (Orientation.HORIZONTAL, 0) ;
         var rightIcons = new Box (Orientation.HORIZONTAL, 0) ;
 
         var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
-        openButton.clicked.connect (on_open) ;
+        openButton.clicked.connect (() => {
+            if( on_open () == true ){
+                header.set_title (fileName) ;
+                header.set_subtitle (fileLocation) ;
+                label.set_label (fileName) ;
+            }
+        }) ;
 
         var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
         newButton.clicked.connect (() => {
-            header.set_title (fileName) ;
-            header.set_subtitle (fileLocation) ;
         }) ;
 
         var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
@@ -73,12 +83,11 @@ class iZiCodeEditor : Window {
         var vbox = new Box (Orientation.VERTICAL, 0) ;
         vbox.pack_start (scrolled_window, true, true, 0) ;
 
-        var label = new Label (null) ;
-        label.set_label ("Example") ;
         notebook.append_page (vbox, label) ;
+
     }
 
-    void on_open() {
+    bool on_open() {
         FileChooserDialog chooser = new FileChooserDialog (
             "Select a file to edit", this, FileChooserAction.OPEN,
             "_Cancel",
@@ -112,7 +121,9 @@ class iZiCodeEditor : Window {
             } catch ( Error e ){
                 stderr.printf ("Error: %s\n", e.message) ;
             }
+            return true ;
         }
+        return false ;
     }
 
     static int main(string[] args) {
