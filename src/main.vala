@@ -60,7 +60,7 @@ class iZiCodeEditor : Window {
         settings.bind ("auto-indent", source_view, "auto_indent", SettingsBindFlags.DEFAULT) ;
         settings.changed["indent-width"].connect (() => {
             source_view.indent_width = (settings.get_int ("indent-width")) ;
-        }) ;                                    // Bind tab indent setting
+        }) ; // Bind tab indent setting
         settings.bind ("indent-on-tab", source_view, "indent_on_tab", SettingsBindFlags.DEFAULT) ;
 
         // Bind the line number margin prefrence
@@ -121,11 +121,23 @@ class iZiCodeEditor : Window {
         grid.set_margin_start (10) ;
 
         var saveas_button = new Button.with_label ("Save as") ;
-        saveas_button.get_style_context ().add_class (STYLE_CLASS_FLAT) ;
         saveas_button.clicked.connect (saveas) ;
         saveas_button.get_child ().set_halign (Gtk.Align.START) ;
 
-        grid.attach (saveas_button, 0, 0, 1, 1) ;
+        var dark_label = new Gtk.Label ("Use dark variant") ;
+        var dark_toggle = new Switch () ;
+
+        dark_toggle.notify["active"].connect (() => {
+            if( dark_toggle.active ){
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", true) ;
+            } else {
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", false) ;
+            }
+        }) ;
+
+        grid.attach (dark_label, 0, 0, 1, 1) ;
+        grid.attach (dark_toggle, 1, 0, 1, 1) ;
+        grid.attach (saveas_button, 0, 1, 1, 1) ;
         grid.show_all () ;
 
         var popover = new Popover (menuButton) ;
