@@ -7,6 +7,7 @@ namespace iZiCodeEditor{
     private Gtk.HeaderBar header ;
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
+            { "next-page", next_page },
             { "undo", action_undo },
             { "redo", action_redo },
             { "open", action_open },
@@ -27,6 +28,7 @@ namespace iZiCodeEditor{
         public void add_main_window(Gtk.Application app) {
 
             app.add_action_entries (action_entries, app) ;
+            app.set_accels_for_action ("app.next-page", { "<Primary>Tab" }) ;
             app.set_accels_for_action ("app.show-menu", { "F10" }) ;
             app.set_accels_for_action ("app.undo", { "<Primary>Z" }) ;
             app.set_accels_for_action ("app.redo", { "<Primary>Y" }) ;
@@ -127,6 +129,14 @@ namespace iZiCodeEditor{
                 action_quit () ;
                 return true ;
             }) ;
+        }
+
+        private void next_page() {
+            if( (notebook.get_current_page () + 1) == notebook.get_n_pages () ){
+                notebook.set_current_page (0) ;
+            } else {
+                notebook.next_page () ;
+            }
         }
 
         private void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
