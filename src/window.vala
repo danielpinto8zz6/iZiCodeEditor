@@ -5,6 +5,8 @@ namespace iZiCodeEditor{
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
     private Gtk.HeaderBar header ;
+    private Gtk.Button searchButton ;
+
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
             { "next-page", next_page },
@@ -78,6 +80,7 @@ namespace iZiCodeEditor{
             notebook.set_scrollable (true) ;
             notebook.switch_page.connect (on_notebook_page_switched) ;
             notebook.page_reordered.connect (on_page_reordered) ;
+
             // window
             window = new Gtk.ApplicationWindow (app) ;
             window.window_position = Gtk.WindowPosition.CENTER ;
@@ -98,6 +101,7 @@ namespace iZiCodeEditor{
 
             var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
             var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
+            searchButton = new Button.from_icon_name ("search-symbolic", IconSize.BUTTON) ;
             var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
 
             var menuButton = new Gtk.MenuButton () ;
@@ -109,11 +113,13 @@ namespace iZiCodeEditor{
             openButton.clicked.connect (action_open) ;
             newButton.clicked.connect (action_new) ;
             saveButton.clicked.connect (action_save) ;
+            searchButton.clicked.connect (action_find) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;
             leftIcons.get_style_context ().add_class ("linked") ;
 
+            rightIcons.pack_start (searchButton, false, false, 0) ;
             rightIcons.pack_start (saveButton, false, false, 0) ;
             rightIcons.pack_start (menuButton, false, false, 0) ;
             rightIcons.get_style_context ().add_class ("linked") ;

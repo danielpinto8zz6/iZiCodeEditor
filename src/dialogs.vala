@@ -30,9 +30,10 @@ namespace iZiCodeEditor{
             var dialog = new Gtk.MessageDialog (window,
                                                 Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
                                                 "The file '%s' is not saved.\nDo you want to save it before closing?", path) ;
-            dialog.add_button ("Close Without Saving", Gtk.ResponseType.NO) ;
+            dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
             dialog.add_button ("Save", Gtk.ResponseType.YES) ;
+            dialog.set_title ("Question");
             dialog.set_resizable (false) ;
             dialog.set_default_response (Gtk.ResponseType.YES) ;
             int response = dialog.run () ;
@@ -112,7 +113,7 @@ namespace iZiCodeEditor{
             var dialog = new Gtk.MessageDialog (window,
                                                 Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE,
                                                 "Error saving file %s.\nThe file on disk may now be truncated!", path) ;
-            dialog.add_button ("Close Without Saving", Gtk.ResponseType.NO) ;
+            dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Select New Location", Gtk.ResponseType.YES) ;
             dialog.set_resizable (false) ;
             dialog.set_title ("Error") ;

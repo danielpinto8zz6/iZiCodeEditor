@@ -2,64 +2,43 @@ namespace iZiCodeEditor{
     public class Find : Gtk.Dialog {
         private Gtk.Entry entry ;
         private Gtk.SourceSearchContext context ;
+        private Gtk.Popover popover ;
+        private Gtk.Box buttonBox ;
 
         public void show_dialog() {
             if( notebook.get_n_pages () == 0 ){
                 return ;
             }
 
-            var dialog = new Gtk.Dialog () ;
-            dialog.set_transient_for (window) ;
-            dialog.set_border_width (5) ;
-            dialog.set_property ("skip-taskbar-hint", true) ;
-            dialog.set_resizable (false) ;
+            popover = new Gtk.Popover (searchButton) ;
 
-            var header = new Gtk.HeaderBar () ;
-            header.set_show_close_button (true) ;
-            header.set_title ("Find") ;
-            dialog.set_titlebar (header) ;
-
-            var label_sch = new Gtk.Label.with_mnemonic ("Search for:") ;
             entry = new Gtk.Entry () ;
-            var grid = new Gtk.Grid () ;
-            grid.set_column_spacing (30) ;
-            grid.set_row_spacing (10) ;
-            grid.set_border_width (10) ;
-            grid.set_row_homogeneous (true) ;
-            grid.attach (label_sch, 0, 0, 1, 1) ;
-            grid.attach (entry, 1, 0, 7, 1) ;
-            grid.show_all () ;
-            var content = dialog.get_content_area () as Gtk.Container ;
-            content.add (grid) ;
-            dialog.add_button ("Close", 1) ;
-            dialog.add_button ("Previous", 2) ;
-            dialog.add_button ("Next", 3) ;
-            dialog.delete_event.connect (() => {
+
+            var nextButton = new Gtk.Button.from_icon_name ("go-next-symbolic", Gtk.IconSize.BUTTON) ;
+            var prevButton = new Gtk.Button.from_icon_name ("go-previous-symbolic", Gtk.IconSize.BUTTON) ;
+
+            buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
+            buttonBox.get_style_context ().add_class ("linked") ;
+            buttonBox.pack_start (entry, false, false, 0) ;
+            buttonBox.pack_start (prevButton, false, false, 0) ;
+            buttonBox.pack_start (nextButton, false, false, 0) ;
+            buttonBox.border_width = 6 ;
+            popover.delete_event.connect (() => {
                 context.set_highlight (false) ;
-                dialog.destroy () ;
+                popover.destroy () ;
                 return true ;
             }) ;
-            dialog.response.connect (on_response) ;
-            dialog.show_all () ;
-            // signals
+
+            nextButton.clicked.connect (forward) ;
+            prevButton.clicked.connect (backward) ;
+
             entry.changed.connect (forward_on_changed) ;
             entry.activate.connect (forward) ;
             entry_start_text () ;
-        }
 
-        private void on_response(Gtk.Dialog dialog, int response) {
-            switch( response ){
-            case 1:
-                context.set_highlight (false) ;
-                dialog.destroy () ;
-                break ;
-            case 2:
-                backward () ;
-                break ;
-            case 3:
-                forward () ;
-                break ;
-            }
+            popover.add (buttonBox) ;
+            popover.show_all () ;
+
         }
 
         // Set entry text from selection
@@ -150,13 +129,13 @@ namespace iZiCodeEditor{
         // Change entry color
         private void on_found_entry_color() {
             var rgba = Gdk.RGBA () ;
-            rgba.parse ("#000000") ;
+            rgba.parse ("black") ;
             entry.override_color (Gtk.StateFlags.NORMAL, rgba) ;
         }
 
         private void on_not_found_entry_color() {
             var rgba = Gdk.RGBA () ;
-            rgba.parse ("#FF6666") ;
+            rgba.parse ("red") ;
             entry.override_color (Gtk.StateFlags.NORMAL, rgba) ;
         }
 
