@@ -1,61 +1,85 @@
 <schemalist>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor" path="/com/github/danielpinto8zz6/iZiCodeEditor/" gettext-domain="iZiCodeEditor">
-    <key name='color-scheme' type='s'>
-      <default>'cobalt'</default>
-      <summary>Gtk.SourceView Theme</summary>
-      <description>
-        The name of a GtkSouceView theme to use to style the text area
-      </description>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor" path="/com/github/danielpinto8zz6/iZiCodeEditor/">
+    <key name="width" type="i">
+      <default>900</default>
+      <summary>width</summary>
+      <description>Main window width</description>
     </key>
-    <key name='auto-indent' type='b'>
-      <default>true</default>
-      <summary>Autoindent code</summary>
-      <description>
-        When enabled Ennio will attemp to indent code automatically
-      </description>
+    <key name="height" type="i">
+      <default>600</default>
+      <summary>height</summary>
+      <description>Main window heigth</description>
     </key>
-    <key name="indent-width" type="i">
+    <key name="maximized" type="b">
+      <default>false</default>
+      <summary>Maximized</summary>
+      <description>Main window maximized</description>
+    </key>
+    <key name="font" type="s">
+      <default>'Monospace 14'</default>
+      <summary>font</summary>
+      <description>Editor font</description>
+    </key>    
+    <key name="scheme" type="s">
+      <default>'kate'</default>
+      <summary>scheme</summary>
+      <description>Color scheme</description>
+    </key>    
+    <key name="margin-pos" type="u">
+      <default>75</default>
+      <summary>margin-pos</summary>
+      <description>Margin width</description>
+    </key>      
+    <key name="indent-size" type="i">
       <default>4</default>
-      <summary>Tab Size</summary>
-      <description>Specifies the number of spaces that should be displayed instead of Tab characters.</description>
+      <summary>indent-size</summary>
+      <description>Indent width</description>
+    </key>    
+    <key name="tab-size" type="u">
+      <default>4</default>
+      <summary>tab-size</summary>
+      <description>Tab width</description>
     </key>
-    <key name='highlight-current-line' type='b'>
+    <key name="numbers-show" type="b">
       <default>true</default>
-      <summary>Highlight active line</summary>
-      <description>
-        When enabled Ennio will highlight the current line
-      </description>
+      <summary>numbers-show</summary>
+      <description>Show line numbers</description>
     </key>
-    <key name='show-right-margin' type='b'>
+    <key name="highlight" type="b">
       <default>true</default>
-      <summary>Show page margin</summary>
-      <description>
-        Display a vertical bar 80 charecters accross Helps with languages such as Python where it's good practice to keep lines less than 80 charecters long
-      </description>
+      <summary>highlight</summary>
+      <description>Highlight current line</description>
     </key>
-    <key name="spaces-instead-of-tabs" type="b">
+    <key name="margin-show" type="b">
       <default>true</default>
-      <summary>Use spaces instead of tabs</summary>
-      <description>Whether should replace tabs with spaces</description>
-    </key>
-    <key name='show-line-numbers' type='b'>
+      <summary>margin-show</summary>
+      <description>Show margin on right</description>
+    </key>    
+    
+    <key name="spaces" type="b">
       <default>true</default>
-      <summary>Number lines</summary>
-      <description>
-        Show line numbers down the left of the screen
-      </description>
+      <summary>spaces</summary>
+      <description>Insert spaces instead of tabs</description>
     </key>
-    <key name='indent-on-tab' type='b'>
+    <key name="auto-indent" type="b">
       <default>true</default>
-      <summary>Multiline Indent</summary>
-      <description>
-        When multiple lines are selected indent them using the tab key
-      </description>
+      <summary>auto-indent</summary>
+      <description>Auto indentation of text</description>
     </key>
-    <key name="right-margin-position" type="i">
-      <default>80</default>
-      <summary>Right margin position</summary>
-      <description>Specifies the right margin position.</description>
+    <key name="pattern-show" type="b">
+      <default>true</default>
+      <summary>pattern-show</summary>
+      <description>Show grid pattern</description>
     </key>
+    <key name="recent-files" type="as">
+      <default>[]</default>
+      <summary>Recently opened files</summary>
+      <description>Recently opened files</description>
+    </key>
+    <key name="active-tab" type="u">
+      <default>0</default>
+      <summary>active-tab</summary>
+      <description>Active tab position</description>
+    </key>       
   </schema>
 </schemalist>

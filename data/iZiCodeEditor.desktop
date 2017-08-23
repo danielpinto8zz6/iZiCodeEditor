@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=iZiCodeEditor
+Comment=Simple text editor
+Exec=iZiCodeEditor %F
+Icon=accessories-text-editor
+Terminal=false
+Categories=GTK;Development;
+MimeType=text/plain;application/x-desktop;application/xml;application/x-shellscript
+StartupNotify=true

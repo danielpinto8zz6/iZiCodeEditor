@@ -1,5 +1,15 @@
 vala_sources = [
-    'main.vala',
+    'application.vala',
+    'find.vala',
+    'operations.vala',
+    'settings.vala',
+    'apply.vala', 
+    'preferences.vala',
+    'tabs.vala',
+    'dialogs.vala',
+    'notebook.vala',
+    'replace.vala',
+    'window.vala'
 ]
 
 vala_args = [
