@@ -23,10 +23,8 @@ namespace iZiCodeEditor{
             buttonBox.pack_start (prevButton, false, false, 0) ;
             buttonBox.pack_start (nextButton, false, false, 0) ;
             buttonBox.border_width = 6 ;
-            popover.delete_event.connect (() => {
+            popover.closed.connect (() => {
                 context.set_highlight (false) ;
-                popover.destroy () ;
-                return true ;
             }) ;
 
             nextButton.clicked.connect (forward) ;
