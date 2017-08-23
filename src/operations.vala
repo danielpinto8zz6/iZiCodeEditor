@@ -163,6 +163,5 @@ namespace iZiCodeEditor{
             var view = tabs.get_current_sourceview () ;
             view.redo () ;
         }
-
     }
 }

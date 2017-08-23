@@ -1,6 +1,8 @@
 namespace iZiCodeEditor{
     public class NBook : Gtk.Notebook {
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
+        private Gtk.SourceView tab_view ;
+
 
         public void create_tab(string path) {
             for( int i = 0 ; i < files.length () ; i++ ){
@@ -11,7 +13,7 @@ namespace iZiCodeEditor{
                 }
             }
             // Page
-            var tab_view = new Gtk.SourceView () ;
+            tab_view = new Gtk.SourceView () ;
             // from settings
             tab_view.override_font (Pango.FontDescription.from_string (font)) ;
             tab_view.set_right_margin_position (margin_pos) ;
@@ -31,6 +33,13 @@ namespace iZiCodeEditor{
             tab_view.set_cursor_visible (true) ;
             tab_view.set_left_margin (10) ;
             tab_view.set_smart_backspace (true) ;
+
+            tab_view.key_press_event.connect ((ev) => {
+                if( ev.keyval == 65307 ) // Esc key
+                    searchbar.set_search_mode (false) ;
+                return false ;
+            }) ;
+
             //// drag and drop
             Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
             tab_view.drag_data_received.connect (on_drag_data_received) ;
@@ -92,7 +101,6 @@ namespace iZiCodeEditor{
             notebook.set_tab_reorderable (tab_page, true) ;
             notebook.set_current_page (notebook.get_n_pages () - 1) ;
             notebook.show_all () ;
-            tab_view.grab_focus () ;
             buffer.modified_changed.connect (() => {
                 on_modified_changed (buffer, tab_label, path) ;
             }) ;

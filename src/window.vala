@@ -5,6 +5,8 @@ namespace iZiCodeEditor{
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
     private Gtk.HeaderBar header ;
+    private Gtk.SearchEntry entry ;
+    private Gtk.SearchBar searchbar ;
     private Gtk.Button searchButton ;
 
     public class MainWin : Gtk.ApplicationWindow {
@@ -14,7 +16,7 @@ namespace iZiCodeEditor{
             { "redo", action_redo },
             { "open", action_open },
             { "save", action_save },
-            { "find", action_find },
+            { "search", action_search },
             { "new", action_new },
             { "save-as", action_save_as },
             { "save-all", action_save_all },
@@ -38,7 +40,7 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.save", { "<Primary>S" }) ;
             app.set_accels_for_action ("app.new", { "<Primary>N" }) ;
             app.set_accels_for_action ("app.save-all", { "<Primary><Shift>S" }) ;
-            app.set_accels_for_action ("app.find", { "<Primary>F" }) ;
+            app.set_accels_for_action ("app.search", { "<Primary>F" }) ;
             app.set_accels_for_action ("app.replace", { "<Primary>H" }) ;
             app.set_accels_for_action ("app.wrap", { "<Primary>R" }) ;
             app.set_accels_for_action ("app.color", { "F9" }) ;
@@ -53,7 +55,7 @@ namespace iZiCodeEditor{
             section.append ("Save All", "app.save-all") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("Find...", "app.find") ;
+            section.append ("Search...", "app.search") ;
             section.append ("Replace...", "app.replace") ;
             section.append ("Text Wrap", "app.wrap") ;
             menu.append_section (null, section) ;
@@ -112,8 +114,8 @@ namespace iZiCodeEditor{
 
             openButton.clicked.connect (action_open) ;
             newButton.clicked.connect (action_new) ;
+            searchButton.clicked.connect (action_replace) ;
             saveButton.clicked.connect (action_save) ;
-            searchButton.clicked.connect (action_find) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;
@@ -127,7 +129,35 @@ namespace iZiCodeEditor{
             header.pack_start (leftIcons) ;
             header.pack_end (rightIcons) ;
 
-            window.add (notebook) ;
+            var search = new iZiCodeEditor.Search () ;
+
+            searchbar = new Gtk.SearchBar () ;
+
+            var nextButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
+            var prevButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
+
+            entry = new Gtk.SearchEntry () ;
+            searchbar.connect_entry (entry) ;
+
+            var searchBox = new Gtk.Box (Orientation.HORIZONTAL, 0) ;
+            searchBox.pack_start (entry, false, true, 0) ;
+            searchBox.pack_start (prevButton, false, false, 0) ;
+            searchBox.pack_start (nextButton, false, false, 0) ;
+            searchBox.get_style_context ().add_class ("linked") ;
+            searchbar.add (searchBox) ;
+
+            nextButton.clicked.connect (search.forward) ;
+            prevButton.clicked.connect (search.backward) ;
+
+            entry.changed.connect (search.forward_on_changed) ;
+            entry.activate.connect (search.forward) ;
+            entry.key_press_event.connect (search.on_search_entry_key_press) ;
+
+            var mainGrid = new Gtk.Grid () ;
+            mainGrid.attach (notebook, 0, 0, 1, 1) ;
+            mainGrid.attach (searchbar, 0, 1, 1, 1) ;
+
+            window.add (mainGrid) ;
 
             window.show_all () ;
 
@@ -199,9 +229,12 @@ namespace iZiCodeEditor{
             operations.save_current () ;
         }
 
-        private void action_find() {
-            var find = new iZiCodeEditor.Find () ;
-            find.show_dialog () ;
+        private void action_search() {
+            if( notebook.get_n_pages () == 0 ){
+                return ;
+            }
+            searchbar.set_search_mode (true) ;
+            entry.grab_focus_without_selecting () ;
         }
 
         // gear menu
@@ -221,7 +254,7 @@ namespace iZiCodeEditor{
         }
 
         private void action_replace() {
-            var replace = new iZiCodeEditor.Replace () ;
+            var replace = new iZiCodeEditor.Search () ;
             replace.show_dialog () ;
         }
 
