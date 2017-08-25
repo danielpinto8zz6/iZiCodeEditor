@@ -9,7 +9,7 @@ namespace iZiCodeEditor{
     private Gtk.SearchBar searchbar ;
     private Gtk.Button searchButton ;
     private Gtk.Button recentsButton ;
-    int untitledNumber = 0 ;
+    private int untitledNumber = 0 ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -144,9 +144,10 @@ namespace iZiCodeEditor{
             var search = new iZiCodeEditor.Search () ;
 
             searchbar = new Gtk.SearchBar () ;
+            searchbar.set_show_close_button (true) ;
 
-            var nextButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
-            var prevButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
+            var nextButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
+            var prevButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
 
             entry = new Gtk.SearchEntry () ;
             searchbar.connect_entry (entry) ;
@@ -167,13 +168,24 @@ namespace iZiCodeEditor{
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
-            mainBox.pack_start (notebook, false, true, 0) ;
-            mainBox.pack_start (searchbar, false, true, 0) ;
+            // Alignment:
+            Gtk.Alignment alignment = new Gtk.Alignment (0.5f, 0.5f, 0, 0) ;
+            alignment.add (searchbar) ;
 
+            mainBox.pack_start (notebook, false, true, 0) ;
+            mainBox.pack_start (alignment, false, false, 0) ;
 
             window.add (mainBox) ;
 
             window.show_all () ;
+
+            // File file = File.new_for_path ("/home/daniel/test.txt") ;
+            // FileMonitor monitor = file.monitor_file (FileMonitorFlags.NONE, null) ;
+            // print ("Monitoring: %s\n", file.get_path ()) ;
+            //
+            // monitor.changed.connect (() => {
+            // print ("nice") ;
+            // }) ;
 
             window.delete_event.connect (() => {
                 action_quit () ;

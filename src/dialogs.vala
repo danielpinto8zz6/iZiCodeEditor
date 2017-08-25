@@ -13,8 +13,12 @@ namespace iZiCodeEditor{
                 string cf = tabs.get_current_path () ;
                 chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
+            var filter = new Gtk.FileFilter () ;
+            filter.add_mime_type ("text/plain") ;
+
             chooser.set_select_multiple (false) ;
             chooser.set_modal (true) ;
+            chooser.set_filter (filter) ;
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
                 selected = chooser.get_filename () ;
