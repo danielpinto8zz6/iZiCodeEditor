@@ -9,6 +9,7 @@ namespace iZiCodeEditor{
     private Gtk.SearchBar searchbar ;
     private Gtk.Button searchButton ;
     private Gtk.Button recentsButton ;
+    int untitledNumber = 0 ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -164,11 +165,13 @@ namespace iZiCodeEditor{
             entry.activate.connect (search.forward) ;
             entry.key_press_event.connect (search.on_search_entry_key_press) ;
 
-            var mainGrid = new Gtk.Grid () ;
-            mainGrid.attach (notebook, 0, 0, 1, 1) ;
-            mainGrid.attach (searchbar, 0, 1, 1, 1) ;
+            var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
-            window.add (mainGrid) ;
+            mainBox.pack_start (notebook, false, true, 0) ;
+            mainBox.pack_start (searchbar, false, true, 0) ;
+
+
+            window.add (mainBox) ;
 
             window.show_all () ;
 
@@ -255,8 +258,11 @@ namespace iZiCodeEditor{
 
         // gear menu
         private void action_new() {
+            untitledNumber++ ;
+            string number = untitledNumber.to_string () ;
+            string path = "/tmp/untitled_".concat (number) ;
             var nbook = new iZiCodeEditor.NBook () ;
-            nbook.create_tab ("/tmp/untitled") ;
+            nbook.create_tab (path) ;
         }
 
         private void action_save_as() {

@@ -69,6 +69,11 @@ namespace iZiCodeEditor{
             var view = tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string cf = tabs.get_current_path () ;
+            // if( cf == "/tmp/untitled" ){
+            //     var dialogs = new iZiCodeEditor.Dialogs () ;
+            //     dialogs.show_save () ;
+            //     return ;
+            // }
             save_from_buffer (cf, buffer) ;
             view.grab_focus () ;
         }
@@ -100,6 +105,11 @@ namespace iZiCodeEditor{
             var view = tabs.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = tabs.get_path_at_tab (pos) ;
+            // if( path == "/tmp/untitled" ){
+            //     var dialogs = new iZiCodeEditor.Dialogs () ;
+            //     dialogs.show_save () ;
+            //     return ;
+            // }
             save_from_buffer (path, buffer) ;
             view.grab_focus () ;
         }
@@ -163,5 +173,6 @@ namespace iZiCodeEditor{
             var view = tabs.get_current_sourceview () ;
             view.redo () ;
         }
+
     }
 }

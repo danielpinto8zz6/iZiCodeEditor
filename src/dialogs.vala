@@ -148,6 +148,8 @@ namespace iZiCodeEditor{
 
         public void show_recents() {
 
+            string fileopen = null ;
+
             var popover = new Gtk.Popover (recentsButton) ;
 
             Gtk.RecentChooserWidget chooser = new Gtk.RecentChooserWidget () ;
@@ -165,23 +167,17 @@ namespace iZiCodeEditor{
 
             chooser.selection_changed.connect (() => {
                 string uri = chooser.get_current_uri () ;
-                load_recents (uri) ;
-
+                fileopen = uri.replace ("file://", "") ;
+                fileopen = Uri.unescape_string (fileopen) ;
+                var nbook = new iZiCodeEditor.NBook () ;
+                var operations = new iZiCodeEditor.Operations () ;
+                nbook.create_tab (fileopen) ;
+                operations.open_file (fileopen) ;
             }) ;
 
             popover.add (chooser) ;
 
             popover.show_all () ;
-
-        }
-
-        private void load_recents(string uri) {
-
-            string selected = Filename.from_uri (uri) ;
-            var nbook = new iZiCodeEditor.NBook () ;
-            var operations = new iZiCodeEditor.Operations () ;
-            nbook.create_tab (selected) ;
-            operations.open_file (selected) ;
 
         }
 

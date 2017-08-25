@@ -21,8 +21,9 @@ namespace iZiCodeEditor{
 
         public override void activate() {
             if( files.length () == 0 ){
+                untitledNumber++ ;
                 string fileopen = GLib.Path.build_filename (GLib.Environment.get_tmp_dir (),
-                                                            "untitled") ;
+                                                            "untitled_1") ;
                 var nbook = new iZiCodeEditor.NBook () ;
                 nbook.create_tab (fileopen) ;
             }
