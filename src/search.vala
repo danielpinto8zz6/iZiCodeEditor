@@ -161,9 +161,7 @@ namespace iZiCodeEditor{
 
         public void on_not_found_entry_color() {
             if( entry.text == "" ){
-              var rgba = Gdk.RGBA () ;
-              rgba.parse ("black") ;
-              entry.override_color (Gtk.StateFlags.NORMAL, rgba) ;
+                return ;
             }
             var rgba = Gdk.RGBA () ;
             rgba.parse ("red") ;

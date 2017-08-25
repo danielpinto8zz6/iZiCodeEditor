@@ -80,6 +80,11 @@
       <default>0</default>
       <summary>active-tab</summary>
       <description>Active tab position</description>
+    </key> 
+    <key name="darktheme" type="b">
+      <default>false</default>
+      <summary>darktheme</summary>
+      <description>Dark theme variant</description>
     </key>       
   </schema>
 </schemalist>

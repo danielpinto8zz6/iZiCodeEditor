@@ -15,6 +15,7 @@ namespace iZiCodeEditor{
     private bool spaces ;
     private bool auto_indent ;
     private bool pattern_show ;
+    private bool darktheme ;
 
     private string[] recent_files ;
 
@@ -41,6 +42,7 @@ namespace iZiCodeEditor{
             get_pattern_show () ;
             get_recent_files () ;
             get_active_tab () ;
+            get_darktheme () ;
         }
 
         // settings get
@@ -106,6 +108,10 @@ namespace iZiCodeEditor{
 
         public uint get_active_tab() {
             return active_tab = settings.get_uint ("active-tab") ;
+        }
+
+        public bool get_darktheme() {
+            return darktheme = settings.get_boolean ("darktheme") ;
         }
 
         // settings set
@@ -175,6 +181,10 @@ namespace iZiCodeEditor{
 
         public void set_active_tab() {
             settings.set_uint ("active-tab", active_tab) ;
+        }
+
+        public void set_darktheme() {
+            settings.set_boolean ("darktheme", darktheme) ;
         }
 
     }

@@ -13,6 +13,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_spaces ;
         Gtk.Switch button_auto_indent ;
         Gtk.Switch button_pattern_show ;
+        Gtk.Switch button_darktheme ;
 
         public void on_activate() {
 
@@ -28,6 +29,7 @@ namespace iZiCodeEditor{
             var label_spaces = new Gtk.Label ("Insert spaces instead of tabs") ;
             var label_auto_indent = new Gtk.Label ("Text auto indentation") ;
             var label_pattern_show = new Gtk.Label ("Show grid pattern") ;
+            var label_darktheme = new Gtk.Label ("Use dark variant") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_scheme.set_halign (Gtk.Align.START) ;
@@ -40,6 +42,7 @@ namespace iZiCodeEditor{
             label_spaces.set_halign (Gtk.Align.START) ;
             label_auto_indent.set_halign (Gtk.Align.START) ;
             label_pattern_show.set_halign (Gtk.Align.START) ;
+            label_darktheme.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_scheme.set_hexpand (true) ;
@@ -52,6 +55,7 @@ namespace iZiCodeEditor{
             label_spaces.set_hexpand (true) ;
             label_auto_indent.set_hexpand (true) ;
             label_pattern_show.set_hexpand (true) ;
+            label_darktheme.set_hexpand (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -65,6 +69,7 @@ namespace iZiCodeEditor{
             button_spaces = new Gtk.Switch () ;
             button_auto_indent = new Gtk.Switch () ;
             button_pattern_show = new Gtk.Switch () ;
+            button_darktheme = new Gtk.Switch () ;
             // Default values
             button_font.set_font_name (font) ;
             get_styles_list (button_scheme) ;
@@ -77,6 +82,7 @@ namespace iZiCodeEditor{
             button_spaces.set_active (spaces) ;
             button_auto_indent.set_active (auto_indent) ;
             button_pattern_show.set_active (pattern_show) ;
+            button_darktheme.set_active (darktheme) ;
             // Connect signals
             button_font.font_set.connect (on_button_font_changed) ;
             button_scheme.changed.connect (on_button_scheme_changed) ;
@@ -89,6 +95,7 @@ namespace iZiCodeEditor{
             button_spaces.notify["active"].connect (on_button_spaces_changed) ;
             button_auto_indent.notify["active"].connect (on_button_auto_indent_changed) ;
             button_pattern_show.notify["active"].connect (on_button_pattern_show_changed) ;
+            button_darktheme.notify["active"].connect (on_button_darktheme_changed) ;
             // Dialog
             var preferences = new Gtk.Dialog () ;
             preferences.set_title ("Preferences") ;
@@ -135,6 +142,8 @@ namespace iZiCodeEditor{
             grid_view.attach (button_auto_indent, 1, 4, 1, 1) ;
             grid_view.attach (label_pattern_show, 0, 5, 1, 1) ;
             grid_view.attach (button_pattern_show, 1, 5, 1, 1) ;
+            grid_view.attach (label_darktheme, 0, 6, 1, 1) ;
+            grid_view.attach (button_darktheme, 1, 6, 1, 1) ;
             grid_view.set_can_focus (false) ;
             grid_view.set_margin_start (10) ;
             grid_view.set_margin_end (10) ;
@@ -283,6 +292,18 @@ namespace iZiCodeEditor{
             var apply = new iZiCodeEditor.Apply () ;
             settings.set_pattern_show () ;
             apply.set_pattern_show () ;
+        }
+
+        private void on_button_darktheme_changed() {
+            if( button_darktheme.active ){
+                darktheme = true ;
+            } else {
+                darktheme = false ;
+            }
+            var settings = new iZiCodeEditor.Settings () ;
+            var apply = new iZiCodeEditor.Apply () ;
+            settings.set_darktheme () ;
+            apply.set_darktheme () ;
         }
 
     }

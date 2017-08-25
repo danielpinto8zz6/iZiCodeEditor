@@ -8,6 +8,7 @@ namespace iZiCodeEditor{
     private Gtk.SearchEntry entry ;
     private Gtk.SearchBar searchbar ;
     private Gtk.Button searchButton ;
+    private Gtk.Button recentsButton ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -89,6 +90,13 @@ namespace iZiCodeEditor{
             window.set_default_size (width, height) ;
             window.set_icon_name (ICON) ;
 
+            if( darktheme == true ){
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", true) ;
+            } else {
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", false) ;
+
+            }
+
             header = new Gtk.HeaderBar () ;
             header.set_show_close_button (true) ;
             header.set_title (NAME) ;
@@ -103,6 +111,7 @@ namespace iZiCodeEditor{
 
             var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
             var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
+            recentsButton = new Button.from_icon_name ("document-open-recent-symbolic", IconSize.BUTTON) ;
             searchButton = new Button.from_icon_name ("search-symbolic", IconSize.BUTTON) ;
             var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
 
@@ -114,11 +123,13 @@ namespace iZiCodeEditor{
 
             openButton.clicked.connect (action_open) ;
             newButton.clicked.connect (action_new) ;
+            recentsButton.clicked.connect (action_recents) ;
             searchButton.clicked.connect (action_replace) ;
             saveButton.clicked.connect (action_save) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;
+            leftIcons.pack_start (recentsButton, false, false, 0) ;
             leftIcons.get_style_context ().add_class ("linked") ;
 
             rightIcons.pack_start (searchButton, false, false, 0) ;
@@ -222,6 +233,11 @@ namespace iZiCodeEditor{
         private void action_open() {
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_open () ;
+        }
+
+        private void action_recents() {
+            var dialogs = new iZiCodeEditor.Dialogs () ;
+            dialogs.show_recents () ;
         }
 
         private void action_save() {

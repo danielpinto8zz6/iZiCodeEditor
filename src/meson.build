@@ -1,6 +1,6 @@
 vala_sources = [
     'application.vala',
-    'find.vala',
+    'search.vala',
     'operations.vala',
     'settings.vala',
     'apply.vala', 
@@ -8,7 +8,6 @@ vala_sources = [
     'tabs.vala',
     'dialogs.vala',
     'notebook.vala',
-    'replace.vala',
     'window.vala'
 ]
 

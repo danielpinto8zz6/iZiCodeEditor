@@ -33,7 +33,7 @@ namespace iZiCodeEditor{
             dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
             dialog.add_button ("Save", Gtk.ResponseType.YES) ;
-            dialog.set_title ("Question");
+            dialog.set_title ("Question") ;
             dialog.set_resizable (false) ;
             dialog.set_default_response (Gtk.ResponseType.YES) ;
             int response = dialog.run () ;
@@ -144,6 +144,45 @@ namespace iZiCodeEditor{
             about.license_type = Gtk.License.GPL_3_0 ;
             about.run () ;
             about.hide () ;
+        }
+
+        public void show_recents() {
+
+            var popover = new Gtk.Popover (recentsButton) ;
+
+            Gtk.RecentChooserWidget chooser = new Gtk.RecentChooserWidget () ;
+
+            var filter = new Gtk.RecentFilter () ;
+            filter.add_mime_type ("text/plain") ;
+
+            chooser.margin = 5 ;
+            chooser.set_limit (15) ;
+            chooser.set_show_tips (true) ;
+            chooser.set_show_not_found (false) ;
+            chooser.set_show_private (false) ;
+            chooser.set_filter (filter) ;
+            chooser.width_request = 200 ;
+
+            chooser.selection_changed.connect (() => {
+                string uri = chooser.get_current_uri () ;
+                load_recents (uri) ;
+
+            }) ;
+
+            popover.add (chooser) ;
+
+            popover.show_all () ;
+
+        }
+
+        private void load_recents(string uri) {
+
+            string selected = Filename.from_uri (uri) ;
+            var nbook = new iZiCodeEditor.NBook () ;
+            var operations = new iZiCodeEditor.Operations () ;
+            nbook.create_tab (selected) ;
+            operations.open_file (selected) ;
+
         }
 
     }
