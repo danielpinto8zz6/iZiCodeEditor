@@ -11,6 +11,8 @@ namespace iZiCodeEditor{
     private Gtk.Button recentsButton ;
     private int untitledNumber = 0 ;
     private Gtk.Notebook bottomBar ;
+    private Gtk.Notebook rightBar ;
+    private Gtk.Notebook leftBar ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -163,15 +165,50 @@ namespace iZiCodeEditor{
             entry.activate.connect (search.forward) ;
             entry.key_press_event.connect (search.on_search_entry_key_press) ;
 
-            // BottomBar
+            // Bars
 
             bottomBar = new Gtk.Notebook () ;
+            bottomBar.no_show_all = true ;
+            bottomBar.page_added.connect (() => { on_bars_changed (bottomBar) ; }) ;
+            bottomBar.page_removed.connect (() => { on_bars_changed (bottomBar) ; }) ;
+
+            leftBar = new Gtk.Notebook () ;
+            leftBar.no_show_all = true ;
+            leftBar.width_request = 200 ;
+            leftBar.page_added.connect (() => { on_bars_changed (leftBar) ; }) ;
+            leftBar.page_removed.connect (() => { on_bars_changed (leftBar) ; }) ;
+
+
+            rightBar = new Gtk.Notebook () ;
+            rightBar.no_show_all = true ;
+            rightBar.width_request = 200 ;
+            rightBar.page_added.connect (() => { on_bars_changed (rightBar) ; }) ;
+            rightBar.page_removed.connect (() => { on_bars_changed (rightBar) ; }) ;
+
+            var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
+            content.width_request = 200 ;
+            content.pack_start (notebook, true, true, 0) ;
+            content.pack_start (searchbar, false, true, 0) ;
+
+
+            var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
+            leftPane.position = 180 ;
+            // leftPane.pack1 (leftBar, false, false) ;
+            leftPane.pack2 (content, true, false) ;
+
+            var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
+            rightPane.position = (width - 180) ;
+            rightPane.pack1 (leftPane, true, false) ;
+            // rightPane.pack2 (rightBar, false, false) ;
+
+            var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
+            mainPane.position = (height - 150) ;
+            mainPane.pack1 (rightPane, true, false) ;
+            mainPane.pack2 (bottomBar, false, false) ;
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
-            mainBox.pack_start (notebook, false, true, 0) ;
-            mainBox.pack_start (searchbar, false, false, 0) ;
-            mainBox.pack_start (bottomBar, false, true, 0) ;
+            mainBox.pack_start (mainPane, false, true, 0) ;
 
             if( show_terminal == true ){
                 var terminal = new iZiCodeEditor.Terminal () ;
@@ -186,6 +223,13 @@ namespace iZiCodeEditor{
                 action_quit () ;
                 return true ;
             }) ;
+        }
+
+        private void on_bars_changed(Gtk.Notebook notebook) {
+            var pages = notebook.get_n_pages () ;
+            notebook.set_show_tabs (pages > 1) ;
+            notebook.no_show_all = (pages == 0) ;
+            notebook.visible = (pages > 0) ;
         }
 
         private void next_page() {

@@ -40,6 +40,8 @@ namespace iZiCodeEditor{
             terminal.child_exited.connect (() => {
                 bottomBar.remove_page (notebook.page_num (scrolled)) ;
                 show_terminal = false ;
+                var settings = new iZiCodeEditor.Settings () ;
+                settings.set_terminal () ;
             }) ;
         }
 
