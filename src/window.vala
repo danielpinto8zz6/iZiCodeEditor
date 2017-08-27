@@ -92,12 +92,7 @@ namespace iZiCodeEditor{
             window.set_default_size (width, height) ;
             window.set_icon_name (ICON) ;
 
-            if( darktheme == true ){
-                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", true) ;
-            } else {
-                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", false) ;
-
-            }
+            Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", darktheme) ;
 
             header = new Gtk.HeaderBar () ;
             header.set_show_close_button (true) ;
@@ -180,7 +175,7 @@ namespace iZiCodeEditor{
 
             if( show_terminal == true ){
                 var terminal = new iZiCodeEditor.Terminal () ;
-                terminal.show_terminal () ;
+                terminal.show_term () ;
             }
 
             window.add (mainBox) ;

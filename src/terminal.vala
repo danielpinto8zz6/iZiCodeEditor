@@ -4,7 +4,7 @@ namespace iZiCodeEditor{
         private GLib.Pid child_pid ;
         private Vte.Terminal terminal ;
 
-        public void show_terminal() {
+        public void show_term() {
             // Terminal
             terminal = new Vte.Terminal () ;
 
@@ -16,21 +16,31 @@ namespace iZiCodeEditor{
             terminal.expand = true ;
             terminal.set_cursor_blink_mode (Vte.CursorBlinkMode.OFF) ;
             terminal.set_cursor_shape (Vte.CursorShape.UNDERLINE) ;
-            // term.child_exited.connect (action_quit) ;
             terminal.button_press_event.connect (terminal_button_press) ;
             try {
-                terminal.spawn_sync (Vte.PtyFlags.DEFAULT, terminalPath, { Vte.get_user_shell () }, null,
-                                     SpawnFlags.SEARCH_PATH, null, out child_pid) ;
+                terminal.spawn_sync (Vte.PtyFlags.DEFAULT, terminalPath, { Vte.get_user_shell () }, null, GLib.SpawnFlags.SEARCH_PATH, null, out child_pid) ;
             } catch ( Error e ){
                 stderr.printf ("error: %s\n", e.message) ;
             }
-            var scrolled = new Gtk.ScrolledWindow (null, null) ;
-            scrolled.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS) ;
-            scrolled.add (terminal) ;
+            var scrolled = new Gtk.Scrollbar (Gtk.Orientation.VERTICAL, terminal.vadjustment) ;
+
+            var gridTerminal = new Gtk.Grid () ;
+
+            gridTerminal.attach (terminal, 0, 0, 1, 1) ;
+            gridTerminal.attach (scrolled, 1, 0, 1, 1) ;
+
+            /* Make the terminal occupy the whole GUI */
+            terminal.vexpand = true ;
+            terminal.hexpand = true ;
 
             Gtk.Label labelTerminal = new Gtk.Label ("Terminal") ;
 
-            bottomBar.append_page (scrolled, labelTerminal) ;
+            bottomBar.append_page (gridTerminal, labelTerminal) ;
+
+            terminal.child_exited.connect (() => {
+                bottomBar.remove_page (notebook.page_num (scrolled)) ;
+                show_terminal = false ;
+            }) ;
         }
 
         private void action_copy() {
