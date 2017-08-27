@@ -10,6 +10,7 @@ namespace iZiCodeEditor{
     private Gtk.Button searchButton ;
     private Gtk.Button recentsButton ;
     private int untitledNumber = 0 ;
+    private Gtk.Notebook bottomBar ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -141,6 +142,7 @@ namespace iZiCodeEditor{
             header.pack_start (leftIcons) ;
             header.pack_end (rightIcons) ;
 
+            // SearchBar
             var search = new iZiCodeEditor.Search () ;
 
             searchbar = new Gtk.SearchBar () ;
@@ -166,26 +168,24 @@ namespace iZiCodeEditor{
             entry.activate.connect (search.forward) ;
             entry.key_press_event.connect (search.on_search_entry_key_press) ;
 
+            // BottomBar
+
+            bottomBar = new Gtk.Notebook () ;
+
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
-            // Alignment:
-            Gtk.Alignment alignment = new Gtk.Alignment (0.5f, 0.5f, 0, 0) ;
-            alignment.add (searchbar) ;
-
             mainBox.pack_start (notebook, false, true, 0) ;
-            mainBox.pack_start (alignment, false, false, 0) ;
+            mainBox.pack_start (searchbar, false, false, 0) ;
+            mainBox.pack_start (bottomBar, false, true, 0) ;
+
+            if( show_terminal == true ){
+                var terminal = new iZiCodeEditor.Terminal () ;
+                terminal.show_terminal () ;
+            }
 
             window.add (mainBox) ;
 
             window.show_all () ;
-
-            // File file = File.new_for_path ("/home/daniel/test.txt") ;
-            // FileMonitor monitor = file.monitor_file (FileMonitorFlags.NONE, null) ;
-            // print ("Monitoring: %s\n", file.get_path ()) ;
-            //
-            // monitor.changed.connect (() => {
-            // print ("nice") ;
-            // }) ;
 
             window.delete_event.connect (() => {
                 action_quit () ;
@@ -204,10 +204,10 @@ namespace iZiCodeEditor{
         private void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
             var tabs = new iZiCodeEditor.Tabs () ;
             string path = tabs.get_path_at_tab ((int) page_num) ;
-            string title = GLib.Path.get_basename (path) ;
-            string subtitle = Path.get_dirname (path) ;
-            header.set_title (title) ;
-            header.set_subtitle (subtitle) ;
+            string filename = GLib.Path.get_basename (path) ;
+            string filelocation = Path.get_dirname (path) ;
+            header.set_title (filename) ;
+            header.set_subtitle (filelocation) ;
         }
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {

@@ -85,6 +85,11 @@
       <default>false</default>
       <summary>darktheme</summary>
       <description>Dark theme variant</description>
-    </key>       
+    </key>   
+    <key name="show-terminal" type="b">
+      <default>false</default>
+      <summary>show-terminal</summary>
+      <description>Show terminal</description>
+    </key>    
   </schema>
 </schemalist>
