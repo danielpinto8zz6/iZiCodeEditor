@@ -5,6 +5,7 @@ namespace iZiCodeEditor{
 
 
         public void create_tab(string path) {
+
             for( int i = 0 ; i < files.length () ; i++ ){
                 if( files.nth_data (i) == path ){
                     notebook.set_current_page (i) ;
@@ -100,10 +101,20 @@ namespace iZiCodeEditor{
             notebook.append_page_menu (tab_page, tab, menu_label) ;
             notebook.set_tab_reorderable (tab_page, true) ;
             notebook.set_current_page (notebook.get_n_pages () - 1) ;
+            on_tabs_changed (notebook) ;
             notebook.show_all () ;
+            notebook.page_added.connect (() => { on_tabs_changed (notebook) ; }) ;
+            notebook.page_removed.connect (() => { on_tabs_changed (notebook) ; }) ;
             buffer.modified_changed.connect (() => {
                 on_modified_changed (buffer, tab_label, path) ;
             }) ;
+        }
+
+        private void on_tabs_changed(Gtk.Notebook notebook) {
+            var pages = notebook.get_n_pages () ;
+            notebook.set_show_tabs (pages > 1) ;
+            notebook.no_show_all = (pages == 0) ;
+            notebook.visible = (pages > 0) ;
         }
 
         // Drag Data
