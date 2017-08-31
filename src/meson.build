@@ -9,7 +9,7 @@ vala_sources = [
     'dialogs.vala',
     'notebook.vala',
     'window.vala',
-    'terminal.vala',
+    'toolbar.vala',
     'replace.vala'
 ]
 

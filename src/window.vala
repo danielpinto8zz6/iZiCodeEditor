@@ -128,11 +128,6 @@ namespace iZiCodeEditor{
 
             mainBox.pack_start (mainPane, false, true, 0) ;
 
-            if( show_terminal == true ){
-                var terminal = new iZiCodeEditor.Terminal () ;
-                terminal.show_term () ;
-            }
-
             window.add (mainBox) ;
 
             window.show_all () ;
