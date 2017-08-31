@@ -4,15 +4,14 @@ namespace iZiCodeEditor{
     private GLib.List<string> files ;
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
-    private Gtk.HeaderBar header ;
     private Gtk.SearchEntry entry ;
     private Gtk.SearchBar searchbar ;
-    private Gtk.Button searchButton ;
-    private Gtk.Button recentsButton ;
     private int untitledNumber = 0 ;
     private Gtk.Notebook bottomBar ;
     private Gtk.Notebook rightBar ;
     private Gtk.Notebook leftBar ;
+
+    public iZiCodeEditor.Toolbar toolbar ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -53,29 +52,7 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.close", { "<Primary>W" }) ;
             app.set_accels_for_action ("app.close-all", { "<Primary><Shift>W" }) ;
             app.set_accels_for_action ("app.quit", { "<Primary>Q" }) ;
-            // app menu
-            var menu = new GLib.Menu () ;
-            var section = new GLib.Menu () ;
-            section.append ("Save As...", "app.save-as") ;
-            section.append ("Save All", "app.save-all") ;
-            menu.append_section (null, section) ;
-            section = new GLib.Menu () ;
-            section.append ("Search...", "app.search") ;
-            section.append ("Replace...", "app.replace") ;
-            section.append ("Text Wrap", "app.wrap") ;
-            menu.append_section (null, section) ;
-            section = new GLib.Menu () ;
-            section.append ("Close", "app.close") ;
-            section.append ("Close All", "app.close-all") ;
-            menu.append_section (null, section) ;
-            section = new GLib.Menu () ;
-            section.append ("Preferences", "app.pref") ;
-            menu.append_section (null, section) ;
-            section = new GLib.Menu () ;
-            section.append ("About", "app.about") ;
-            section.append ("Quit", "app.quit") ;
-            menu.append_section (null, section) ;
-            // app.set_app_menu (menu) ;
+
 
             files = new GLib.List<string>() ;
             var settings = new iZiCodeEditor.Settings () ;
@@ -96,48 +73,14 @@ namespace iZiCodeEditor{
 
             Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", darktheme) ;
 
-            header = new Gtk.HeaderBar () ;
-            header.set_show_close_button (true) ;
-            header.set_title (NAME) ;
-            window.set_titlebar (header) ;
+            toolbar = new iZiCodeEditor.Toolbar () ;
+            toolbar.set_show_close_button (true) ;
+            toolbar.set_title (NAME) ;
+            window.set_titlebar (toolbar) ;
 
             if( maximized == true ){
                 window.maximize () ;
             }
-
-            var leftIcons = new Box (Orientation.HORIZONTAL, 0) ;
-            var rightIcons = new Box (Orientation.HORIZONTAL, 0) ;
-
-            var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
-            var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
-            recentsButton = new Button.from_icon_name ("document-open-recent-symbolic", IconSize.BUTTON) ;
-            searchButton = new Button.from_icon_name ("search-symbolic", IconSize.BUTTON) ;
-            var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
-
-            var menuButton = new Gtk.MenuButton () ;
-            menuButton.image = new Image.from_icon_name ("open-menu-symbolic", IconSize.MENU) ;
-            menuButton.use_popover = true ;
-            menuButton.margin_start = 5 ;
-            menuButton.set_menu_model (menu) ;
-
-            openButton.clicked.connect (action_open) ;
-            newButton.clicked.connect (action_new) ;
-            recentsButton.clicked.connect (action_recents) ;
-            searchButton.clicked.connect (action_replace) ;
-            saveButton.clicked.connect (action_save) ;
-
-            leftIcons.pack_start (openButton, false, false, 0) ;
-            leftIcons.pack_start (newButton, false, false, 0) ;
-            leftIcons.pack_start (recentsButton, false, false, 0) ;
-            leftIcons.get_style_context ().add_class ("linked") ;
-
-            rightIcons.pack_start (searchButton, false, false, 0) ;
-            rightIcons.pack_start (saveButton, false, false, 0) ;
-            rightIcons.pack_start (menuButton, false, false, 0) ;
-            rightIcons.get_style_context ().add_class ("linked") ;
-
-            header.pack_start (leftIcons) ;
-            header.pack_end (rightIcons) ;
 
             // SearchBar
             var search = new iZiCodeEditor.Search () ;
@@ -245,8 +188,8 @@ namespace iZiCodeEditor{
             string path = tabs.get_path_at_tab ((int) page_num) ;
             string filename = GLib.Path.get_basename (path) ;
             string filelocation = Path.get_dirname (path) ;
-            header.set_title (filename) ;
-            header.set_subtitle (filelocation) ;
+            toolbar.set_title (filename) ;
+            toolbar.set_subtitle (filelocation) ;
         }
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {
@@ -273,33 +216,28 @@ namespace iZiCodeEditor{
             window.get_application ().quit () ;
         }
 
-        private void action_undo() {
+        public void action_undo() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.undo_last () ;
         }
 
-        private void action_redo() {
+        public void action_redo() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.redo_last () ;
         }
 
         // buttons
-        private void action_open() {
+        public void action_open() {
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_open () ;
         }
 
-        private void action_recents() {
-            var dialogs = new iZiCodeEditor.Dialogs () ;
-            dialogs.show_recents () ;
-        }
-
-        private void action_save() {
+        public void action_save() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.save_current () ;
         }
 
-        private void action_search() {
+        public void action_search() {
             if( notebook.get_n_pages () == 0 ){
                 return ;
             }
@@ -308,7 +246,7 @@ namespace iZiCodeEditor{
         }
 
         // gear menu
-        private void action_new() {
+        public void action_new() {
             untitledNumber++ ;
             string number = untitledNumber.to_string () ;
             string path = "/tmp/untitled_".concat (number) ;
@@ -316,43 +254,43 @@ namespace iZiCodeEditor{
             nbook.create_tab (path) ;
         }
 
-        private void action_save_as() {
+        public void action_save_as() {
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_save () ;
         }
 
-        private void action_save_all() {
+        public void action_save_all() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.save_all () ;
         }
 
-        private void action_replace() {
+        public void action_replace() {
             var replace = new iZiCodeEditor.Search () ;
             replace.show_dialog () ;
         }
 
-        private void action_wrap() {
+        public void action_wrap() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.wrap_text () ;
         }
 
-        private void action_close() {
+        public void action_close() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.close_tab () ;
         }
 
-        private void action_close_all() {
+        public void action_close_all() {
             var operations = new iZiCodeEditor.Operations () ;
             operations.close_all_tabs () ;
         }
 
         // app menu
-        private void action_preferences() {
+        public void action_preferences() {
             var prefdialog = new iZiCodeEditor.PrefDialog () ;
             prefdialog.on_activate () ;
         }
 
-        private void action_about() {
+        public void action_about() {
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_about () ;
         }

@@ -150,40 +150,5 @@ namespace iZiCodeEditor{
             about.hide () ;
         }
 
-        public void show_recents() {
-
-            string fileopen = null ;
-
-            var popover = new Gtk.Popover (recentsButton) ;
-
-            Gtk.RecentChooserWidget chooser = new Gtk.RecentChooserWidget () ;
-
-            var filter = new Gtk.RecentFilter () ;
-            filter.add_mime_type ("text/plain") ;
-
-            chooser.margin = 5 ;
-            chooser.set_limit (15) ;
-            chooser.set_show_tips (true) ;
-            chooser.set_show_not_found (false) ;
-            chooser.set_show_private (false) ;
-            chooser.set_filter (filter) ;
-            chooser.width_request = 200 ;
-
-            chooser.selection_changed.connect (() => {
-                string uri = chooser.get_current_uri () ;
-                fileopen = uri.replace ("file://", "") ;
-                fileopen = Uri.unescape_string (fileopen) ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                var operations = new iZiCodeEditor.Operations () ;
-                nbook.create_tab (fileopen) ;
-                operations.open_file (fileopen) ;
-            }) ;
-
-            popover.add (chooser) ;
-
-            popover.show_all () ;
-
-        }
-
     }
 }
