@@ -1,0 +1,4 @@
+[Plugin]
+Module=terminal.so
+Name=Terminal
+Description=Terminal for iZiCodeEditor

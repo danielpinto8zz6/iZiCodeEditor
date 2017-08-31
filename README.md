@@ -7,16 +7,13 @@ This is under development.
 Building
 --------
 ```shell
-mkdir build
-meson build
-
-cd build
-ninja
+sudo make
 ```
 
 Running
 -------
 ```shell
-cd build
-./src/iZiCodeEditor
+export LD_LIBRARY_PATH=.
+export GI_TYPELIB_PATH=.
+./iZiCodeEditor
 ```

@@ -79,6 +79,8 @@ namespace iZiCodeEditor{
 
             search = new iZiCodeEditor.Search () ;
 
+            var plugins = new iZiCodeEditor.Plugins () ;
+
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
             content.pack_start (notebook, true, true, 0) ;
@@ -86,18 +88,18 @@ namespace iZiCodeEditor{
 
             var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             leftPane.position = 180 ;
-            leftPane.pack1 (leftBar, false, false) ;
+            leftPane.pack1 (plugins.leftBar, false, false) ;
             leftPane.pack2 (content, true, false) ;
 
             var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             rightPane.position = (width - 180) ;
             rightPane.pack1 (leftPane, true, false) ;
-            rightPane.pack2 (rightBar, false, false) ;
+            rightPane.pack2 (plugins.rightBar, false, false) ;
 
             var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
             mainPane.position = (height - 150) ;
             mainPane.pack1 (rightPane, true, false) ;
-            mainPane.pack2 (bottomBar, false, false) ;
+            mainPane.pack2 (plugins.bottomBar, false, false) ;
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
