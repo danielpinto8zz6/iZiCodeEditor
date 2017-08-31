@@ -1,5 +1,3 @@
-using Gtk ;
-
 namespace iZiCodeEditor{
     public class Search : Gtk.SearchBar {
         public Gtk.SearchEntry entry ;
@@ -15,7 +13,7 @@ namespace iZiCodeEditor{
             entry = new Gtk.SearchEntry () ;
             connect_entry (entry) ;
 
-            var searchBox = new Gtk.Box (Orientation.HORIZONTAL, 0) ;
+            var searchBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             searchBox.pack_start (entry, false, true, 0) ;
             searchBox.pack_start (prevButton, false, false, 0) ;
             searchBox.pack_start (nextButton, false, false, 0) ;

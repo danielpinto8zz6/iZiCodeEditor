@@ -1,4 +1,3 @@
-using Gtk ;
 namespace iZiCodeEditor{
 
     public class Toolbar : Gtk.HeaderBar {
@@ -29,15 +28,15 @@ namespace iZiCodeEditor{
             menu.append_section (null, section) ;
             // app.set_app_menu (menu) ;
 
-            var leftIcons = new Box (Orientation.HORIZONTAL, 0) ;
-            var rightIcons = new Box (Orientation.HORIZONTAL, 0) ;
+            var leftIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
+            var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
 
-            var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
-            var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
-            var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
+            var openButton = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.BUTTON) ;
+            var newButton = new Gtk.Button.from_icon_name ("tab-new-symbolic", Gtk.IconSize.BUTTON) ;
+            var saveButton = new Gtk.Button.from_icon_name ("document-save-symbolic", Gtk.IconSize.BUTTON) ;
 
             var menuButton = new Gtk.MenuButton () ;
-            menuButton.image = new Image.from_icon_name ("open-menu-symbolic", IconSize.MENU) ;
+            menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.MENU) ;
             menuButton.use_popover = true ;
             menuButton.margin_start = 5 ;
             menuButton.set_menu_model (menu) ;

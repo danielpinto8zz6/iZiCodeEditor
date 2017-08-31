@@ -1,18 +1,14 @@
-using Gtk ;
-
 namespace iZiCodeEditor{
     private GLib.List<string> files ;
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
-    private int untitledNumber = 0 ;
-    private Gtk.Notebook bottomBar ;
-    private Gtk.Notebook rightBar ;
-    private Gtk.Notebook leftBar ;
-
-    public iZiCodeEditor.Toolbar toolbar ;
-    public iZiCodeEditor.Search search ;
+    private iZiCodeEditor.Search search ;
 
     public class MainWin : Gtk.ApplicationWindow {
+
+        public iZiCodeEditor.Toolbar toolbar ;
+        private int untitledNumber = 0 ;
+
         private const GLib.ActionEntry[] action_entries = {
             { "next-page", next_page },
             { "undo", action_undo },
@@ -83,41 +79,20 @@ namespace iZiCodeEditor{
 
             search = new iZiCodeEditor.Search () ;
 
-            // Bars
-
-            bottomBar = new Gtk.Notebook () ;
-            bottomBar.no_show_all = true ;
-            bottomBar.page_added.connect (() => { on_bars_changed (bottomBar) ; }) ;
-            bottomBar.page_removed.connect (() => { on_bars_changed (bottomBar) ; }) ;
-
-            leftBar = new Gtk.Notebook () ;
-            leftBar.no_show_all = true ;
-            leftBar.width_request = 200 ;
-            leftBar.page_added.connect (() => { on_bars_changed (leftBar) ; }) ;
-            leftBar.page_removed.connect (() => { on_bars_changed (leftBar) ; }) ;
-
-
-            rightBar = new Gtk.Notebook () ;
-            rightBar.no_show_all = true ;
-            rightBar.width_request = 200 ;
-            rightBar.page_added.connect (() => { on_bars_changed (rightBar) ; }) ;
-            rightBar.page_removed.connect (() => { on_bars_changed (rightBar) ; }) ;
-
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
             content.pack_start (notebook, true, true, 0) ;
             content.pack_start (search, false, true, 0) ;
 
-
             var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             leftPane.position = 180 ;
-            // leftPane.pack1 (leftBar, false, false) ;
+            leftPane.pack1 (leftBar, false, false) ;
             leftPane.pack2 (content, true, false) ;
 
             var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             rightPane.position = (width - 180) ;
             rightPane.pack1 (leftPane, true, false) ;
-            // rightPane.pack2 (rightBar, false, false) ;
+            rightPane.pack2 (rightBar, false, false) ;
 
             var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
             mainPane.position = (height - 150) ;
@@ -136,13 +111,6 @@ namespace iZiCodeEditor{
                 action_quit () ;
                 return true ;
             }) ;
-        }
-
-        private void on_bars_changed(Gtk.Notebook notebook) {
-            var pages = notebook.get_n_pages () ;
-            notebook.set_show_tabs (pages > 1) ;
-            notebook.no_show_all = (pages == 0) ;
-            notebook.visible = (pages > 0) ;
         }
 
         private void next_page() {
