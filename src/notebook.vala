@@ -3,7 +3,6 @@ namespace iZiCodeEditor{
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
         private Gtk.SourceView tab_view ;
 
-
         public void create_tab(string path) {
 
             for( int i = 0 ; i < files.length () ; i++ ){
@@ -34,14 +33,6 @@ namespace iZiCodeEditor{
             tab_view.set_cursor_visible (true) ;
             tab_view.set_left_margin (10) ;
             tab_view.set_smart_backspace (true) ;
-
-            tab_view.key_press_event.connect ((ev) => {
-                if( ev.keyval == 65307 ){ // Esc key
-                    var search = new iZiCodeEditor.Search () ;
-                    search.set_search_mode (false) ;
-                }
-                return false ;
-            }) ;
 
             //// drag and drop
             Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
@@ -124,7 +115,7 @@ namespace iZiCodeEditor{
                                            Gtk.SelectionData data, uint info, uint time) {
             string fileopen = null ;
             foreach( string uri in data.get_uris () ){
-                fileopen = uri.replace ("file://", "") ;
+                filemenu_labelopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
                 var nbook = new iZiCodeEditor.NBook () ;
                 nbook.create_tab (fileopen) ;

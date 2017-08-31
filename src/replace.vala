@@ -79,25 +79,8 @@ namespace iZiCodeEditor{
             }) ;
             dialog.show_all () ;
 
-            entry_start_text () ;
-
             entry_sch.grab_focus_without_selecting () ;
 
-        }
-
-        // Set entry text from selectin
-        public void entry_start_text() {
-            Gtk.TextIter sel_st ;
-            Gtk.TextIter sel_end ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
-            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            buffer.get_selection_bounds (out sel_st, out sel_end) ;
-            string sel_text = buffer.get_text (sel_st, sel_end, true) ;
-            entry_sch.grab_focus () ;
-            entry_sch.set_text (sel_text) ;
-            entry_sch.select_region (0, 0) ;
-            entry_sch.set_position (-1) ;
         }
 
         // Replace

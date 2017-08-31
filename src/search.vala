@@ -1,5 +1,3 @@
-using Gtk ;
-
 namespace iZiCodeEditor{
     public class Search : Gtk.SearchBar {
         public Gtk.SearchEntry entry ;
@@ -15,7 +13,7 @@ namespace iZiCodeEditor{
             entry = new Gtk.SearchEntry () ;
             connect_entry (entry) ;
 
-            var searchBox = new Gtk.Box (Orientation.HORIZONTAL, 0) ;
+            var searchBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             searchBox.pack_start (entry, false, true, 0) ;
             searchBox.pack_start (prevButton, false, false, 0) ;
             searchBox.pack_start (nextButton, false, false, 0) ;
@@ -29,22 +27,6 @@ namespace iZiCodeEditor{
             entry.activate.connect (forward) ;
             entry.key_press_event.connect (on_search_entry_key_press) ;
 
-            entry_start_text () ;
-        }
-
-        // Set entry text from selection
-        private void entry_start_text() {
-            Gtk.TextIter sel_st ;
-            Gtk.TextIter sel_end ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
-            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            buffer.get_selection_bounds (out sel_st, out sel_end) ;
-            string sel_text = buffer.get_text (sel_st, sel_end, true) ;
-            entry.grab_focus () ;
-            entry.set_text (sel_text) ;
-            entry.select_region (0, 0) ;
-            entry.set_position (-1) ;
         }
 
         // Search forward on entry changed
