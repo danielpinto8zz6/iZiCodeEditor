@@ -36,8 +36,10 @@ namespace iZiCodeEditor{
             tab_view.set_smart_backspace (true) ;
 
             tab_view.key_press_event.connect ((ev) => {
-                if( ev.keyval == 65307 ) // Esc key
-                    searchbar.set_search_mode (false) ;
+                if( ev.keyval == 65307 ){ // Esc key
+                    var search = new iZiCodeEditor.Search () ;
+                    search.set_search_mode (false) ;
+                }
                 return false ;
             }) ;
 

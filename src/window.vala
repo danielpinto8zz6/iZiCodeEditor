@@ -4,14 +4,13 @@ namespace iZiCodeEditor{
     private GLib.List<string> files ;
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
-    private Gtk.SearchEntry entry ;
-    private Gtk.SearchBar searchbar ;
     private int untitledNumber = 0 ;
     private Gtk.Notebook bottomBar ;
     private Gtk.Notebook rightBar ;
     private Gtk.Notebook leftBar ;
 
     public iZiCodeEditor.Toolbar toolbar ;
+    public iZiCodeEditor.Search search ;
 
     public class MainWin : Gtk.ApplicationWindow {
         private const GLib.ActionEntry[] action_entries = {
@@ -82,31 +81,7 @@ namespace iZiCodeEditor{
                 window.maximize () ;
             }
 
-            // SearchBar
-            var search = new iZiCodeEditor.Search () ;
-
-            searchbar = new Gtk.SearchBar () ;
-            searchbar.set_show_close_button (true) ;
-
-            var nextButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
-            var prevButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
-
-            entry = new Gtk.SearchEntry () ;
-            searchbar.connect_entry (entry) ;
-
-            var searchBox = new Gtk.Box (Orientation.HORIZONTAL, 0) ;
-            searchBox.pack_start (entry, false, true, 0) ;
-            searchBox.pack_start (prevButton, false, false, 0) ;
-            searchBox.pack_start (nextButton, false, false, 0) ;
-            searchBox.get_style_context ().add_class ("linked") ;
-            searchbar.add (searchBox) ;
-
-            nextButton.clicked.connect (search.forward) ;
-            prevButton.clicked.connect (search.backward) ;
-
-            entry.changed.connect (search.forward_on_changed) ;
-            entry.activate.connect (search.forward) ;
-            entry.key_press_event.connect (search.on_search_entry_key_press) ;
+            search = new iZiCodeEditor.Search () ;
 
             // Bars
 
@@ -131,7 +106,7 @@ namespace iZiCodeEditor{
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
             content.pack_start (notebook, true, true, 0) ;
-            content.pack_start (searchbar, false, true, 0) ;
+            content.pack_start (search, false, true, 0) ;
 
 
             var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
@@ -241,8 +216,8 @@ namespace iZiCodeEditor{
             if( notebook.get_n_pages () == 0 ){
                 return ;
             }
-            searchbar.set_search_mode (true) ;
-            entry.grab_focus_without_selecting () ;
+            search.set_search_mode (true) ;
+            search.entry.grab_focus_without_selecting () ;
         }
 
         // gear menu

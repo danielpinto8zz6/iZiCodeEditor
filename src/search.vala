@@ -1,5 +1,8 @@
+using Gtk ;
+
 namespace iZiCodeEditor{
-    public class Search : Gtk.Dialog {
+    public class Search : Gtk.SearchBar {
+        public Gtk.SearchEntry entry ;
         private Gtk.Entry entry_sch ;
         private Gtk.Entry entry_rep ;
         private Gtk.CheckButton check_case ;
@@ -8,6 +11,31 @@ namespace iZiCodeEditor{
         private Gtk.CheckButton check_wordboundaries ;
         private Gtk.SourceSearchContext context ;
         private Gtk.Popover popover ;
+
+        construct {
+
+            set_show_close_button (true) ;
+
+            var nextButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
+            var prevButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
+
+            entry = new Gtk.SearchEntry () ;
+            connect_entry (entry) ;
+
+            var searchBox = new Gtk.Box (Orientation.HORIZONTAL, 0) ;
+            searchBox.pack_start (entry, false, true, 0) ;
+            searchBox.pack_start (prevButton, false, false, 0) ;
+            searchBox.pack_start (nextButton, false, false, 0) ;
+            searchBox.get_style_context ().add_class ("linked") ;
+            add (searchBox) ;
+
+            nextButton.clicked.connect (forward) ;
+            prevButton.clicked.connect (backward) ;
+
+            entry.changed.connect (forward_on_changed) ;
+            entry.activate.connect (forward) ;
+            entry.key_press_event.connect (on_search_entry_key_press) ;
+        }
 
         public void show_dialog() {
             if( notebook.get_n_pages () == 0 ){
@@ -194,7 +222,7 @@ namespace iZiCodeEditor{
                 forward () ;
                 return true ;
             case "Escape":
-                searchbar.set_search_mode (false) ;
+                set_search_mode (false) ;
                 return true ;
             }
 
