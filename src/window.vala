@@ -240,7 +240,7 @@ namespace iZiCodeEditor{
         }
 
         public void action_replace() {
-            var replace = new iZiCodeEditor.Search () ;
+            var replace = new iZiCodeEditor.Replace () ;
             replace.show_dialog () ;
         }
 

@@ -1,6 +1,5 @@
 using Gtk ;
 namespace iZiCodeEditor{
-    public Gtk.Button searchButton ;
 
     public class Toolbar : Gtk.HeaderBar {
 
@@ -35,7 +34,6 @@ namespace iZiCodeEditor{
 
             var openButton = new Button.from_icon_name ("document-open-symbolic", IconSize.BUTTON) ;
             var newButton = new Button.from_icon_name ("tab-new-symbolic", IconSize.BUTTON) ;
-            searchButton = new Button.from_icon_name ("search-symbolic", IconSize.BUTTON) ;
             var saveButton = new Button.from_icon_name ("document-save-symbolic", IconSize.BUTTON) ;
 
             var menuButton = new Gtk.MenuButton () ;
@@ -47,14 +45,12 @@ namespace iZiCodeEditor{
             var window = new iZiCodeEditor.MainWin () ;
             openButton.clicked.connect (window.action_open) ;
             newButton.clicked.connect (window.action_new) ;
-            searchButton.clicked.connect (window.action_replace) ;
             saveButton.clicked.connect (window.action_save) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;
             leftIcons.get_style_context ().add_class ("linked") ;
 
-            rightIcons.pack_start (searchButton, false, false, 0) ;
             rightIcons.pack_start (saveButton, false, false, 0) ;
             rightIcons.pack_start (menuButton, false, false, 0) ;
             rightIcons.get_style_context ().add_class ("linked") ;
