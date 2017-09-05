@@ -3,10 +3,10 @@ namespace iZiCodeEditor{
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
     private Gtk.Button searchButton ;
+    public iZiCodeEditor.Toolbar toolbar ;
 
     public class MainWin : Gtk.ApplicationWindow {
 
-        public iZiCodeEditor.Toolbar toolbar ;
         private int untitledNumber = 0 ;
 
         private const GLib.ActionEntry[] action_entries = {

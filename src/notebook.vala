@@ -140,7 +140,8 @@ namespace iZiCodeEditor{
                 files.remove_link (del_item) ;
                 print ("debug: removed %s\n", path) ;
                 if( notebook.get_n_pages () == 0 ){
-                    window.set_title (NAME) ;
+                    toolbar.set_title (NAME) ;
+                    toolbar.set_subtitle (null) ;
                 }
             }
         }
