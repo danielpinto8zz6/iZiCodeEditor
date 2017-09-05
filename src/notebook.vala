@@ -115,7 +115,7 @@ namespace iZiCodeEditor{
                                            Gtk.SelectionData data, uint info, uint time) {
             string fileopen = null ;
             foreach( string uri in data.get_uris () ){
-                filemenu_labelopen = uri.replace ("file://", "") ;
+                fileopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
                 var nbook = new iZiCodeEditor.NBook () ;
                 nbook.create_tab (fileopen) ;

@@ -2,7 +2,7 @@ namespace iZiCodeEditor{
     private GLib.List<string> files ;
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
-    private iZiCodeEditor.Search search ;
+    private Gtk.Button searchButton ;
 
     public class MainWin : Gtk.ApplicationWindow {
 
@@ -77,12 +77,9 @@ namespace iZiCodeEditor{
                 window.maximize () ;
             }
 
-            search = new iZiCodeEditor.Search () ;
-
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
             content.pack_start (notebook, true, true, 0) ;
-            content.pack_start (search, false, true, 0) ;
 
             var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             leftPane.position = 180 ;
@@ -179,8 +176,8 @@ namespace iZiCodeEditor{
             if( notebook.get_n_pages () == 0 ){
                 return ;
             }
-            search.set_search_mode (true) ;
-            search.entry.grab_focus_without_selecting () ;
+            var search = new iZiCodeEditor.Search () ;
+            search.show_dialog () ;
         }
 
         // gear menu
