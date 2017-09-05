@@ -69,7 +69,13 @@ namespace iZiCodeEditor{
             var view = tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string cf = tabs.get_current_path () ;
-            save_from_buffer (cf, buffer) ;
+            string filelocation = Path.get_dirname (cf) ;
+            if( filelocation == "/tmp" ){
+                var dialogs = new iZiCodeEditor.Dialogs () ;
+                dialogs.show_save () ;
+            } else {
+                save_from_buffer (cf, buffer) ;
+            }
             view.grab_focus () ;
         }
 
@@ -100,14 +106,21 @@ namespace iZiCodeEditor{
             var view = tabs.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = tabs.get_path_at_tab (pos) ;
-            save_from_buffer (path, buffer) ;
+            string filelocation = Path.get_dirname (path) ;
+            if( filelocation == "/tmp" ){
+                var dialogs = new iZiCodeEditor.Dialogs () ;
+                notebook.set_current_page (pos) ;
+                dialogs.show_save () ;
+            } else {
+                save_from_buffer (path, buffer) ;
+            }
             view.grab_focus () ;
         }
 
         // save all files
         public void save_all() {
             int i ;
-            for( i = 0 ; i < files.length () ; i++ ){
+            for( i = (int) files.length () - 1 ; i >= 0 ; i-- ){
                 save_file_at_pos (i) ;
             }
         }

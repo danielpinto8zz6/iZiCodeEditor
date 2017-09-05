@@ -100,8 +100,14 @@ namespace iZiCodeEditor{
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
             var tabs = new iZiCodeEditor.Tabs () ;
             string cf = tabs.get_current_path () ;
-            dialog.set_current_folder (Path.get_dirname (cf)) ;
-            dialog.set_current_name (Path.get_basename (cf)) ;
+            string filelocation = Path.get_dirname (cf) ;
+            if( filelocation == "/tmp" ){
+                dialog.set_current_folder (Environment.get_home_dir () ) ;
+                dialog.set_current_name ("Untitled Document") ;
+            } else {
+                dialog.set_current_folder (Path.get_dirname (cf)) ;
+                dialog.set_current_name (Path.get_basename (cf)) ;
+            }
             dialog.set_do_overwrite_confirmation (true) ;
             dialog.set_modal (true) ;
             dialog.show () ;
