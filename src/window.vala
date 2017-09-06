@@ -183,6 +183,13 @@ namespace iZiCodeEditor{
             untitledNumber++ ;
             string number = untitledNumber.to_string () ;
             string path = "/tmp/untitled_".concat (number) ;
+            for( int i = 0 ; i < files.length () ; i++ ){
+                if( files.nth_data (i) == path ){
+                    untitledNumber++ ;
+                    number = untitledNumber.to_string () ;
+                    path = "/tmp/untitled_".concat (number) ;
+                }
+            }
             var nbook = new iZiCodeEditor.NBook () ;
             nbook.create_tab (path) ;
         }
