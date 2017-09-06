@@ -14,6 +14,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_auto_indent ;
         Gtk.Switch button_pattern_show ;
         Gtk.Switch button_darktheme ;
+        Gtk.Switch button_textwrap ;
 
         public void on_activate() {
 
@@ -30,6 +31,7 @@ namespace iZiCodeEditor{
             var label_auto_indent = new Gtk.Label ("Text auto indentation") ;
             var label_pattern_show = new Gtk.Label ("Show grid pattern") ;
             var label_darktheme = new Gtk.Label ("Use dark variant") ;
+            var label_textwrap = new Gtk.Label ("Text wrap") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_scheme.set_halign (Gtk.Align.START) ;
@@ -43,6 +45,7 @@ namespace iZiCodeEditor{
             label_auto_indent.set_halign (Gtk.Align.START) ;
             label_pattern_show.set_halign (Gtk.Align.START) ;
             label_darktheme.set_halign (Gtk.Align.START) ;
+            label_textwrap.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_scheme.set_hexpand (true) ;
@@ -56,6 +59,7 @@ namespace iZiCodeEditor{
             label_auto_indent.set_hexpand (true) ;
             label_pattern_show.set_hexpand (true) ;
             label_darktheme.set_hexpand (true) ;
+            label_textwrap.set_hexpand (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -70,6 +74,21 @@ namespace iZiCodeEditor{
             button_auto_indent = new Gtk.Switch () ;
             button_pattern_show = new Gtk.Switch () ;
             button_darktheme = new Gtk.Switch () ;
+            button_textwrap = new Gtk.Switch () ;
+
+            button_font.set_halign (Gtk.Align.END) ;
+            button_scheme.set_halign (Gtk.Align.END) ;
+            button_margin_pos.set_halign (Gtk.Align.END) ;
+            button_indent_size.set_halign (Gtk.Align.END) ;
+            button_tab_size.set_halign (Gtk.Align.END) ;
+            button_numbers_show.set_halign (Gtk.Align.END) ;
+            button_highlight.set_halign (Gtk.Align.END) ;
+            button_margin_show.set_halign (Gtk.Align.END) ;
+            button_spaces.set_halign (Gtk.Align.END) ;
+            button_auto_indent.set_halign (Gtk.Align.END) ;
+            button_pattern_show.set_halign (Gtk.Align.END) ;
+            button_darktheme.set_halign (Gtk.Align.END) ;
+            button_textwrap.set_halign (Gtk.Align.END) ;
             // Default values
             button_font.set_font_name (font) ;
             get_styles_list (button_scheme) ;
@@ -83,6 +102,7 @@ namespace iZiCodeEditor{
             button_auto_indent.set_active (auto_indent) ;
             button_pattern_show.set_active (pattern_show) ;
             button_darktheme.set_active (darktheme) ;
+            button_textwrap.set_active (textwrap) ;
             // Connect signals
             button_font.font_set.connect (on_button_font_changed) ;
             button_scheme.changed.connect (on_button_scheme_changed) ;
@@ -96,6 +116,7 @@ namespace iZiCodeEditor{
             button_auto_indent.notify["active"].connect (on_button_auto_indent_changed) ;
             button_pattern_show.notify["active"].connect (on_button_pattern_show_changed) ;
             button_darktheme.notify["active"].connect (on_button_darktheme_changed) ;
+            button_textwrap.notify["active"].connect (on_button_textwrap_changed) ;
             // Dialog
             var preferences = new Gtk.Dialog () ;
             preferences.set_title ("Preferences") ;
@@ -120,6 +141,8 @@ namespace iZiCodeEditor{
             grid_editor.attach (button_indent_size, 1, 3, 1, 1) ;
             grid_editor.attach (label_tab_size, 0, 4, 1, 1) ;
             grid_editor.attach (button_tab_size, 1, 4, 1, 1) ;
+            grid_editor.attach (label_textwrap, 0, 5, 1, 1) ;
+            grid_editor.attach (button_textwrap, 1, 5, 1, 1) ;
             grid_editor.set_can_focus (false) ;
             grid_editor.set_margin_start (10) ;
             grid_editor.set_margin_end (10) ;
@@ -304,6 +327,18 @@ namespace iZiCodeEditor{
             var apply = new iZiCodeEditor.Apply () ;
             settings.set_darktheme () ;
             apply.set_darktheme () ;
+        }
+
+        private void on_button_textwrap_changed() {
+            if( button_textwrap.active ){
+                textwrap = true ;
+            } else {
+                textwrap = false ;
+            }
+            var settings = new iZiCodeEditor.Settings () ;
+            var apply = new iZiCodeEditor.Apply () ;
+            settings.set_textwrap () ;
+            apply.set_textwrap () ;
         }
 
     }

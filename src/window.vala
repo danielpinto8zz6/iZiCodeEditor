@@ -20,7 +20,6 @@ namespace iZiCodeEditor{
             { "save-as", action_save_as },
             { "save-all", action_save_all },
             { "replace", action_replace },
-            { "wrap", action_wrap },
             { "close", action_close },
             { "close-all", action_close_all },
             { "pref", action_preferences },
@@ -41,7 +40,6 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.save-all", { "<Primary><Shift>S" }) ;
             app.set_accels_for_action ("app.search", { "<Primary>F" }) ;
             app.set_accels_for_action ("app.replace", { "<Primary>H" }) ;
-            app.set_accels_for_action ("app.wrap", { "<Primary>R" }) ;
             app.set_accels_for_action ("app.color", { "F9" }) ;
             app.set_accels_for_action ("app.pref", { "<Primary>P" }) ;
             app.set_accels_for_action ("app.close", { "<Primary>W" }) ;
@@ -202,11 +200,6 @@ namespace iZiCodeEditor{
         public void action_replace() {
             var replace = new iZiCodeEditor.Replace () ;
             replace.show_dialog () ;
-        }
-
-        public void action_wrap() {
-            var operations = new iZiCodeEditor.Operations () ;
-            operations.wrap_text () ;
         }
 
         public void action_close() {

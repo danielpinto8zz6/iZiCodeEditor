@@ -13,7 +13,6 @@ namespace iZiCodeEditor{
             section = new GLib.Menu () ;
             section.append ("Search...", "app.search") ;
             section.append ("Replace...", "app.replace") ;
-            section.append ("Text Wrap", "app.wrap") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
             section.append ("Close", "app.close") ;

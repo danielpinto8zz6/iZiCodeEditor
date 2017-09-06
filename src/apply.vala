@@ -12,7 +12,7 @@ namespace iZiCodeEditor{
                     stderr.printf ("Error: %s\n", e.message) ;
                 }
                 view.get_style_context ().add_provider (provider,
-                                                            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
+                                                        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
             }
         }
 
@@ -109,6 +109,19 @@ namespace iZiCodeEditor{
                 Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", true) ;
             } else {
                 Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", false) ;
+
+            }
+        }
+
+        public void set_textwrap() {
+            for( int i = 0 ; i < files.length () ; i++ ){
+                var tabs = new iZiCodeEditor.Tabs () ;
+                var view = tabs.get_sourceview_at_tab (i) ;
+                if( textwrap == true ){
+                    view.set_wrap_mode (Gtk.WrapMode.WORD) ;
+                } else {
+                    view.set_wrap_mode (Gtk.WrapMode.NONE) ;
+                }
 
             }
         }

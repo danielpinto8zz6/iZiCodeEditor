@@ -16,7 +16,7 @@ namespace iZiCodeEditor{
     private bool auto_indent ;
     private bool pattern_show ;
     private bool darktheme ;
-    private bool show_terminal ;
+    private bool textwrap ;
 
     private string[] recent_files ;
 
@@ -44,7 +44,7 @@ namespace iZiCodeEditor{
             get_recent_files () ;
             get_active_tab () ;
             get_darktheme () ;
-            get_terminal () ;
+            get_textwrap () ;
         }
 
         // settings get
@@ -116,8 +116,8 @@ namespace iZiCodeEditor{
             return darktheme = settings.get_boolean ("darktheme") ;
         }
 
-        public bool get_terminal() {
-            return show_terminal = settings.get_boolean ("show-terminal") ;
+        public bool get_textwrap() {
+            return textwrap = settings.get_boolean ("text-wrap") ;
         }
 
         // settings set
@@ -193,8 +193,9 @@ namespace iZiCodeEditor{
             settings.set_boolean ("darktheme", darktheme) ;
         }
 
-        public void set_terminal() {
-            settings.set_boolean ("show-terminal", show_terminal) ;
+        public void set_textwrap() {
+            settings.set_boolean ("text-wrap", textwrap) ;
         }
+
     }
 }

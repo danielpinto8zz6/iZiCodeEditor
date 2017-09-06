@@ -41,6 +41,11 @@ namespace iZiCodeEditor{
             tab_view.set_cursor_visible (true) ;
             tab_view.set_left_margin (10) ;
             tab_view.set_smart_backspace (true) ;
+            if( textwrap == true ){
+                tab_view.set_wrap_mode (Gtk.WrapMode.WORD) ;
+            } else {
+                tab_view.set_wrap_mode (Gtk.WrapMode.NONE) ;
+            }
 
             //// drag and drop
             Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
