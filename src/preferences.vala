@@ -175,21 +175,13 @@ namespace iZiCodeEditor{
             grid_view.set_row_spacing (10) ;
             grid_view.set_column_spacing (10) ;
 
-            var grid_preferences = new Gtk.Grid () ;
-
-            Gtk.Stack stack = new Gtk.Stack () ;
-            stack.set_transition_type (Gtk.StackTransitionType.CROSSFADE) ;
-            stack.add_titled (grid_editor, "Editor", "Editor") ;
-            stack.add_titled (grid_view, "View", "View") ;
-            grid_preferences.attach (stack, 1, 0, 1, 1) ;
-
-            Gtk.StackSidebar sidebar = new Gtk.StackSidebar () ;
-            sidebar.set_stack (stack) ;
-            grid_preferences.attach (sidebar, 0, 0, 1, 1) ;
-
+            var pref_notebook = new Gtk.Notebook () ;
+            pref_notebook.append_page (grid_view, new Gtk.Label ("Editor")) ;
+            pref_notebook.append_page (grid_editor, new Gtk.Label ("View")) ;
             var content = preferences.get_content_area () as Gtk.Container ;
-            content.add (grid_preferences) ;
+            content.add (pref_notebook) ;
             preferences.show_all () ;
+
         }
 
         private void get_styles_list(Gtk.ComboBoxText combo) {
