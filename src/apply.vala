@@ -5,7 +5,14 @@ namespace iZiCodeEditor{
             for( int i = 0 ; i < files.length () ; i++ ){
                 var tabs = new iZiCodeEditor.Tabs () ;
                 var view = tabs.get_sourceview_at_tab (i) ;
-                view.override_font (Pango.FontDescription.from_string (font)) ;
+                var provider = new Gtk.CssProvider () ;
+                try {
+                    provider.load_from_data (pango_font_description_to_css (), pango_font_description_to_css ().length) ;
+                } catch ( Error e ){
+                    stderr.printf ("Error: %s\n", e.message) ;
+                }
+                view.get_style_context ().add_provider (provider,
+                                                            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
             }
         }
 

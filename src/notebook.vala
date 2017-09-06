@@ -14,8 +14,16 @@ namespace iZiCodeEditor{
             }
             // Page
             tab_view = new Gtk.SourceView () ;
-            // from settings
-            tab_view.override_font (Pango.FontDescription.from_string (font)) ;
+
+            var provider = new Gtk.CssProvider () ;
+            try {
+                provider.load_from_data (pango_font_description_to_css (), pango_font_description_to_css ().length) ;
+            } catch ( Error e ){
+                stderr.printf ("Error: %s\n", e.message) ;
+            }
+            tab_view.get_style_context ().add_provider (provider,
+                                                        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
+
             tab_view.set_right_margin_position (margin_pos) ;
             tab_view.set_indent_width (indent_size) ;
             tab_view.set_tab_width (tab_size) ;
@@ -66,7 +74,6 @@ namespace iZiCodeEditor{
                 return false ;
             }) ;
             var css_stuff = """ * { padding :0; } """ ;
-            var provider = new Gtk.CssProvider () ;
             try {
                 provider.load_from_data (css_stuff, css_stuff.length) ;
             } catch ( Error e ){

@@ -117,15 +117,15 @@ namespace iZiCodeEditor{
             settings.set_search_text (search) ;
             // replace forward/backward
             if( forward ){
-                found = context.forward (sel_st, out match_st, out match_end) ;
+                found = context.forward2 (sel_st, out match_st, out match_end, null) ;
             } else {
-                found = context.backward (sel_end, out match_st, out match_end) ;
+                found = context.backward2 (sel_end, out match_st, out match_end, null) ;
             }
             if( found ){
                 try {
                     buffer.select_range (match_st, match_end) ;
                     view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
-                    context.replace (match_st, match_end, replace, replace.length) ;
+                    context.replace2 (match_st, match_end, replace, replace.length) ;
                 } catch ( Error e ){
                     stderr.printf ("error: %s\n", e.message) ;
                 }
@@ -160,7 +160,7 @@ namespace iZiCodeEditor{
             buffer.get_selection_bounds (out sel_st, out sel_end) ;
             settings.set_search_text (search) ;
             // replace all
-            bool found = context.forward (sel_st, out match_st, out match_end) ;
+            bool found = context.forward2 (sel_st, out match_st, out match_end, null) ;
             if( found ){
                 try {
                     context.replace_all (replace, replace.length) ;
@@ -204,9 +204,9 @@ namespace iZiCodeEditor{
             settings.set_search_text (search) ;
             // find forward/backward
             if( forward ){
-                found = context.forward (sel_end, out match_st, out match_end) ;
+                found = context.forward2 (sel_end, out match_st, out match_end, null) ;
             } else {
-                found = context.backward (sel_st, out match_st, out match_end) ;
+                found = context.backward2 (sel_st, out match_st, out match_end, null) ;
             }
             if( found ){
                 buffer.select_range (match_st, match_end) ;

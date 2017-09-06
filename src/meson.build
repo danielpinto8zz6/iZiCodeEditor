@@ -10,7 +10,8 @@ vala_sources = [
     'notebook.vala',
     'window.vala',
     'toolbar.vala',
-    'replace.vala'
+    'replace.vala',
+    'utils.vala'
 ]
 
 vala_args = [

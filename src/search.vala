@@ -62,7 +62,7 @@ namespace iZiCodeEditor{
             settings.set_search_text (entry.get_text ()) ;
             context.set_highlight (true) ;
             settings.set_wrap_around (true) ;
-            bool found = context.forward (sel_st, out match_st, out match_end) ;
+            bool found = context.forward2 (sel_st, out match_st, out match_end, null) ;
             if( found ){
                 buffer.select_range (match_st, match_end) ;
                 view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
@@ -89,7 +89,7 @@ namespace iZiCodeEditor{
             context = new Gtk.SourceSearchContext (buffer, settings) ;
             settings.set_search_text (entry.get_text ()) ;
             settings.set_wrap_around (true) ;
-            bool found = context.forward (sel_end, out match_st, out match_end) ;
+            bool found = context.forward2 (sel_end, out match_st, out match_end, null) ;
             if( found ){
                 buffer.select_range (match_st, match_end) ;
                 view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
@@ -118,7 +118,7 @@ namespace iZiCodeEditor{
             context = new Gtk.SourceSearchContext (buffer, settings) ;
             settings.set_search_text (entry.get_text ()) ;
             settings.set_wrap_around (true) ;
-            bool found = context.backward (sel_st, out match_st, out match_end) ;
+            bool found = context.backward2 (sel_st, out match_st, out match_end, null) ;
             if( found == true ){
                 buffer.select_range (match_st, match_end) ;
                 view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
