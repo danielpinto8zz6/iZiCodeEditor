@@ -13,17 +13,14 @@ namespace iZiCodeEditor{
 
             var nextButton = new Gtk.Button.from_icon_name ("go-down-symbolic", Gtk.IconSize.BUTTON) ;
             var prevButton = new Gtk.Button.from_icon_name ("go-up-symbolic", Gtk.IconSize.BUTTON) ;
-            var closeButton = new Gtk.Button.from_icon_name ("close-symbolic", Gtk.IconSize.BUTTON) ;
 
             nextButton.set_can_focus (false) ;
             prevButton.set_can_focus (false) ;
-            closeButton.set_can_focus (false) ;
 
             var searchBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             searchBox.pack_start (entry, false, true, 0) ;
             searchBox.pack_start (prevButton, false, false, 0) ;
             searchBox.pack_start (nextButton, false, false, 0) ;
-            searchBox.pack_start (closeButton, false, false, 0) ;
             searchBox.get_style_context ().add_class ("linked") ;
             searchBox.valign = Gtk.Align.CENTER ;
             searchBox.set_border_width (3) ;
@@ -31,8 +28,13 @@ namespace iZiCodeEditor{
 
             popover = new Gtk.Popover (searchButton) ;
             popover.add (searchBox) ;
-            popover.set_modal (false) ;
             popover.set_visible (true) ;
+
+            popover.scroll_event.connect ((evt) => {
+                var scrolled = (Gtk.ScrolledWindow)notebook.get_nth_page (notebook.get_current_page ()) ;
+                scrolled.scroll_event (evt) ;
+                return Gdk.EVENT_PROPAGATE ;
+            }) ;
 
             // signals
             entry.changed.connect (forward_on_changed) ;
@@ -41,9 +43,6 @@ namespace iZiCodeEditor{
             entry.key_press_event.connect (on_search_entry_key_press) ;
             nextButton.clicked.connect (forward) ;
             prevButton.clicked.connect (backward) ;
-            closeButton.clicked.connect (() => {
-                popover.hide () ;
-            }) ;
 
             popover.hide.connect (on_popover_hide) ;
         }
@@ -157,9 +156,6 @@ namespace iZiCodeEditor{
             case "Return":
             case "Down":
                 forward () ;
-                return true ;
-            case "Escape":
-                popover.hide () ;
                 return true ;
             }
 
