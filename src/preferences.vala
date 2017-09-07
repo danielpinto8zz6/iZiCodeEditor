@@ -32,6 +32,15 @@ namespace iZiCodeEditor{
             var label_pattern_show = new Gtk.Label ("Show grid pattern") ;
             var label_darktheme = new Gtk.Label ("Use dark variant") ;
             var label_textwrap = new Gtk.Label ("Text wrap") ;
+            var label_font_header = new Gtk.Label ("<b>Font</b>") ;
+            var label_color_header = new Gtk.Label ("<b>Color Scheme</b>") ;
+            var label_tabs_header = new Gtk.Label ("<b>Tab Stops</b>") ;
+            var label_wrap_header = new Gtk.Label ("<b>Text Wrapping</b>") ;
+            var label_highlight_header = new Gtk.Label ("<b>Highlighting</b>") ;
+            var label_margin_header = new Gtk.Label ("<b>Margin</b>") ;
+            var label_theme_header = new Gtk.Label ("<b>Theme</b>") ;
+            var label_source_header = new Gtk.Label ("<b>Source</b>") ;
+            var label_indent_header = new Gtk.Label ("<b>Indent</b>") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_scheme.set_halign (Gtk.Align.START) ;
@@ -46,6 +55,15 @@ namespace iZiCodeEditor{
             label_pattern_show.set_halign (Gtk.Align.START) ;
             label_darktheme.set_halign (Gtk.Align.START) ;
             label_textwrap.set_halign (Gtk.Align.START) ;
+            label_font_header.set_halign (Gtk.Align.START) ;
+            label_color_header.set_halign (Gtk.Align.START) ;
+            label_tabs_header.set_halign (Gtk.Align.START) ;
+            label_wrap_header.set_halign (Gtk.Align.START) ;
+            label_highlight_header.set_halign (Gtk.Align.START) ;
+            label_margin_header.set_halign (Gtk.Align.START) ;
+            label_theme_header.set_halign (Gtk.Align.START) ;
+            label_source_header.set_halign (Gtk.Align.START) ;
+            label_indent_header.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_scheme.set_hexpand (true) ;
@@ -60,6 +78,35 @@ namespace iZiCodeEditor{
             label_pattern_show.set_hexpand (true) ;
             label_darktheme.set_hexpand (true) ;
             label_textwrap.set_hexpand (true) ;
+            label_font_header.set_hexpand (true) ;
+            label_color_header.set_hexpand (true) ;
+            label_tabs_header.set_hexpand (true) ;
+            label_wrap_header.set_hexpand (true) ;
+            label_highlight_header.set_hexpand (true) ;
+            label_margin_header.set_hexpand (true) ;
+            label_theme_header.set_hexpand (true) ;
+            label_source_header.set_hexpand (true) ;
+            label_indent_header.set_hexpand (true) ;
+
+            label_font_header.set_use_markup (true) ;
+            label_color_header.set_use_markup (true) ;
+            label_tabs_header.set_use_markup (true) ;
+            label_wrap_header.set_use_markup (true) ;
+            label_highlight_header.set_use_markup (true) ;
+            label_margin_header.set_use_markup (true) ;
+            label_theme_header.set_use_markup (true) ;
+            label_source_header.set_use_markup (true) ;
+            label_indent_header.set_use_markup (true) ;
+
+            label_font_header.set_line_wrap (true) ;
+            label_color_header.set_line_wrap (true) ;
+            label_tabs_header.set_line_wrap (true) ;
+            label_wrap_header.set_line_wrap (true) ;
+            label_highlight_header.set_line_wrap (true) ;
+            label_margin_header.set_line_wrap (true) ;
+            label_theme_header.set_line_wrap (true) ;
+            label_source_header.set_line_wrap (true) ;
+            label_indent_header.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -103,6 +150,7 @@ namespace iZiCodeEditor{
             button_pattern_show.set_active (pattern_show) ;
             button_darktheme.set_active (darktheme) ;
             button_textwrap.set_active (textwrap) ;
+
             // Connect signals
             button_font.font_set.connect (on_button_font_changed) ;
             button_scheme.changed.connect (on_button_scheme_changed) ;
@@ -117,6 +165,11 @@ namespace iZiCodeEditor{
             button_pattern_show.notify["active"].connect (on_button_pattern_show_changed) ;
             button_darktheme.notify["active"].connect (on_button_darktheme_changed) ;
             button_textwrap.notify["active"].connect (on_button_textwrap_changed) ;
+
+            if( !margin_show ){
+                button_margin_pos.set_sensitive (false) ;
+            }
+
             // Dialog
             var preferences = new Gtk.Dialog () ;
             preferences.set_title ("Preferences") ;
@@ -129,20 +182,47 @@ namespace iZiCodeEditor{
             header.set_title ("Preferences") ;
             preferences.set_titlebar (header) ;
 
+            // View Grid
+            var grid_view = new Gtk.Grid () ;
+            grid_view.attach (label_source_header, 0, 0, 1, 1) ;
+            grid_view.attach (label_numbers_show, 0, 1, 1, 1) ;
+            grid_view.attach (button_numbers_show, 1, 1, 1, 1) ;
+            grid_view.attach (label_pattern_show, 0, 2, 1, 1) ;
+            grid_view.attach (button_pattern_show, 1, 2, 1, 1) ;
+            grid_view.attach (label_margin_header, 0, 3, 1, 1) ;
+            grid_view.attach (label_margin_show, 0, 4, 1, 1) ;
+            grid_view.attach (button_margin_show, 1, 4, 1, 1) ;
+            grid_view.attach (label_margin_pos, 0, 5, 1, 1) ;
+            grid_view.attach (button_margin_pos, 1, 5, 1, 1) ;
+            grid_view.attach (label_wrap_header, 0, 6, 1, 1) ;
+            grid_view.attach (label_textwrap, 0, 7, 1, 1) ;
+            grid_view.attach (button_textwrap, 1, 7, 1, 1) ;
+            grid_view.attach (label_highlight_header, 0, 8, 1, 1) ;
+            grid_view.attach (label_highlight, 0, 9, 1, 1) ;
+            grid_view.attach (button_highlight, 1, 9, 1, 1) ;
+            grid_view.attach (label_theme_header, 0, 10, 1, 1) ;
+            grid_view.attach (label_darktheme, 0, 11, 1, 1) ;
+            grid_view.attach (button_darktheme, 1, 11, 1, 1) ;
+            grid_view.set_can_focus (false) ;
+            grid_view.set_margin_start (10) ;
+            grid_view.set_margin_end (10) ;
+            grid_view.set_margin_top (10) ;
+            grid_view.set_margin_bottom (10) ;
+            grid_view.set_row_spacing (10) ;
+            grid_view.set_column_spacing (10) ;
+
             // Editor Grid
             var grid_editor = new Gtk.Grid () ;
-            grid_editor.attach (label_font, 0, 0, 1, 1) ;
-            grid_editor.attach (button_font, 1, 0, 1, 1) ;
-            grid_editor.attach (label_scheme, 0, 1, 1, 1) ;
-            grid_editor.attach (button_scheme, 1, 1, 1, 1) ;
-            grid_editor.attach (label_margin_pos, 0, 2, 1, 1) ;
-            grid_editor.attach (button_margin_pos, 1, 2, 1, 1) ;
-            grid_editor.attach (label_indent_size, 0, 3, 1, 1) ;
-            grid_editor.attach (button_indent_size, 1, 3, 1, 1) ;
-            grid_editor.attach (label_tab_size, 0, 4, 1, 1) ;
-            grid_editor.attach (button_tab_size, 1, 4, 1, 1) ;
-            grid_editor.attach (label_textwrap, 0, 5, 1, 1) ;
-            grid_editor.attach (button_textwrap, 1, 5, 1, 1) ;
+            grid_editor.attach (label_tabs_header, 0, 0, 1, 1) ;
+            grid_editor.attach (label_tab_size, 0, 1, 1, 1) ;
+            grid_editor.attach (button_tab_size, 1, 1, 1, 1) ;
+            grid_editor.attach (label_spaces, 0, 2, 1, 1) ;
+            grid_editor.attach (button_spaces, 1, 2, 1, 1) ;
+            grid_editor.attach (label_indent_header, 0, 3, 1, 1) ;
+            grid_editor.attach (label_auto_indent, 0, 4, 1, 1) ;
+            grid_editor.attach (button_auto_indent, 1, 4, 1, 1) ;
+            grid_editor.attach (label_indent_size, 0, 5, 1, 1) ;
+            grid_editor.attach (button_indent_size, 1, 5, 1, 1) ;
             grid_editor.set_can_focus (false) ;
             grid_editor.set_margin_start (10) ;
             grid_editor.set_margin_end (10) ;
@@ -152,32 +232,25 @@ namespace iZiCodeEditor{
             grid_editor.set_column_spacing (10) ;
 
             // View Grid
-            var grid_view = new Gtk.Grid () ;
-            grid_view.attach (label_numbers_show, 0, 0, 1, 1) ;
-            grid_view.attach (button_numbers_show, 1, 0, 1, 1) ;
-            grid_view.attach (label_highlight, 0, 1, 1, 1) ;
-            grid_view.attach (button_highlight, 1, 1, 1, 1) ;
-            grid_view.attach (label_margin_show, 0, 2, 1, 1) ;
-            grid_view.attach (button_margin_show, 1, 2, 1, 1) ;
-            grid_view.attach (label_spaces, 0, 3, 1, 1) ;
-            grid_view.attach (button_spaces, 1, 3, 1, 1) ;
-            grid_view.attach (label_auto_indent, 0, 4, 1, 1) ;
-            grid_view.attach (button_auto_indent, 1, 4, 1, 1) ;
-            grid_view.attach (label_pattern_show, 0, 5, 1, 1) ;
-            grid_view.attach (button_pattern_show, 1, 5, 1, 1) ;
-            grid_view.attach (label_darktheme, 0, 6, 1, 1) ;
-            grid_view.attach (button_darktheme, 1, 6, 1, 1) ;
-            grid_view.set_can_focus (false) ;
-            grid_view.set_margin_start (10) ;
-            grid_view.set_margin_end (10) ;
-            grid_view.set_margin_top (10) ;
-            grid_view.set_margin_bottom (10) ;
-            grid_view.set_row_spacing (10) ;
-            grid_view.set_column_spacing (10) ;
+            var grid_fontscolors = new Gtk.Grid () ;
+            grid_fontscolors.attach (label_font_header, 0, 0, 1, 1) ;
+            grid_fontscolors.attach (label_font, 0, 1, 1, 1) ;
+            grid_fontscolors.attach (button_font, 1, 1, 1, 1) ;
+            grid_fontscolors.attach (label_color_header, 0, 2, 1, 1) ;
+            grid_fontscolors.attach (label_scheme, 0, 3, 1, 1) ;
+            grid_fontscolors.attach (button_scheme, 1, 3, 1, 1) ;
+            grid_fontscolors.set_can_focus (false) ;
+            grid_fontscolors.set_margin_start (10) ;
+            grid_fontscolors.set_margin_end (10) ;
+            grid_fontscolors.set_margin_top (10) ;
+            grid_fontscolors.set_margin_bottom (10) ;
+            grid_fontscolors.set_row_spacing (10) ;
+            grid_fontscolors.set_column_spacing (10) ;
 
             var pref_notebook = new Gtk.Notebook () ;
-            pref_notebook.append_page (grid_view, new Gtk.Label ("Editor")) ;
-            pref_notebook.append_page (grid_editor, new Gtk.Label ("View")) ;
+            pref_notebook.append_page (grid_view, new Gtk.Label ("View")) ;
+            pref_notebook.append_page (grid_editor, new Gtk.Label ("Editor")) ;
+            pref_notebook.append_page (grid_fontscolors, new Gtk.Label ("Fonts & Colors")) ;
             var content = preferences.get_content_area () as Gtk.Container ;
             content.add (pref_notebook) ;
             preferences.show_all () ;
@@ -264,8 +337,10 @@ namespace iZiCodeEditor{
         private void on_button_margin_show_changed() {
             if( button_margin_show.active ){
                 margin_show = true ;
+                button_margin_pos.set_sensitive (true) ;
             } else {
                 margin_show = false ;
+                button_margin_pos.set_sensitive (false) ;
             }
             var settings = new iZiCodeEditor.Settings () ;
             var apply = new iZiCodeEditor.Apply () ;
