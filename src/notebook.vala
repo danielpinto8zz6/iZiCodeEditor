@@ -5,11 +5,13 @@ namespace iZiCodeEditor{
 
         public void create_tab(string path) {
 
-            for( int i = 0 ; i < files.length () ; i++ ){
-                if( files.nth_data (i) == path ){
-                    notebook.set_current_page (i) ;
-                    // print("debug: refusing to add %s again\n", path);
-                    return ;
+            if( path != "Untitled" ){
+                for( int i = 0 ; i < files.length () ; i++ ){
+                    if( files.nth_data (i) == path ){
+                        notebook.set_current_page (i) ;
+                        // print("debug: refusing to add %s again\n", path);
+                        return ;
+                    }
                 }
             }
             // Page
@@ -59,6 +61,7 @@ namespace iZiCodeEditor{
             tab_page.add (tab_view) ;
             tab_page.show_all () ;
             // File name
+
             string fname = GLib.Path.get_basename (path) ;
             if( fname.length > 18 ){
                 fname = fname.substring (0, 15) + "..." ;
@@ -157,8 +160,13 @@ namespace iZiCodeEditor{
                 } else {
                     string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
                     string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
-                    toolbar.set_title (filename) ;
-                    toolbar.set_subtitle (filelocation) ;
+                    if( filename == "Untitled" ){
+                        toolbar.set_title (filename) ;
+                        toolbar.set_subtitle (null) ;
+                    } else {
+                        toolbar.set_title (filename) ;
+                        toolbar.set_subtitle (filelocation) ;
+                    }
                 }
             }
         }

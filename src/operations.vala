@@ -69,8 +69,7 @@ namespace iZiCodeEditor{
             var view = tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string cf = tabs.get_current_path () ;
-            string filelocation = Path.get_dirname (cf) ;
-            if( filelocation == "/tmp" ){
+            if( cf == "Untitled" ){
                 var dialogs = new iZiCodeEditor.Dialogs () ;
                 dialogs.show_save () ;
             } else {
@@ -106,8 +105,7 @@ namespace iZiCodeEditor{
             var view = tabs.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = tabs.get_path_at_tab (pos) ;
-            string filelocation = Path.get_dirname (path) ;
-            if( filelocation == "/tmp" ){
+            if( path == "Untitled" ){
                 var dialogs = new iZiCodeEditor.Dialogs () ;
                 notebook.set_current_page (pos) ;
                 dialogs.show_save () ;

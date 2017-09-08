@@ -7,8 +7,6 @@ namespace iZiCodeEditor{
 
     public class MainWin : Gtk.ApplicationWindow {
 
-        private int untitledNumber = 0 ;
-
         private const GLib.ActionEntry[] action_entries = {
             { "next-page", next_page },
             { "undo", action_undo },
@@ -121,8 +119,14 @@ namespace iZiCodeEditor{
             string path = tabs.get_path_at_tab ((int) page_num) ;
             string filename = GLib.Path.get_basename (path) ;
             string filelocation = Path.get_dirname (path) ;
-            toolbar.set_title (filename) ;
-            toolbar.set_subtitle (filelocation) ;
+            if( filename == "Untitled" ){
+                toolbar.set_title (filename) ;
+                toolbar.set_subtitle (null) ;
+            } else {
+                toolbar.set_title (filename) ;
+                toolbar.set_subtitle (filelocation) ;
+            }
+
         }
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {
@@ -180,18 +184,8 @@ namespace iZiCodeEditor{
 
         // gear menu
         public void action_new() {
-            untitledNumber++ ;
-            string number = untitledNumber.to_string () ;
-            string path = "/tmp/untitled_".concat (number) ;
-            for( int i = 0 ; i < files.length () ; i++ ){
-                if( files.nth_data (i) == path ){
-                    untitledNumber++ ;
-                    number = untitledNumber.to_string () ;
-                    path = "/tmp/untitled_".concat (number) ;
-                }
-            }
             var nbook = new iZiCodeEditor.NBook () ;
-            nbook.create_tab (path) ;
+            nbook.create_tab ("Untitled") ;
         }
 
         public void action_save_as() {

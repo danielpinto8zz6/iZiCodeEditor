@@ -11,12 +11,7 @@ namespace iZiCodeEditor{
             if( notebook.get_n_pages () > 0 ){
                 var tabs = new iZiCodeEditor.Tabs () ;
                 string cf = tabs.get_current_path () ;
-                string filelocation = Path.get_dirname (cf) ;
-                if( filelocation == "/tmp" ){
-                    chooser.set_current_folder (Environment.get_home_dir ()) ;
-                } else {
-                    chooser.set_current_folder (Path.get_dirname (cf)) ;
-                }
+                chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
             var filter = new Gtk.FileFilter () ;
             filter.add_mime_type ("text/plain") ;
@@ -105,14 +100,8 @@ namespace iZiCodeEditor{
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
             var tabs = new iZiCodeEditor.Tabs () ;
             string cf = tabs.get_current_path () ;
-            string filelocation = Path.get_dirname (cf) ;
-            if( filelocation == "/tmp" ){
-                dialog.set_current_folder (Environment.get_home_dir ()) ;
-                dialog.set_current_name ("Untitled Document") ;
-            } else {
-                dialog.set_current_folder (Path.get_dirname (cf)) ;
-                dialog.set_current_name (Path.get_basename (cf)) ;
-            }
+            dialog.set_current_folder (Path.get_dirname (cf)) ;
+            dialog.set_current_name (Path.get_basename (cf)) ;
             dialog.set_do_overwrite_confirmation (true) ;
             dialog.set_modal (true) ;
             dialog.show () ;
