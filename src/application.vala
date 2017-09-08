@@ -20,9 +20,12 @@ namespace iZiCodeEditor{
         }
 
         public override void activate() {
-
-            var mainwin = new iZiCodeEditor.MainWin () ;
-            mainwin.action_new () ;
+            if( files.length () == 0 ){
+                string fileopen = GLib.Path.build_filename (GLib.Environment.get_tmp_dir (),
+                                                            "untitled_1") ;
+                var nbook = new iZiCodeEditor.NBook () ;
+                nbook.create_tab (fileopen) ;
+            }
             get_active_window ().present () ;
         }
 
