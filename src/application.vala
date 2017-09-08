@@ -6,6 +6,14 @@ namespace iZiCodeEditor{
     const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null } ;
 
     private class Application : Gtk.Application {
+
+        private static GLib.Settings _settings = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor") ;
+        public static GLib.Settings settings {
+            get {
+                return _settings ;
+            }
+        }
+
         public Application () {
             Object (application_id: "org.vala-apps.iZiCodeEditor",
                     flags : GLib.ApplicationFlags.HANDLES_OPEN) ;

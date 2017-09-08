@@ -1,6 +1,7 @@
 namespace iZiCodeEditor{
     public class Operations : GLib.Object {
         public void add_recent_files() {
+            string[] recent_files = Application.settings.get_strv ("recent-files") ;
             if( recent_files.length > 0 ){
                 for( int i = 0 ; i < recent_files.length ; i++ ){
                     var one = GLib.File.new_for_path (recent_files[i]) ;
@@ -11,7 +12,7 @@ namespace iZiCodeEditor{
                         operations.open_file (recent_files[i]) ;
                     }
                 }
-                notebook.set_current_page ((int) active_tab) ;
+                notebook.set_current_page (Application.settings.get_int ("active-tab")) ;
             }
         }
 

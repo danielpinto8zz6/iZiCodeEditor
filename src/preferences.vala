@@ -2,7 +2,7 @@ namespace iZiCodeEditor{
     public class PrefDialog : Gtk.Dialog {
 
         Gtk.FontButton button_font ;
-        Gtk.ComboBoxText button_scheme ;
+        Gtk.SourceStyleSchemeChooserButton button_scheme ;
         Gtk.SpinButton button_margin_pos ;
         Gtk.SpinButton button_indent_size ;
         Gtk.SpinButton button_tab_size ;
@@ -110,7 +110,7 @@ namespace iZiCodeEditor{
 
             // Buttons
             button_font = new Gtk.FontButton () ;
-            button_scheme = new Gtk.ComboBoxText () ;
+            button_scheme = new Gtk.SourceStyleSchemeChooserButton () ;
             button_margin_pos = new Gtk.SpinButton.with_range (70, 110, 1) ;
             button_indent_size = new Gtk.SpinButton.with_range (1, 8, 1) ;
             button_tab_size = new Gtk.SpinButton.with_range (1, 8, 1) ;
@@ -136,39 +136,27 @@ namespace iZiCodeEditor{
             button_pattern_show.set_halign (Gtk.Align.END) ;
             button_darktheme.set_halign (Gtk.Align.END) ;
             button_textwrap.set_halign (Gtk.Align.END) ;
-            // Default values
-            button_font.set_font_name (font) ;
-            get_styles_list (button_scheme) ;
-            button_margin_pos.set_value (margin_pos) ;
-            button_indent_size.set_value (indent_size) ;
-            button_tab_size.set_value (tab_size) ;
-            button_numbers_show.set_active (numbers_show) ;
-            button_highlight.set_active (highlight) ;
-            button_margin_show.set_active (margin_show) ;
-            button_spaces.set_active (spaces) ;
-            button_auto_indent.set_active (auto_indent) ;
-            button_pattern_show.set_active (pattern_show) ;
-            button_darktheme.set_active (darktheme) ;
-            button_textwrap.set_active (textwrap) ;
 
-            // Connect signals
-            button_font.font_set.connect (on_button_font_changed) ;
-            button_scheme.changed.connect (on_button_scheme_changed) ;
-            button_margin_pos.value_changed.connect (on_button_margin_pos_changed) ;
-            button_indent_size.value_changed.connect (on_button_indent_size_changed) ;
-            button_tab_size.value_changed.connect (on_button_tab_size_changed) ;
-            button_numbers_show.notify["active"].connect (on_button_numbers_show_changed) ;
-            button_highlight.notify["active"].connect (on_button_highlight_changed) ;
-            button_margin_show.notify["active"].connect (on_button_margin_show_changed) ;
-            button_spaces.notify["active"].connect (on_button_spaces_changed) ;
-            button_auto_indent.notify["active"].connect (on_button_auto_indent_changed) ;
-            button_pattern_show.notify["active"].connect (on_button_pattern_show_changed) ;
-            button_darktheme.notify["active"].connect (on_button_darktheme_changed) ;
-            button_textwrap.notify["active"].connect (on_button_textwrap_changed) ;
+            button_font.set_font_name (Application.settings.get_string ("font")) ;
+            button_font.notify["font"].connect (() => {
+                Application.settings.set_string ("font", button_font.get_font ().to_string ()) ;
+            }) ;
+            Application.settings.bind ("indent-size", button_indent_size, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("tab-size", button_tab_size, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("numbers-show", button_numbers_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("highlight", button_highlight, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("margin-show", button_margin_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("margin-pos", button_margin_pos, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("spaces", button_spaces, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("auto-indent", button_auto_indent, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("pattern-show", button_pattern_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
 
-            if( !margin_show ){
-                button_margin_pos.set_sensitive (false) ;
-            }
+            button_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme")) ;
+            button_scheme.notify["style-scheme"].connect (() => {
+                Application.settings.set_string ("scheme", button_scheme.style_scheme.id) ;
+            }) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;
@@ -255,157 +243,6 @@ namespace iZiCodeEditor{
             content.add (pref_notebook) ;
             preferences.show_all () ;
 
-        }
-
-        private void get_styles_list(Gtk.ComboBoxText combo) {
-            var manager = new Gtk.SourceStyleSchemeManager () ;
-            string[] scheme_ids ;
-            scheme_ids = manager.get_scheme_ids () ;
-            foreach( string i in scheme_ids ){
-                var scheme = manager.get_scheme (i) ;
-                combo.append (scheme.id, scheme.name) ;
-            }
-            combo.set_active_id (scheme) ;
-        }
-
-        // 1. Editor
-        private void on_button_font_changed() {
-            font = button_font.get_font ().to_string () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_font () ;
-            apply.set_font () ;
-        }
-
-        private void on_button_scheme_changed() {
-            scheme = button_scheme.get_active_id () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_scheme () ;
-            apply.set_scheme () ;
-        }
-
-        private void on_button_margin_pos_changed() {
-            margin_pos = button_margin_pos.get_value_as_int () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_margin_pos () ;
-            apply.set_margin_pos () ;
-        }
-
-        private void on_button_indent_size_changed() {
-            indent_size = button_indent_size.get_value_as_int () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_indent_size () ;
-            apply.set_indent_size () ;
-        }
-
-        private void on_button_tab_size_changed() {
-            tab_size = button_tab_size.get_value_as_int () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_tab_size () ;
-            apply.set_tab_size () ;
-        }
-
-        // 2. View
-        private void on_button_numbers_show_changed() {
-            if( button_numbers_show.active ){
-                numbers_show = true ;
-            } else {
-                numbers_show = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_numbers_show () ;
-            apply.set_numbers_show () ;
-        }
-
-        private void on_button_highlight_changed() {
-            if( button_highlight.active ){
-                highlight = true ;
-            } else {
-                highlight = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_highlight () ;
-            apply.set_highlight () ;
-        }
-
-        private void on_button_margin_show_changed() {
-            if( button_margin_show.active ){
-                margin_show = true ;
-                button_margin_pos.set_sensitive (true) ;
-            } else {
-                margin_show = false ;
-                button_margin_pos.set_sensitive (false) ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_margin_show () ;
-            apply.set_margin_show () ;
-        }
-
-        private void on_button_spaces_changed() {
-            if( button_spaces.active ){
-                spaces = true ;
-            } else {
-                spaces = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_spaces () ;
-            apply.set_spaces () ;
-        }
-
-        private void on_button_auto_indent_changed() {
-            if( button_auto_indent.active ){
-                auto_indent = true ;
-            } else {
-                auto_indent = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_auto_indent () ;
-            apply.set_auto_indent () ;
-        }
-
-        private void on_button_pattern_show_changed() {
-            if( button_pattern_show.active ){
-                pattern_show = true ;
-            } else {
-                pattern_show = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_pattern_show () ;
-            apply.set_pattern_show () ;
-        }
-
-        private void on_button_darktheme_changed() {
-            if( button_darktheme.active ){
-                darktheme = true ;
-            } else {
-                darktheme = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_darktheme () ;
-            apply.set_darktheme () ;
-        }
-
-        private void on_button_textwrap_changed() {
-            if( button_textwrap.active ){
-                textwrap = true ;
-            } else {
-                textwrap = false ;
-            }
-            var settings = new iZiCodeEditor.Settings () ;
-            var apply = new iZiCodeEditor.Apply () ;
-            settings.set_textwrap () ;
-            apply.set_textwrap () ;
         }
 
     }

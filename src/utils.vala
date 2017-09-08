@@ -2,7 +2,7 @@ namespace iZiCodeEditor{
     public string pango_font_description_to_css() {
         StringBuilder str = new StringBuilder () ;
 
-        Pango.FontDescription desc = Pango.FontDescription.from_string (font) ;
+        Pango.FontDescription desc = Pango.FontDescription.from_string (Application.settings.get_string ("font")) ;
         var family = desc.get_family () ;
         var weight = desc.get_weight () ;
         var style = desc.get_style () ;

@@ -23,40 +23,64 @@ namespace iZiCodeEditor{
             } catch ( Error e ){
                 stderr.printf ("Error: %s\n", e.message) ;
             }
+            Application.settings.changed["font"].connect (() => {
+                try {
+                    provider.load_from_data (pango_font_description_to_css (), pango_font_description_to_css ().length) ;
+                } catch ( Error e ){
+                    stderr.printf ("Error: %s\n", e.message) ;
+                }
+            }) ;
+
             tab_view.get_style_context ().add_provider (provider,
                                                         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
 
-            tab_view.set_right_margin_position (margin_pos) ;
-            tab_view.set_indent_width (indent_size) ;
-            tab_view.set_tab_width (tab_size) ;
-            tab_view.set_show_line_numbers (numbers_show) ;
-            tab_view.set_highlight_current_line (highlight) ;
-            tab_view.set_show_right_margin (margin_show) ;
-            tab_view.set_insert_spaces_instead_of_tabs (spaces) ;
-            tab_view.set_auto_indent (auto_indent) ;
-            if( pattern_show == true ){
+            Application.settings.bind ("tab-size", tab_view, "tab_width", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("indent-size", tab_view, "indent_width", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("margin-pos", tab_view, "right_margin_position", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("numbers-show", tab_view, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("highlight", tab_view, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("margin-show", tab_view, "show_right_margin", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("spaces", tab_view, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("auto-indent", tab_view, "auto_indent", SettingsBindFlags.DEFAULT) ;
+            if( Application.settings.get_boolean ("pattern-show") ){
                 tab_view.set_background_pattern (Gtk.SourceBackgroundPatternType.GRID) ;
             } else {
                 tab_view.set_background_pattern (Gtk.SourceBackgroundPatternType.NONE) ;
             }
+            Application.settings.changed["pattern-show"].connect (() => {
+                if( Application.settings.get_boolean ("pattern-show") ){
+                    tab_view.background_pattern = Gtk.SourceBackgroundPatternType.GRID ;
+                } else {
+                    tab_view.background_pattern = Gtk.SourceBackgroundPatternType.NONE ;
+                }
+            }) ;
             // default
             tab_view.set_cursor_visible (true) ;
             tab_view.set_left_margin (10) ;
             tab_view.set_smart_backspace (true) ;
-            if( textwrap == true ){
+
+            if( Application.settings.get_boolean ("text-wrap") ){
                 tab_view.set_wrap_mode (Gtk.WrapMode.WORD) ;
             } else {
                 tab_view.set_wrap_mode (Gtk.WrapMode.NONE) ;
             }
+            Application.settings.changed["pattern-show"].connect (() => {
+                if( Application.settings.get_boolean ("text-wrap") ){
+                    tab_view.set_wrap_mode (Gtk.WrapMode.WORD) ;
+                } else {
+                    tab_view.set_wrap_mode (Gtk.WrapMode.NONE) ;
+                }
+            }) ;
 
             //// drag and drop
             Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
             tab_view.drag_data_received.connect (on_drag_data_received) ;
             // style scheme
-            var style_manager = new Gtk.SourceStyleSchemeManager () ;
-            var style_scheme = style_manager.get_scheme (scheme) ;
             var buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
-            buffer.set_style_scheme (style_scheme) ;
+            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
+            Application.settings.changed["scheme"].connect (() => {
+                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
+            }) ;
             var tab_page = new Gtk.ScrolledWindow (null, null) ;
             tab_page.add (tab_view) ;
             tab_page.show_all () ;

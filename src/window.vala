@@ -46,8 +46,6 @@ namespace iZiCodeEditor{
 
 
             files = new GLib.List<string>() ;
-            var settings = new iZiCodeEditor.Settings () ;
-            settings.get_all () ;
 
             notebook = new Gtk.Notebook () ;
             notebook.expand = true ;
@@ -59,17 +57,21 @@ namespace iZiCodeEditor{
             // window
             window = new Gtk.ApplicationWindow (app) ;
             window.window_position = Gtk.WindowPosition.CENTER ;
-            window.set_default_size (width, height) ;
+            window.set_default_size (Application.settings.get_int ("width"), Application.settings.get_int ("height")) ;
             window.set_icon_name (ICON) ;
 
-            Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", darktheme) ;
+            Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings.get_boolean ("dark-mode")) ;
+
+            Application.settings.changed["dark-mode"].connect (() => {
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings.get_boolean ("dark-mode")) ;
+            }) ;
 
             toolbar = new iZiCodeEditor.Toolbar () ;
             toolbar.set_show_close_button (true) ;
             toolbar.set_title (NAME) ;
             window.set_titlebar (toolbar) ;
 
-            if( maximized == true ){
+            if( Application.settings.get_boolean ("maximized") ){
                 window.maximize () ;
             }
 
@@ -83,12 +85,12 @@ namespace iZiCodeEditor{
             leftPane.pack2 (content, true, false) ;
 
             var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
-            rightPane.position = (width - 180) ;
+            rightPane.position = (Application.settings.get_int ("width") - 180) ;
             rightPane.pack1 (leftPane, true, false) ;
             // rightPane.pack2 (rightBar, false, false) ;
 
             var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
-            mainPane.position = (height - 150) ;
+            mainPane.position = (Application.settings.get_int ("height") - 150) ;
             mainPane.pack1 (rightPane, true, false) ;
             // mainPane.pack2 (bottomBar, false, false) ;
 
@@ -146,6 +148,7 @@ namespace iZiCodeEditor{
             }
             for( int i = 0 ; i < files.length () ; i++ ){
                 print ("NEW LIST %s\n", files.nth_data (i)) ;
+
             }
         }
 
@@ -225,15 +228,13 @@ namespace iZiCodeEditor{
         }
 
         public void action_quit() {
+            int width, height ;
             window.get_size (out width, out height) ;
-            maximized = window.is_maximized ;
-            active_tab = notebook.get_current_page () ;
-            var settings = new iZiCodeEditor.Settings () ;
-            settings.set_width () ;
-            settings.set_height () ;
-            settings.set_maximized () ;
-            settings.set_active_tab () ;
-            GLib.Settings.sync () ;
+            Application.settings.set_boolean ("maximized", window.is_maximized) ;
+            Application.settings.set_int ("width", width) ;
+            Application.settings.set_int ("height", height) ;
+            Application.settings.set_int ("active-tab", notebook.get_current_page ()) ;
+
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.changes_all () ;
         }

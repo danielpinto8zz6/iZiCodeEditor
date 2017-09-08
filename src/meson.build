@@ -2,8 +2,6 @@ vala_sources = [
     'application.vala',
     'search.vala',
     'operations.vala',
-    'settings.vala',
-    'apply.vala', 
     'preferences.vala',
     'tabs.vala',
     'dialogs.vala',

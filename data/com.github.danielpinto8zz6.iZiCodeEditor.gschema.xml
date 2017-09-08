@@ -81,10 +81,10 @@
       <summary>active-tab</summary>
       <description>Active tab position</description>
     </key>
-    <key name="darktheme" type="b">
+    <key name="dark-mode" type="b">
       <default>false</default>
-      <summary>darktheme</summary>
-      <description>Dark theme variant</description>
+      <summary>dark-mode</summary>
+      <description>Dark mode theme variant</description>
     </key>
     <key name="text-wrap" type="b">
       <default>true</default>

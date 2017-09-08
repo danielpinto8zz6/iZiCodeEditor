@@ -67,8 +67,12 @@ namespace iZiCodeEditor{
         }
 
         public void changes_all() {
-            var settings = new iZiCodeEditor.Settings () ;
-            settings.set_recent_files () ;
+            string[] recent_files = {} ;
+            for( int i = 0 ; i < files.length () ; i++ ){
+                    recent_files += files.nth_data (i) ;
+            }
+            Application.settings.set_strv ("recent-files", recent_files) ;
+
             for( int i = (int) files.length () - 1 ; i >= 0 ; i-- ){
                 var tabs = new iZiCodeEditor.Tabs () ;
                 string path = tabs.get_path_at_tab (i) ;
