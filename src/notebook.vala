@@ -154,6 +154,11 @@ namespace iZiCodeEditor{
                 if( notebook.get_n_pages () == 0 ){
                     toolbar.set_title (NAME) ;
                     toolbar.set_subtitle (null) ;
+                } else {
+                    string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
+                    string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
+                    toolbar.set_title (filename) ;
+                    toolbar.set_subtitle (filelocation) ;
                 }
             }
         }
