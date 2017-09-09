@@ -6,8 +6,8 @@ namespace iZiCodeEditor{
     public iZiCodeEditor.Toolbar toolbar ;
 
     public class MainWin : Gtk.ApplicationWindow {
-
         private const GLib.ActionEntry[] action_entries = {
+
             { "next-page", next_page },
             { "undo", action_undo },
             { "redo", action_redo },

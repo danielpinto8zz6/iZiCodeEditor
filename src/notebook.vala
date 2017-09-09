@@ -2,6 +2,10 @@ namespace iZiCodeEditor{
     public class NBook : Gtk.Notebook {
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
         private Gtk.SourceView tab_view ;
+        Gee.HashMap<string, string> brackets ;
+        Gee.TreeSet<Gtk.TextBuffer> buffers ;
+        string last_inserted ;
+        private Gtk.SourceBuffer buffer ;
 
         public void create_tab(string path) {
 
@@ -75,12 +79,31 @@ namespace iZiCodeEditor{
             //// drag and drop
             Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
             tab_view.drag_data_received.connect (on_drag_data_received) ;
+
+            buffers = new Gee.TreeSet<Gtk.TextBuffer> () ;
+            brackets = new Gee.HashMap<string, string> () ;
+            brackets.set ("(", ")") ;
+            brackets.set ("[", "]") ;
+            brackets.set ("{", "}") ;
+            brackets.set ("<", ">") ;
+            brackets.set ("⟨", "⟩") ;
+            brackets.set ("｢", "｣") ;
+            brackets.set ("⸤", "⸥") ;
+            brackets.set ("‘", "‘") ;
+            brackets.set ("'", "'") ;
+            brackets.set ("\"", "\"") ;
+
             // style scheme
-            var buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
+            buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
             buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
             Application.settings.changed["scheme"].connect (() => {
                 buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
             }) ;
+
+            buffer.insert_text.disconnect (on_insert_text) ;
+            buffer.insert_text.connect (on_insert_text) ;
+            buffers.add (buffer) ;
+
             var tab_page = new Gtk.ScrolledWindow (null, null) ;
             tab_page.add (tab_view) ;
             tab_page.show_all () ;
@@ -140,6 +163,38 @@ namespace iZiCodeEditor{
             buffer.modified_changed.connect (() => {
                 on_modified_changed (buffer, tab_label, path) ;
             }) ;
+        }
+
+        private void on_insert_text(ref Gtk.TextIter pos, string new_text, int new_text_length) {
+            // If you are copy/pasting a large amount of text...
+            if( new_text_length > 1 ){
+                return ;
+            }
+            // To avoid infinite loop
+            if( last_inserted == new_text ){
+                return ;
+            }
+
+            if( new_text in brackets.keys ){
+                string text = brackets.get (new_text) ;
+                int len = text.length ;
+                last_inserted = text ;
+                buffer.insert (ref pos, text, len) ;
+
+                // To make " and ' brackets work correctly (opening and closing chars are the same)
+                last_inserted = null ;
+
+                pos.backward_chars (len) ;
+                buffer.place_cursor (pos) ;
+            } else if( new_text in brackets.values ){ // Handle matching closing brackets.
+                var end_pos = pos ;
+                end_pos.forward_chars (1) ;
+
+                if( new_text == buffer.get_text (pos, end_pos, true) ){
+                    buffer.delete (ref pos, ref end_pos) ;
+                    buffer.place_cursor (pos) ;
+                }
+            }
         }
 
         private void on_tabs_changed(Gtk.Notebook notebook) {

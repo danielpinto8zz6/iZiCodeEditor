@@ -15,11 +15,11 @@ vala_sources = [
 vala_args = [
     '--pkg=gtk+-3.0',
     '--pkg=gtksourceview-3.0',
-    '--pkg=vte-2.91'
+    '--pkg=gee-0.8'
 ]
 
 iZiCodeEditor = executable('iZiCodeEditor',
                      vala_sources,
                      vala_args: vala_args,
                      install: true,
-                     dependencies : [gtk, sourceview, vte])
+                     dependencies : [gtk, sourceview, gee])
