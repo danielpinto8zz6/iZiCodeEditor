@@ -15,6 +15,9 @@ namespace iZiCodeEditor{
             section.append ("Replace...", "app.replace") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
+            section.append ("Go to line...", "app.gotoline") ;
+            menu.append_section (null, section) ;
+            section = new GLib.Menu () ;
             section.append ("Close", "app.close") ;
             section.append ("Close All", "app.close-all") ;
             menu.append_section (null, section) ;

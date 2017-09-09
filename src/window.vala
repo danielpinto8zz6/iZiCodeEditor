@@ -14,6 +14,7 @@ namespace iZiCodeEditor{
             { "open", action_open },
             { "save", action_save },
             { "search", action_search },
+            { "gotoline", action_gotoline },
             { "new", action_new },
             { "save-as", action_save_as },
             { "save-all", action_save_all },
@@ -37,6 +38,7 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.new", { "<Primary>N" }) ;
             app.set_accels_for_action ("app.save-all", { "<Primary><Shift>S" }) ;
             app.set_accels_for_action ("app.search", { "<Primary>F" }) ;
+            app.set_accels_for_action ("app.gotoline", { "<Primary>L" }) ;
             app.set_accels_for_action ("app.replace", { "<Primary>H" }) ;
             app.set_accels_for_action ("app.color", { "F9" }) ;
             app.set_accels_for_action ("app.pref", { "<Primary>P" }) ;
@@ -183,6 +185,14 @@ namespace iZiCodeEditor{
             }
             var search = new iZiCodeEditor.Search () ;
             search.show_dialog () ;
+        }
+
+        public void action_gotoline() {
+            if( notebook.get_n_pages () == 0 ){
+                return ;
+            }
+            var gotoline = new iZiCodeEditor.GoToLine () ;
+            gotoline.show_dialog () ;
         }
 
         // gear menu

@@ -160,6 +160,7 @@ namespace iZiCodeEditor{
             notebook.show_all () ;
             notebook.page_added.connect (() => { on_tabs_changed (notebook) ; }) ;
             notebook.page_removed.connect (() => { on_tabs_changed (notebook) ; }) ;
+            print ("%i", buffer.get_line_count ()) ;
             buffer.modified_changed.connect (() => {
                 on_modified_changed (buffer, tab_label, path) ;
             }) ;

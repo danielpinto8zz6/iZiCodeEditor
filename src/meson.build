@@ -9,7 +9,8 @@ vala_sources = [
     'window.vala',
     'toolbar.vala',
     'replace.vala',
-    'utils.vala'
+    'utils.vala',
+    'goto.vala'
 ]
 
 vala_args = [
