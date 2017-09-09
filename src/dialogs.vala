@@ -69,6 +69,7 @@ namespace iZiCodeEditor{
         public void changes_all() {
             string[] recent_files = {} ;
             for( int i = 0 ; i < files.length () ; i++ ){
+                if( files.nth_data (i) != "Untitled" )
                     recent_files += files.nth_data (i) ;
             }
             Application.settings.set_strv ("recent-files", recent_files) ;
