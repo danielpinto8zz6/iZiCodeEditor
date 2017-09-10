@@ -24,6 +24,13 @@ namespace iZiCodeEditor{
                 selected = chooser.get_filename () ;
                 var nbook = new iZiCodeEditor.NBook () ;
                 var operations = new iZiCodeEditor.Operations () ;
+                var tabs = new iZiCodeEditor.Tabs () ;
+                string path = tabs.get_path_at_tab (notebook.get_current_page ()) ;
+                var view = tabs.get_sourceview_at_tab (notebook.get_current_page ()) ;
+                var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+                if( buffer.get_modified () == false && path == "Untitled" ){
+                    operations.close_tab () ;
+                }
                 nbook.create_tab (selected) ;
                 operations.open_file (selected) ;
             }
