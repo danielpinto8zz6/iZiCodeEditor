@@ -243,7 +243,7 @@ namespace iZiCodeEditor{
             Application.settings.set_boolean ("maximized", window.is_maximized) ;
             Application.settings.set_int ("width", width) ;
             Application.settings.set_int ("height", height) ;
-            Application.settings.set_int ("active-tab", notebook.get_current_page ()) ;
+            Application.settings.set_uint ("active-tab", notebook.get_current_page ()) ;
 
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.changes_all () ;

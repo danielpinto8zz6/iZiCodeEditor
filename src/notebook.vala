@@ -116,6 +116,7 @@ namespace iZiCodeEditor{
             var tab_page = new Gtk.Grid () ;
             tab_page.attach (scroll, 0, 0, 1, 1) ;
             tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
+            tab_page.show_all () ;
 
             if( Application.settings.get_boolean ("source-map") ){
                 source_map.show () ;
@@ -174,7 +175,7 @@ namespace iZiCodeEditor{
             tab.set_hexpand (false) ;
             tab.show_all () ;
             files.append (path) ;
-            print ("debug: added %s\n", path) ;
+            //print ("debug: added %s\n", path) ;
             var menu_label = new Gtk.Label (GLib.Path.get_basename (path)) ;
             menu_label.set_alignment (0.0f, 0.5f) ;
             // Add tab and page to notebook
@@ -185,7 +186,6 @@ namespace iZiCodeEditor{
             notebook.show_all () ;
             notebook.page_added.connect (() => { on_tabs_changed (notebook) ; }) ;
             notebook.page_removed.connect (() => { on_tabs_changed (notebook) ; }) ;
-            print ("%i", buffer.get_line_count ()) ;
             buffer.modified_changed.connect (() => {
                 on_modified_changed (buffer, tab_label, path) ;
             }) ;
@@ -258,7 +258,7 @@ namespace iZiCodeEditor{
                 notebook.remove_page (page_num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
-                print ("debug: removed %s\n", path) ;
+                //print ("debug: removed %s\n", path) ;
                 if( notebook.get_n_pages () == 0 ){
                     toolbar.set_title (NAME) ;
                     toolbar.set_subtitle (null) ;

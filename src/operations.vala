@@ -12,7 +12,7 @@ namespace iZiCodeEditor{
                         operations.open_file (recent_files[i]) ;
                     }
                 }
-                notebook.set_current_page (Application.settings.get_int ("active-tab")) ;
+                notebook.set_current_page ((int) Application.settings.get_uint ("active-tab")) ;
             }
         }
 
@@ -53,7 +53,7 @@ namespace iZiCodeEditor{
             try {
                 file.replace_contents (bf.text.data, null, false, 0, null, null) ;
                 bf.set_modified (false) ;
-                print ("debug saved: %s\n", filename) ;
+                //print ("debug saved: %s\n", filename) ;
             } catch ( Error e ){
                 var dialogs = new iZiCodeEditor.Dialogs () ;
                 dialogs.save_fallback (filename) ;
@@ -143,22 +143,22 @@ namespace iZiCodeEditor{
                 return ;
             }
             var tabs = new iZiCodeEditor.Tabs () ;
-            var scrolled = (Gtk.ScrolledWindow)notebook.get_nth_page (
+            var tab_page = (Gtk.Grid)notebook.get_nth_page (
                 notebook.get_current_page ()) ;
             string path = tabs.get_current_path () ;
             var nbook = new iZiCodeEditor.NBook () ;
-            nbook.destroy_tab (scrolled, path) ;
+            nbook.destroy_tab (tab_page, path) ;
         }
 
         // close all tab
         public void close_all_tabs() {
             for( uint i = files.length () ; i > 0 ; i-- ){
                 var tabs = new iZiCodeEditor.Tabs () ;
-                var scrolled = (Gtk.ScrolledWindow)notebook.get_nth_page (
+                var tab_page = (Gtk.Grid)notebook.get_nth_page (
                     notebook.get_current_page ()) ;
                 string path = tabs.get_current_path () ;
                 var nbook = new iZiCodeEditor.NBook () ;
-                nbook.destroy_tab (scrolled, path) ;
+                nbook.destroy_tab (tab_page, path) ;
             }
         }
 

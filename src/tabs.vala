@@ -49,7 +49,7 @@ namespace iZiCodeEditor{
                     var tab_page = (Gtk.Grid)notebook.get_nth_page (i) ;
                     var nbook = new iZiCodeEditor.NBook () ;
                     nbook.destroy_tab (tab_page, path) ;
-                    print ("debug: removed tab number %d with: %s\n", i, path) ;
+                    //print ("debug: removed tab number %d with: %s\n", i, path) ;
                 }
             }
         }
