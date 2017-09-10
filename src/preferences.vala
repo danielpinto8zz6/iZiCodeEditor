@@ -15,6 +15,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_pattern_show ;
         Gtk.Switch button_darktheme ;
         Gtk.Switch button_textwrap ;
+        Gtk.Switch button_source_map ;
 
         public void on_activate() {
 
@@ -41,6 +42,8 @@ namespace iZiCodeEditor{
             var label_theme_header = new Gtk.Label ("<b>Theme</b>") ;
             var label_source_header = new Gtk.Label ("<b>Source</b>") ;
             var label_indent_header = new Gtk.Label ("<b>Indent</b>") ;
+            var label_source_map_header = new Gtk.Label ("<b>Source Map</b>") ;
+            var label_source_map = new Gtk.Label ("Show source map") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_scheme.set_halign (Gtk.Align.START) ;
@@ -64,6 +67,8 @@ namespace iZiCodeEditor{
             label_theme_header.set_halign (Gtk.Align.START) ;
             label_source_header.set_halign (Gtk.Align.START) ;
             label_indent_header.set_halign (Gtk.Align.START) ;
+            label_source_map.set_halign (Gtk.Align.START) ;
+            label_source_map_header.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_scheme.set_hexpand (true) ;
@@ -87,6 +92,8 @@ namespace iZiCodeEditor{
             label_theme_header.set_hexpand (true) ;
             label_source_header.set_hexpand (true) ;
             label_indent_header.set_hexpand (true) ;
+            label_source_map.set_hexpand (true) ;
+            label_source_map_header.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -97,6 +104,7 @@ namespace iZiCodeEditor{
             label_theme_header.set_use_markup (true) ;
             label_source_header.set_use_markup (true) ;
             label_indent_header.set_use_markup (true) ;
+            label_source_map_header.set_use_markup (true) ;
 
             label_font_header.set_line_wrap (true) ;
             label_color_header.set_line_wrap (true) ;
@@ -107,6 +115,7 @@ namespace iZiCodeEditor{
             label_theme_header.set_line_wrap (true) ;
             label_source_header.set_line_wrap (true) ;
             label_indent_header.set_line_wrap (true) ;
+            label_source_map_header.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -122,6 +131,7 @@ namespace iZiCodeEditor{
             button_pattern_show = new Gtk.Switch () ;
             button_darktheme = new Gtk.Switch () ;
             button_textwrap = new Gtk.Switch () ;
+            button_source_map = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_scheme.set_halign (Gtk.Align.END) ;
@@ -136,6 +146,7 @@ namespace iZiCodeEditor{
             button_pattern_show.set_halign (Gtk.Align.END) ;
             button_darktheme.set_halign (Gtk.Align.END) ;
             button_textwrap.set_halign (Gtk.Align.END) ;
+            button_source_map.set_halign (Gtk.Align.END) ;
 
             button_font.set_font_name (Application.settings.get_string ("font")) ;
             button_font.notify["font"].connect (() => {
@@ -152,6 +163,7 @@ namespace iZiCodeEditor{
             Application.settings.bind ("pattern-show", button_pattern_show, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
 
             button_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme")) ;
             button_scheme.notify["style-scheme"].connect (() => {
@@ -191,6 +203,9 @@ namespace iZiCodeEditor{
             grid_view.attach (label_theme_header, 0, 10, 1, 1) ;
             grid_view.attach (label_darktheme, 0, 11, 1, 1) ;
             grid_view.attach (button_darktheme, 1, 11, 1, 1) ;
+            grid_view.attach (label_source_map_header, 0, 12, 1, 1) ;
+            grid_view.attach (label_source_map, 0, 13, 1, 1) ;
+            grid_view.attach (button_source_map, 1, 13, 1, 1) ;
             grid_view.set_can_focus (false) ;
             grid_view.set_margin_start (10) ;
             grid_view.set_margin_end (10) ;

@@ -116,6 +116,22 @@ namespace iZiCodeEditor{
             var tab_page = new Gtk.Grid () ;
             tab_page.attach (scroll, 0, 0, 1, 1) ;
             tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
+
+            if( Application.settings.get_boolean ("source-map") ){
+                source_map.show () ;
+            } else {
+                source_map.hide () ;
+                source_map.no_show_all = true ;
+            }
+            Application.settings.changed["source-map"].connect (() => {
+                if( Application.settings.get_boolean ("source-map") ){
+                    source_map.show () ;
+                } else {
+                    source_map.hide () ;
+                    source_map.no_show_all = true ;
+                }
+            }) ;
+
             // File name
 
             string fname = GLib.Path.get_basename (path) ;

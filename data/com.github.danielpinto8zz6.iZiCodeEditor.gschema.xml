@@ -91,5 +91,10 @@
       <summary>text-wrap</summary>
       <description>Text wrap</description>
     </key>
+    <key name="source-map" type="b">
+      <default>true</default>
+      <summary>source-map</summary>
+      <description>Source map</description>
+    </key>
   </schema>
 </schemalist>
