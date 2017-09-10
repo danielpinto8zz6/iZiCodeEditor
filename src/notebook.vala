@@ -6,6 +6,7 @@ namespace iZiCodeEditor{
         Gee.TreeSet<Gtk.TextBuffer> buffers ;
         string last_inserted ;
         private Gtk.SourceBuffer buffer ;
+        private Gtk.SourceMap source_map ;
 
         public void create_tab(string path) {
 
@@ -20,6 +21,7 @@ namespace iZiCodeEditor{
             }
             // Page
             tab_view = new Gtk.SourceView () ;
+            source_map = new Gtk.SourceMap () ;
 
             var provider = new Gtk.CssProvider () ;
             try {
@@ -104,9 +106,16 @@ namespace iZiCodeEditor{
             buffer.insert_text.connect (on_insert_text) ;
             buffers.add (buffer) ;
 
-            var tab_page = new Gtk.ScrolledWindow (null, null) ;
-            tab_page.add (tab_view) ;
-            tab_page.show_all () ;
+            var scroll = new Gtk.ScrolledWindow (null, null) ;
+            scroll.add (tab_view) ;
+            scroll.set_hexpand (true) ;
+            scroll.set_vexpand (true) ;
+
+            source_map.set_view (tab_view) ;
+
+            var tab_page = new Gtk.Grid () ;
+            tab_page.attach (scroll, 0, 0, 1, 1) ;
+            tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
             // File name
 
             string fname = GLib.Path.get_basename (path) ;
