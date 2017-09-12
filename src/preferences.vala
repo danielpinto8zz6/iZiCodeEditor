@@ -161,17 +161,17 @@ namespace iZiCodeEditor{
             Application.settings.bind ("indent-size", button_indent_size, "value", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("tab-size", button_tab_size, "value", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("numbers-show", button_numbers_show, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("highlight", button_highlight, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("highlight-current-line", button_highlight, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("margin-show", button_margin_show, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("margin-pos", button_margin_pos, "value", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("spaces", button_spaces, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("spaces-instead-of-tabs", button_spaces, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("auto-indent", button_auto_indent, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("pattern-show", button_pattern_show, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
 
-            button_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme")) ;
+            button_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme")) ;
             button_scheme.notify["style-scheme"].connect (() => {
                 Application.settings.set_string ("scheme", button_scheme.style_scheme.id) ;
             }) ;

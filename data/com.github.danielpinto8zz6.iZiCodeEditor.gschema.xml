@@ -20,9 +20,9 @@
       <summary>font</summary>
       <description>Editor font</description>
     </key>
-    <key name="scheme" type="s">
-      <default>'kate'</default>
-      <summary>scheme</summary>
+    <key name="color-scheme" type="s">
+      <default>'classic'</default>
+      <summary>color-scheme</summary>
       <description>Color scheme</description>
     </key>
     <key name="margin-pos" type="u">
@@ -45,9 +45,9 @@
       <summary>numbers-show</summary>
       <description>Show line numbers</description>
     </key>
-    <key name="highlight" type="b">
+    <key name="highlight-current-line" type="b">
       <default>true</default>
-      <summary>highlight</summary>
+      <summary>highlight-current-line</summary>
       <description>Highlight current line</description>
     </key>
     <key name="margin-show" type="b">
@@ -56,7 +56,7 @@
       <description>Show margin on right</description>
     </key>
 
-    <key name="spaces" type="b">
+    <key name="spaces-instead-of-tabs" type="b">
       <default>true</default>
       <summary>spaces</summary>
       <description>Insert spaces instead of tabs</description>

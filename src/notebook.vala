@@ -44,9 +44,9 @@ namespace iZiCodeEditor{
             Application.settings.bind ("indent-size", tab_view, "indent_width", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("margin-pos", tab_view, "right_margin_position", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("numbers-show", tab_view, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("highlight", tab_view, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("highlight-current-line", tab_view, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("margin-show", tab_view, "show_right_margin", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("spaces", tab_view, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("spaces-instead-of-tabs", tab_view, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("auto-indent", tab_view, "auto_indent", SettingsBindFlags.DEFAULT) ;
             if( Application.settings.get_boolean ("pattern-show") ){
                 tab_view.set_background_pattern (Gtk.SourceBackgroundPatternType.GRID) ;
@@ -97,9 +97,9 @@ namespace iZiCodeEditor{
 
             // style scheme
             buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
-            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
+            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
             Application.settings.changed["scheme"].connect (() => {
-                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("scheme"))) ;
+                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
             }) ;
 
             buffer.insert_text.disconnect (on_insert_text) ;
