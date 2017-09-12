@@ -120,16 +120,20 @@ namespace iZiCodeEditor{
 
             if( Application.settings.get_boolean ("source-map") ){
                 source_map.show () ;
+                scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
             } else {
                 source_map.hide () ;
                 source_map.no_show_all = true ;
+                scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
             }
             Application.settings.changed["source-map"].connect (() => {
                 if( Application.settings.get_boolean ("source-map") ){
                     source_map.show () ;
+                    scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
                 } else {
                     source_map.hide () ;
                     source_map.no_show_all = true ;
+                    scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
                 }
             }) ;
 
