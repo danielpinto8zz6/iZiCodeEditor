@@ -16,6 +16,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_darktheme ;
         Gtk.Switch button_textwrap ;
         Gtk.Switch button_source_map ;
+        Gtk.Switch button_highlight_matching_brackets ;
 
         public void on_activate() {
 
@@ -44,6 +45,7 @@ namespace iZiCodeEditor{
             var label_indent_header = new Gtk.Label ("<b>Indent</b>") ;
             var label_source_map_header = new Gtk.Label ("<b>Source Map</b>") ;
             var label_source_map = new Gtk.Label ("Show source map") ;
+            var label_highlight_matching_brackets = new Gtk.Label ("Highlight matching brackets") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_scheme.set_halign (Gtk.Align.START) ;
@@ -69,6 +71,7 @@ namespace iZiCodeEditor{
             label_indent_header.set_halign (Gtk.Align.START) ;
             label_source_map.set_halign (Gtk.Align.START) ;
             label_source_map_header.set_halign (Gtk.Align.START) ;
+            label_highlight_matching_brackets.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_scheme.set_hexpand (true) ;
@@ -94,6 +97,7 @@ namespace iZiCodeEditor{
             label_indent_header.set_hexpand (true) ;
             label_source_map.set_hexpand (true) ;
             label_source_map_header.set_hexpand (true) ;
+            label_highlight_matching_brackets.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -132,6 +136,7 @@ namespace iZiCodeEditor{
             button_darktheme = new Gtk.Switch () ;
             button_textwrap = new Gtk.Switch () ;
             button_source_map = new Gtk.Switch () ;
+            button_highlight_matching_brackets = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_scheme.set_halign (Gtk.Align.END) ;
@@ -147,6 +152,7 @@ namespace iZiCodeEditor{
             button_darktheme.set_halign (Gtk.Align.END) ;
             button_textwrap.set_halign (Gtk.Align.END) ;
             button_source_map.set_halign (Gtk.Align.END) ;
+            button_highlight_matching_brackets.set_halign (Gtk.Align.END) ;
 
             button_font.set_font_name (Application.settings.get_string ("font")) ;
             button_font.notify["font"].connect (() => {
@@ -169,6 +175,8 @@ namespace iZiCodeEditor{
             button_scheme.notify["style-scheme"].connect (() => {
                 Application.settings.set_string ("scheme", button_scheme.style_scheme.id) ;
             }) ;
+
+            Application.settings.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;
@@ -200,12 +208,14 @@ namespace iZiCodeEditor{
             grid_view.attach (label_highlight_header, 0, 8, 1, 1) ;
             grid_view.attach (label_highlight, 0, 9, 1, 1) ;
             grid_view.attach (button_highlight, 1, 9, 1, 1) ;
-            grid_view.attach (label_theme_header, 0, 10, 1, 1) ;
-            grid_view.attach (label_darktheme, 0, 11, 1, 1) ;
-            grid_view.attach (button_darktheme, 1, 11, 1, 1) ;
-            grid_view.attach (label_source_map_header, 0, 12, 1, 1) ;
-            grid_view.attach (label_source_map, 0, 13, 1, 1) ;
-            grid_view.attach (button_source_map, 1, 13, 1, 1) ;
+            grid_view.attach (label_highlight_matching_brackets, 0, 10, 1, 1) ;
+            grid_view.attach (button_highlight_matching_brackets, 1, 10, 1, 1) ;
+            grid_view.attach (label_theme_header, 0, 11, 1, 1) ;
+            grid_view.attach (label_darktheme, 0, 12, 1, 1) ;
+            grid_view.attach (button_darktheme, 1, 12, 1, 1) ;
+            grid_view.attach (label_source_map_header, 0, 13, 1, 1) ;
+            grid_view.attach (label_source_map, 0, 14, 1, 1) ;
+            grid_view.attach (button_source_map, 1, 14, 1, 1) ;
             grid_view.set_can_focus (false) ;
             grid_view.set_margin_start (10) ;
             grid_view.set_margin_end (10) ;

@@ -106,6 +106,8 @@ namespace iZiCodeEditor{
             buffer.insert_text.connect (on_insert_text) ;
             buffers.add (buffer) ;
 
+            Application.settings.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
+
             var scroll = new Gtk.ScrolledWindow (null, null) ;
             scroll.add (tab_view) ;
             scroll.set_hexpand (true) ;
@@ -179,7 +181,7 @@ namespace iZiCodeEditor{
             tab.set_hexpand (false) ;
             tab.show_all () ;
             files.append (path) ;
-            //print ("debug: added %s\n", path) ;
+            // print ("debug: added %s\n", path) ;
             var menu_label = new Gtk.Label (GLib.Path.get_basename (path)) ;
             menu_label.set_alignment (0.0f, 0.5f) ;
             // Add tab and page to notebook
@@ -262,7 +264,7 @@ namespace iZiCodeEditor{
                 notebook.remove_page (page_num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
-                //print ("debug: removed %s\n", path) ;
+                // print ("debug: removed %s\n", path) ;
                 if( notebook.get_n_pages () == 0 ){
                     toolbar.set_title (NAME) ;
                     toolbar.set_subtitle (null) ;

@@ -96,5 +96,10 @@
       <summary>source-map</summary>
       <description>Source map</description>
     </key>
+    <key name="highlight-matching-brackets" type="b">
+      <default>true</default>
+      <summary>highlight-matching-brackets</summary>
+      <description>Highlight matching brackets</description>
+    </key>
   </schema>
 </schemalist>
