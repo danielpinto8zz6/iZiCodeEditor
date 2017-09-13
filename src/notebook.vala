@@ -23,22 +23,10 @@ namespace iZiCodeEditor{
             tab_view = new Gtk.SourceView () ;
             source_map = new Gtk.SourceMap () ;
 
-            var provider = new Gtk.CssProvider () ;
-            try {
-                provider.load_from_data (pango_font_description_to_css (), pango_font_description_to_css ().length) ;
-            } catch ( Error e ){
-                stderr.printf ("Error: %s\n", e.message) ;
-            }
+            tab_view.override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
             Application.settings.changed["font"].connect (() => {
-                try {
-                    provider.load_from_data (pango_font_description_to_css (), pango_font_description_to_css ().length) ;
-                } catch ( Error e ){
-                    stderr.printf ("Error: %s\n", e.message) ;
-                }
+                tab_view.override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
             }) ;
-
-            tab_view.get_style_context ().add_provider (provider,
-                                                        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
 
             Application.settings.bind ("tab-size", tab_view, "tab_width", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("indent-size", tab_view, "indent_width", SettingsBindFlags.DEFAULT) ;
@@ -160,6 +148,7 @@ namespace iZiCodeEditor{
                 }
                 return false ;
             }) ;
+            var provider = new Gtk.CssProvider () ;
             var css_stuff = """ * { padding :0; } """ ;
             try {
                 provider.load_from_data (css_stuff, css_stuff.length) ;
