@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor" path="/com/github/danielpinto8zz6/iZiCodeEditor/">
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.saved-state" path="/com/github/danielpinto8zz6/iZiCodeEditor/saved-state/">
     <key name="width" type="i">
       <default>900</default>
       <summary>width</summary>
@@ -15,6 +15,18 @@
       <summary>Maximized</summary>
       <description>Main window maximized</description>
     </key>
+    <key name="recent-files" type="as">
+      <default>[]</default>
+      <summary>Recently opened files</summary>
+      <description>Recently opened files</description>
+    </key>
+    <key name="active-tab" type="u">
+      <default>0</default>
+      <summary>active-tab</summary>
+      <description>Active tab position</description>
+    </key>
+  </schema>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/">
     <key name="font" type="s">
       <default>'Monospace Regular 14'</default>
       <summary>font</summary>
@@ -70,16 +82,6 @@
       <default>true</default>
       <summary>pattern-show</summary>
       <description>Show grid pattern</description>
-    </key>
-    <key name="recent-files" type="as">
-      <default>[]</default>
-      <summary>Recently opened files</summary>
-      <description>Recently opened files</description>
-    </key>
-    <key name="active-tab" type="u">
-      <default>0</default>
-      <summary>active-tab</summary>
-      <description>Active tab position</description>
     </key>
     <key name="dark-mode" type="b">
       <default>false</default>

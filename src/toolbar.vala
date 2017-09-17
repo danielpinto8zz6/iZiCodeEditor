@@ -28,6 +28,7 @@ namespace iZiCodeEditor{
             section.append ("About", "app.about") ;
             section.append ("Quit", "app.quit") ;
             menu.append_section (null, section) ;
+            
             // app.set_app_menu (menu) ;
 
             var leftIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;

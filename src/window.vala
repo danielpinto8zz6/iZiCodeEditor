@@ -65,7 +65,7 @@ namespace iZiCodeEditor{
             // window
             window = new Gtk.ApplicationWindow (app) ;
             window.window_position = Gtk.WindowPosition.CENTER ;
-            window.set_default_size (Application.settings.get_int ("width"), Application.settings.get_int ("height")) ;
+            window.set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height")) ;
             window.set_icon_name (ICON) ;
 
             Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings.get_boolean ("dark-mode")) ;
@@ -79,7 +79,7 @@ namespace iZiCodeEditor{
             toolbar.set_title (NAME) ;
             window.set_titlebar (toolbar) ;
 
-            if( Application.settings.get_boolean ("maximized") ){
+            if( Application.saved_state.get_boolean ("maximized") ){
                 window.maximize () ;
             }
 
@@ -93,12 +93,12 @@ namespace iZiCodeEditor{
             leftPane.pack2 (content, true, false) ;
 
             var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
-            rightPane.position = (Application.settings.get_int ("width") - 180) ;
+            rightPane.position = (Application.saved_state.get_int ("width") - 180) ;
             rightPane.pack1 (leftPane, true, false) ;
             // rightPane.pack2 (rightBar, false, false) ;
 
             var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
-            mainPane.position = (Application.settings.get_int ("height") - 150) ;
+            mainPane.position = (Application.saved_state.get_int ("height") - 150) ;
             mainPane.pack1 (rightPane, true, false) ;
             // mainPane.pack2 (bottomBar, false, false) ;
 
@@ -246,10 +246,10 @@ namespace iZiCodeEditor{
         public void action_quit() {
             int width, height ;
             window.get_size (out width, out height) ;
-            Application.settings.set_boolean ("maximized", window.is_maximized) ;
-            Application.settings.set_int ("width", width) ;
-            Application.settings.set_int ("height", height) ;
-            Application.settings.set_uint ("active-tab", notebook.get_current_page ()) ;
+            Application.saved_state.set_boolean ("maximized", window.is_maximized) ;
+            Application.saved_state.set_int ("width", width) ;
+            Application.saved_state.set_int ("height", height) ;
+            Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
 
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.changes_all () ;

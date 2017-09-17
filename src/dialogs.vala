@@ -44,7 +44,6 @@ namespace iZiCodeEditor{
             dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
             dialog.add_button ("Save", Gtk.ResponseType.YES) ;
-            dialog.set_title ("Question") ;
             dialog.set_resizable (false) ;
             dialog.set_default_response (Gtk.ResponseType.YES) ;
             int response = dialog.run () ;
@@ -79,7 +78,7 @@ namespace iZiCodeEditor{
                 if( files.nth_data (i) != "Untitled" )
                     recent_files += files.nth_data (i) ;
             }
-            Application.settings.set_strv ("recent-files", recent_files) ;
+            Application.saved_state.set_strv ("recent-files", recent_files) ;
 
             for( int i = (int) files.length () - 1 ; i >= 0 ; i-- ){
                 var tabs = new iZiCodeEditor.Tabs () ;
@@ -132,7 +131,6 @@ namespace iZiCodeEditor{
             dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Select New Location", Gtk.ResponseType.YES) ;
             dialog.set_resizable (false) ;
-            dialog.set_title ("Error") ;
             dialog.set_default_response (Gtk.ResponseType.YES) ;
             int response = dialog.run () ;
             switch( response ){
@@ -160,6 +158,26 @@ namespace iZiCodeEditor{
             about.license_type = Gtk.License.GPL_3_0 ;
             about.run () ;
             about.hide () ;
+        }
+
+        public void reset_all() {
+            var dialog = new Gtk.MessageDialog (window,
+                                                Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
+                                                "Are you sure you want to reset all preferences?") ;
+            dialog.add_button ("Yes", Gtk.ResponseType.YES) ;
+            dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
+            dialog.set_resizable (false) ;
+            dialog.set_default_response (Gtk.ResponseType.YES) ;
+            int response = dialog.run () ;
+            switch( response ){
+            case Gtk.ResponseType.CANCEL:
+                break ;
+            case Gtk.ResponseType.YES:
+                foreach( var key in Application.settings.settings_schema.list_keys () )
+                    Application.settings.reset (key) ;
+                break ;
+            }
+            dialog.destroy () ;
         }
 
     }

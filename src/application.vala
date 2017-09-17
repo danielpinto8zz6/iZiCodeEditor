@@ -7,13 +7,18 @@ namespace iZiCodeEditor{
 
     private class Application : Gtk.Application {
 
-        private static GLib.Settings _settings = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor") ;
+        private static GLib.Settings _settings = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings") ;
         public static GLib.Settings settings {
             get {
                 return _settings ;
             }
         }
-
+        private static GLib.Settings _saved_state = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.saved-state") ;
+        public static GLib.Settings saved_state {
+            get {
+                return _saved_state ;
+            }
+        }
         public Application () {
             Object (application_id: "org.vala-apps.iZiCodeEditor",
                     flags : GLib.ApplicationFlags.HANDLES_OPEN) ;

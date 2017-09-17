@@ -184,12 +184,18 @@ namespace iZiCodeEditor{
             preferences.set_title ("Preferences") ;
             preferences.set_transient_for (window) ;
             preferences.set_property ("skip-taskbar-hint", true) ;
-            preferences.set_resizable (false) ;
+            preferences.set_resizable (true) ;
 
             var header = new Gtk.HeaderBar () ;
             header.set_show_close_button (true) ;
             header.set_title ("Preferences") ;
             preferences.set_titlebar (header) ;
+
+            var menuButton = new Gtk.Button.with_label ("Reset") ;
+            header.pack_end (menuButton) ;
+
+            var dialogs = new iZiCodeEditor.Dialogs () ;
+            menuButton.clicked.connect (dialogs.reset_all) ;
 
             // View Grid
             var grid_view = new Gtk.Grid () ;
