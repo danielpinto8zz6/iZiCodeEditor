@@ -10,7 +10,8 @@ vala_sources = [
     'toolbar.vala',
     'replace.vala',
     'utils.vala',
-    'goto.vala'
+    'goto.vala',
+    'sourceview.vala'
 ]
 
 vala_args = [

@@ -1,11 +1,7 @@
 namespace iZiCodeEditor{
     public class NBook : Gtk.Notebook {
-        private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
-        private Gtk.SourceView tab_view ;
-        Gee.HashMap<string, string> brackets ;
-        Gee.TreeSet<Gtk.TextBuffer> buffers ;
-        string last_inserted ;
-        private Gtk.SourceBuffer buffer ;
+        public iZiCodeEditor.SourceView tab_view ;
+
         private Gtk.SourceMap source_map ;
 
         public void create_tab(string path) {
@@ -20,81 +16,10 @@ namespace iZiCodeEditor{
                 }
             }
             // Page
-            tab_view = new Gtk.SourceView () ;
+            tab_view = new iZiCodeEditor.SourceView () ;
             source_map = new Gtk.SourceMap () ;
 
-            tab_view.override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
-            Application.settings.changed["font"].connect (() => {
-                tab_view.override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
-            }) ;
-
-            Application.settings.bind ("tab-size", tab_view, "tab_width", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("indent-size", tab_view, "indent_width", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-pos", tab_view, "right_margin_position", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("numbers-show", tab_view, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("highlight-current-line", tab_view, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-show", tab_view, "show_right_margin", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("spaces-instead-of-tabs", tab_view, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("auto-indent", tab_view, "auto_indent", SettingsBindFlags.DEFAULT) ;
-            if( Application.settings.get_boolean ("pattern-show") ){
-                tab_view.set_background_pattern (Gtk.SourceBackgroundPatternType.GRID) ;
-            } else {
-                tab_view.set_background_pattern (Gtk.SourceBackgroundPatternType.NONE) ;
-            }
-            Application.settings.changed["pattern-show"].connect (() => {
-                if( Application.settings.get_boolean ("pattern-show") ){
-                    tab_view.background_pattern = Gtk.SourceBackgroundPatternType.GRID ;
-                } else {
-                    tab_view.background_pattern = Gtk.SourceBackgroundPatternType.NONE ;
-                }
-            }) ;
-            // default
-            tab_view.set_cursor_visible (true) ;
-            tab_view.set_left_margin (10) ;
-            tab_view.set_smart_backspace (true) ;
-
-            if( Application.settings.get_boolean ("text-wrap") ){
-                tab_view.set_wrap_mode (Gtk.WrapMode.WORD) ;
-            } else {
-                tab_view.set_wrap_mode (Gtk.WrapMode.NONE) ;
-            }
-            Application.settings.changed["pattern-show"].connect (() => {
-                if( Application.settings.get_boolean ("text-wrap") ){
-                    tab_view.set_wrap_mode (Gtk.WrapMode.WORD) ;
-                } else {
-                    tab_view.set_wrap_mode (Gtk.WrapMode.NONE) ;
-                }
-            }) ;
-
-            //// drag and drop
-            Gtk.drag_dest_set (tab_view, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
             tab_view.drag_data_received.connect (on_drag_data_received) ;
-
-            buffers = new Gee.TreeSet<Gtk.TextBuffer> () ;
-            brackets = new Gee.HashMap<string, string> () ;
-            brackets.set ("(", ")") ;
-            brackets.set ("[", "]") ;
-            brackets.set ("{", "}") ;
-            brackets.set ("<", ">") ;
-            brackets.set ("⟨", "⟩") ;
-            brackets.set ("｢", "｣") ;
-            brackets.set ("⸤", "⸥") ;
-            brackets.set ("‘", "‘") ;
-            brackets.set ("'", "'") ;
-            brackets.set ("\"", "\"") ;
-
-            // style scheme
-            buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
-            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
-            Application.settings.changed["scheme"].connect (() => {
-                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
-            }) ;
-
-            buffer.insert_text.disconnect (on_insert_text) ;
-            buffer.insert_text.connect (on_insert_text) ;
-            buffers.add (buffer) ;
-
-            Application.settings.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
 
             var scroll = new Gtk.ScrolledWindow (null, null) ;
             scroll.add (tab_view) ;
@@ -181,41 +106,9 @@ namespace iZiCodeEditor{
             notebook.show_all () ;
             notebook.page_added.connect (() => { on_tabs_changed (notebook) ; }) ;
             notebook.page_removed.connect (() => { on_tabs_changed (notebook) ; }) ;
-            buffer.modified_changed.connect (() => {
-                on_modified_changed (buffer, tab_label, path) ;
+            tab_view.buffer.modified_changed.connect (() => {
+                on_modified_changed (tab_view.buffer, tab_label, path) ;
             }) ;
-        }
-
-        private void on_insert_text(ref Gtk.TextIter pos, string new_text, int new_text_length) {
-            // If you are copy/pasting a large amount of text...
-            if( new_text_length > 1 ){
-                return ;
-            }
-            // To avoid infinite loop
-            if( last_inserted == new_text ){
-                return ;
-            }
-
-            if( new_text in brackets.keys ){
-                string text = brackets.get (new_text) ;
-                int len = text.length ;
-                last_inserted = text ;
-                buffer.insert (ref pos, text, len) ;
-
-                // To make " and ' brackets work correctly (opening and closing chars are the same)
-                last_inserted = null ;
-
-                pos.backward_chars (len) ;
-                buffer.place_cursor (pos) ;
-            } else if( new_text in brackets.values ){ // Handle matching closing brackets.
-                var end_pos = pos ;
-                end_pos.forward_chars (1) ;
-
-                if( new_text == buffer.get_text (pos, end_pos, true) ){
-                    buffer.delete (ref pos, ref end_pos) ;
-                    buffer.place_cursor (pos) ;
-                }
-            }
         }
 
         private void on_tabs_changed(Gtk.Notebook notebook) {
