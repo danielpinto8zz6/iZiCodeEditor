@@ -68,7 +68,7 @@ namespace iZiCodeEditor{
             // style scheme
             buffer = (Gtk.SourceBuffer) this.get_buffer () ;
             buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
-            Application.settings.changed["scheme"].connect (() => {
+            Application.settings.changed["color-scheme"].connect (() => {
                 buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
             }) ;
 

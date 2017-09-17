@@ -2,7 +2,7 @@ namespace iZiCodeEditor{
     public class PrefDialog : Gtk.Dialog {
 
         Gtk.FontButton button_font ;
-        Gtk.SourceStyleSchemeChooserButton button_scheme ;
+        Gtk.SourceStyleSchemeChooserWidget widget_scheme ;
         Gtk.SpinButton button_margin_pos ;
         Gtk.SpinButton button_indent_size ;
         Gtk.SpinButton button_tab_size ;
@@ -22,7 +22,6 @@ namespace iZiCodeEditor{
 
             // Labels
             var label_font = new Gtk.Label ("Editor font") ;
-            var label_scheme = new Gtk.Label ("Color scheme") ;
             var label_margin_pos = new Gtk.Label ("Margin width") ;
             var label_indent_size = new Gtk.Label ("Indent width") ;
             var label_tab_size = new Gtk.Label ("Tab width") ;
@@ -48,7 +47,6 @@ namespace iZiCodeEditor{
             var label_highlight_matching_brackets = new Gtk.Label ("Highlight matching brackets") ;
 
             label_font.set_halign (Gtk.Align.START) ;
-            label_scheme.set_halign (Gtk.Align.START) ;
             label_margin_pos.set_halign (Gtk.Align.START) ;
             label_indent_size.set_halign (Gtk.Align.START) ;
             label_tab_size.set_halign (Gtk.Align.START) ;
@@ -74,7 +72,6 @@ namespace iZiCodeEditor{
             label_highlight_matching_brackets.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
-            label_scheme.set_hexpand (true) ;
             label_margin_pos.set_hexpand (true) ;
             label_indent_size.set_hexpand (true) ;
             label_tab_size.set_hexpand (true) ;
@@ -123,7 +120,7 @@ namespace iZiCodeEditor{
 
             // Buttons
             button_font = new Gtk.FontButton () ;
-            button_scheme = new Gtk.SourceStyleSchemeChooserButton () ;
+            widget_scheme = new Gtk.SourceStyleSchemeChooserWidget () ;
             button_margin_pos = new Gtk.SpinButton.with_range (70, 110, 1) ;
             button_indent_size = new Gtk.SpinButton.with_range (1, 8, 1) ;
             button_tab_size = new Gtk.SpinButton.with_range (1, 8, 1) ;
@@ -139,7 +136,6 @@ namespace iZiCodeEditor{
             button_highlight_matching_brackets = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
-            button_scheme.set_halign (Gtk.Align.END) ;
             button_margin_pos.set_halign (Gtk.Align.END) ;
             button_indent_size.set_halign (Gtk.Align.END) ;
             button_tab_size.set_halign (Gtk.Align.END) ;
@@ -153,6 +149,11 @@ namespace iZiCodeEditor{
             button_textwrap.set_halign (Gtk.Align.END) ;
             button_source_map.set_halign (Gtk.Align.END) ;
             button_highlight_matching_brackets.set_halign (Gtk.Align.END) ;
+
+            var scroll_scheme = new Gtk.ScrolledWindow (null, null) ;
+            scroll_scheme.add (widget_scheme) ;
+            scroll_scheme.set_hexpand (true) ;
+            scroll_scheme.set_vexpand (true) ;
 
             button_font.set_font_name (Application.settings.get_string ("font")) ;
             button_font.notify["font"].connect (() => {
@@ -171,9 +172,9 @@ namespace iZiCodeEditor{
             Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
 
-            button_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme")) ;
-            button_scheme.notify["style-scheme"].connect (() => {
-                Application.settings.set_string ("scheme", button_scheme.style_scheme.id) ;
+            widget_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme")) ;
+            widget_scheme.notify["style-scheme"].connect (() => {
+                Application.settings.set_string ("color-scheme", widget_scheme.style_scheme.id) ;
             }) ;
 
             Application.settings.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
@@ -250,8 +251,7 @@ namespace iZiCodeEditor{
             grid_fontscolors.attach (label_font, 0, 1, 1, 1) ;
             grid_fontscolors.attach (button_font, 1, 1, 1, 1) ;
             grid_fontscolors.attach (label_color_header, 0, 2, 1, 1) ;
-            grid_fontscolors.attach (label_scheme, 0, 3, 1, 1) ;
-            grid_fontscolors.attach (button_scheme, 1, 3, 1, 1) ;
+            grid_fontscolors.attach (scroll_scheme, 0, 3, 2, 1) ;
             grid_fontscolors.set_can_focus (false) ;
             grid_fontscolors.set_margin_start (10) ;
             grid_fontscolors.set_margin_end (10) ;
