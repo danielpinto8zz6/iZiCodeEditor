@@ -17,6 +17,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_textwrap ;
         Gtk.Switch button_source_map ;
         Gtk.Switch button_highlight_matching_brackets ;
+        Gtk.Switch button_status_bar ;
 
         public void on_activate() {
 
@@ -45,6 +46,8 @@ namespace iZiCodeEditor{
             var label_source_map_header = new Gtk.Label ("<b>Source Map</b>") ;
             var label_source_map = new Gtk.Label ("Show source map") ;
             var label_highlight_matching_brackets = new Gtk.Label ("Highlight matching brackets") ;
+            var label_status_bar_header = new Gtk.Label ("<b>Status Bar</b>") ;
+            var label_status_bar = new Gtk.Label ("Show status bar") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_margin_pos.set_halign (Gtk.Align.START) ;
@@ -70,6 +73,9 @@ namespace iZiCodeEditor{
             label_source_map.set_halign (Gtk.Align.START) ;
             label_source_map_header.set_halign (Gtk.Align.START) ;
             label_highlight_matching_brackets.set_halign (Gtk.Align.START) ;
+            label_status_bar_header.set_halign (Gtk.Align.START) ;
+            label_status_bar.set_halign (Gtk.Align.START) ;
+
 
             label_font.set_hexpand (true) ;
             label_margin_pos.set_hexpand (true) ;
@@ -95,6 +101,8 @@ namespace iZiCodeEditor{
             label_source_map.set_hexpand (true) ;
             label_source_map_header.set_hexpand (true) ;
             label_highlight_matching_brackets.set_hexpand (true) ;
+            label_status_bar_header.set_hexpand (true) ;
+            label_status_bar.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -106,6 +114,7 @@ namespace iZiCodeEditor{
             label_source_header.set_use_markup (true) ;
             label_indent_header.set_use_markup (true) ;
             label_source_map_header.set_use_markup (true) ;
+            label_status_bar_header.set_use_markup (true) ;
 
             label_font_header.set_line_wrap (true) ;
             label_color_header.set_line_wrap (true) ;
@@ -117,6 +126,7 @@ namespace iZiCodeEditor{
             label_source_header.set_line_wrap (true) ;
             label_indent_header.set_line_wrap (true) ;
             label_source_map_header.set_line_wrap (true) ;
+            label_status_bar_header.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -134,6 +144,7 @@ namespace iZiCodeEditor{
             button_textwrap = new Gtk.Switch () ;
             button_source_map = new Gtk.Switch () ;
             button_highlight_matching_brackets = new Gtk.Switch () ;
+            button_status_bar = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_margin_pos.set_halign (Gtk.Align.END) ;
@@ -149,6 +160,7 @@ namespace iZiCodeEditor{
             button_textwrap.set_halign (Gtk.Align.END) ;
             button_source_map.set_halign (Gtk.Align.END) ;
             button_highlight_matching_brackets.set_halign (Gtk.Align.END) ;
+            button_status_bar.set_halign (Gtk.Align.END) ;
 
             var scroll_scheme = new Gtk.ScrolledWindow (null, null) ;
             scroll_scheme.add (widget_scheme) ;
@@ -171,6 +183,7 @@ namespace iZiCodeEditor{
             Application.settings.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings.bind ("status-bar", button_status_bar, "active", SettingsBindFlags.DEFAULT) ;
 
             widget_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme")) ;
             widget_scheme.notify["style-scheme"].connect (() => {
@@ -223,6 +236,9 @@ namespace iZiCodeEditor{
             grid_view.attach (label_source_map_header, 0, 13, 1, 1) ;
             grid_view.attach (label_source_map, 0, 14, 1, 1) ;
             grid_view.attach (button_source_map, 1, 14, 1, 1) ;
+            grid_view.attach (label_status_bar_header, 0, 15, 1, 1) ;
+            grid_view.attach (label_status_bar, 0, 16, 1, 1) ;
+            grid_view.attach (button_status_bar, 1, 16, 1, 1) ;
             grid_view.set_can_focus (false) ;
             grid_view.set_margin_start (10) ;
             grid_view.set_margin_end (10) ;

@@ -78,6 +78,7 @@ namespace iZiCodeEditor{
             toolbar.set_show_close_button (true) ;
             toolbar.set_title (NAME) ;
             window.set_titlebar (toolbar) ;
+            toolbar.show_all () ;
 
             if( Application.saved_state.get_boolean ("maximized") ){
                 window.maximize () ;
@@ -102,13 +103,39 @@ namespace iZiCodeEditor{
             mainPane.pack1 (rightPane, true, false) ;
             // mainPane.pack2 (bottomBar, false, false) ;
 
+            Gtk.ActionBar action_bar = new Gtk.ActionBar () ;
+
+            Gtk.Button zoomoutButton = new Gtk.Button.from_icon_name ("zoom-out", Gtk.IconSize.SMALL_TOOLBAR) ;
+            action_bar.pack_start (zoomoutButton) ;
+            zoomoutButton.clicked.connect (zoom_out) ;
+            Gtk.Button zoominButton = new Gtk.Button.from_icon_name ("zoom-in", Gtk.IconSize.SMALL_TOOLBAR) ;
+            action_bar.pack_start (zoominButton) ;
+            zoominButton.clicked.connect (zoom_in) ;
+
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
             mainBox.pack_start (mainPane, false, true, 0) ;
 
+            mainBox.pack_end (action_bar, false, false, 0) ;
+
+            mainBox.show_all () ;
+
+            if( Application.settings.get_boolean ("status-bar") ){
+                action_bar.show () ;
+            } else {
+                action_bar.hide () ;
+            }
+            Application.settings.changed["status-bar"].connect (() => {
+                if( Application.settings.get_boolean ("status-bar") ){
+                    action_bar.show () ;
+                } else {
+                    action_bar.hide () ;
+                }
+            }) ;
+
             window.add (mainBox) ;
 
-            window.show_all () ;
+            window.show () ;
 
             window.delete_event.connect (() => {
                 action_quit () ;
@@ -174,7 +201,7 @@ namespace iZiCodeEditor{
             operations.redo_last () ;
         }
 
-        // buttons
+// buttons
         public void action_open() {
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_open () ;
@@ -201,7 +228,7 @@ namespace iZiCodeEditor{
             gotoline.show_dialog () ;
         }
 
-        // gear menu
+// gear menu
         public void action_new() {
             var nbook = new iZiCodeEditor.NBook () ;
             nbook.create_tab ("Untitled") ;
@@ -232,7 +259,7 @@ namespace iZiCodeEditor{
             operations.close_all_tabs () ;
         }
 
-        // app menu
+// app menu
         public void action_preferences() {
             var prefdialog = new iZiCodeEditor.PrefDialog () ;
             prefdialog.on_activate () ;

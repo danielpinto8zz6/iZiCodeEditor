@@ -103,5 +103,10 @@
       <summary>highlight-matching-brackets</summary>
       <description>Highlight matching brackets</description>
     </key>
+    <key name="status-bar" type="b">
+      <default>true</default>
+      <summary>status-bar</summary>
+      <description>Show / Hide status bar</description>
+    </key>
   </schema>
 </schemalist>
