@@ -5,6 +5,7 @@ project('iZiCodeEditor', ['vala', 'c'],
 gtk = dependency('gtk+-3.0')
 sourceview = dependency('gtksourceview-3.0')
 gee = dependency ('gee-0.8')
+vte = dependency ('vte-2.91')
 
 subdir('src')
 subdir('data')

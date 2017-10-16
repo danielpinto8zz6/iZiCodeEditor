@@ -108,5 +108,10 @@
       <summary>status-bar</summary>
       <description>Show / Hide status bar</description>
     </key>
+    <key name="terminal" type="b">
+      <default>false</default>
+      <summary>terminal</summary>
+      <description>Show / Hide terminal</description>
+    </key>
   </schema>
 </schemalist>

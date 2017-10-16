@@ -4,6 +4,8 @@ namespace iZiCodeEditor{
     private Gtk.Notebook notebook ;
     private Gtk.Button searchButton ;
     public iZiCodeEditor.Toolbar toolbar ;
+    private Gtk.Notebook bottomBar ;
+    private iZiCodeEditor.Terminal terminal ;
 
     public int FONT_SIZE_MAX = 72 ;
     public int FONT_SIZE_MIN = 7 ;
@@ -88,6 +90,12 @@ namespace iZiCodeEditor{
             content.width_request = 200 ;
             content.pack_start (notebook, true, true, 0) ;
 
+            // Bottom Bar
+            bottomBar = new Gtk.Notebook () ;
+            bottomBar.no_show_all = true ;
+            bottomBar.page_added.connect (() => { on_bars_changed (bottomBar) ; }) ;
+            bottomBar.page_removed.connect (() => { on_bars_changed (bottomBar) ; }) ;
+
             var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL) ;
             leftPane.position = 180 ;
             // leftPane.pack1 (leftBar, false, false) ;
@@ -101,7 +109,7 @@ namespace iZiCodeEditor{
             var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL) ;
             mainPane.position = (Application.saved_state.get_int ("height") - 150) ;
             mainPane.pack1 (rightPane, true, false) ;
-            // mainPane.pack2 (bottomBar, false, false) ;
+            mainPane.pack2 (bottomBar, false, false) ;
 
             Gtk.ActionBar action_bar = new Gtk.ActionBar () ;
 
@@ -112,13 +120,31 @@ namespace iZiCodeEditor{
             action_bar.pack_start (zoominButton) ;
             zoominButton.clicked.connect (zoom_in) ;
 
-            var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
+            terminal = new iZiCodeEditor.Terminal () ;
 
-            mainBox.pack_start (mainPane, false, true, 0) ;
+            var label_terminal = new Gtk.Label ("Terminal") ;
+            var scrolled_terminal = (Gtk.ScrolledWindow)terminal.get_child_at (1, 0) ;
 
-            mainBox.pack_end (action_bar, false, false, 0) ;
+            var terminal_switch = new Gtk.Button.from_icon_name ("terminal", Gtk.IconSize.SMALL_TOOLBAR) ;
+            action_bar.pack_start (terminal_switch) ;
 
-            mainBox.show_all () ;
+            terminal_switch.clicked.connect (() => {
+                Application.settings.set_boolean ("terminal", !Application.settings.get_boolean ("terminal")) ;
+            }) ;
+
+
+            if( Application.settings.get_boolean ("terminal") ){
+                bottomBar.append_page (terminal, label_terminal) ;
+            } else {
+                bottomBar.remove_page (notebook.page_num (scrolled_terminal)) ;
+            }
+            Application.settings.changed["terminal"].connect (() => {
+                if( Application.settings.get_boolean ("terminal") ){
+                    bottomBar.append_page (terminal, label_terminal) ;
+                } else {
+                    bottomBar.remove_page (notebook.page_num (scrolled_terminal)) ;
+                }
+            }) ;
 
             if( Application.settings.get_boolean ("status-bar") ){
                 action_bar.show () ;
@@ -133,6 +159,14 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
+            var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
+
+            mainBox.pack_start (mainPane, false, true, 0) ;
+
+            mainBox.pack_end (action_bar, false, false, 0) ;
+
+            mainBox.show_all () ;
+
             window.add (mainBox) ;
 
             window.show () ;
@@ -141,6 +175,13 @@ namespace iZiCodeEditor{
                 action_quit () ;
                 return true ;
             }) ;
+        }
+
+        private void on_bars_changed(Gtk.Notebook notebook) {
+            var pages = notebook.get_n_pages () ;
+            notebook.set_show_tabs (pages > 1) ;
+            notebook.no_show_all = (pages == 0) ;
+            notebook.visible = (pages > 0) ;
         }
 
         private void next_page() {

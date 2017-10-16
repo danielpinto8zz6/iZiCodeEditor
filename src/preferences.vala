@@ -18,6 +18,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_source_map ;
         Gtk.Switch button_highlight_matching_brackets ;
         Gtk.Switch button_status_bar ;
+        Gtk.Switch button_terminal ;
 
         public void on_activate() {
 
@@ -48,6 +49,9 @@ namespace iZiCodeEditor{
             var label_highlight_matching_brackets = new Gtk.Label ("Highlight matching brackets") ;
             var label_status_bar_header = new Gtk.Label ("<b>Status Bar</b>") ;
             var label_status_bar = new Gtk.Label ("Show status bar") ;
+            var label_terminal_header = new Gtk.Label ("<b>Terminal</b>") ;
+            var label_terminal = new Gtk.Label ("Show terminal") ;
+
 
             label_font.set_halign (Gtk.Align.START) ;
             label_margin_pos.set_halign (Gtk.Align.START) ;
@@ -75,7 +79,8 @@ namespace iZiCodeEditor{
             label_highlight_matching_brackets.set_halign (Gtk.Align.START) ;
             label_status_bar_header.set_halign (Gtk.Align.START) ;
             label_status_bar.set_halign (Gtk.Align.START) ;
-
+            label_terminal_header.set_halign (Gtk.Align.START) ;
+            label_terminal.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_margin_pos.set_hexpand (true) ;
@@ -103,6 +108,8 @@ namespace iZiCodeEditor{
             label_highlight_matching_brackets.set_hexpand (true) ;
             label_status_bar_header.set_hexpand (true) ;
             label_status_bar.set_hexpand (true) ;
+            label_terminal_header.set_hexpand (true) ;
+            label_terminal.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -115,6 +122,7 @@ namespace iZiCodeEditor{
             label_indent_header.set_use_markup (true) ;
             label_source_map_header.set_use_markup (true) ;
             label_status_bar_header.set_use_markup (true) ;
+            label_terminal_header.set_use_markup (true) ;
 
             label_font_header.set_line_wrap (true) ;
             label_color_header.set_line_wrap (true) ;
@@ -127,6 +135,7 @@ namespace iZiCodeEditor{
             label_indent_header.set_line_wrap (true) ;
             label_source_map_header.set_line_wrap (true) ;
             label_status_bar_header.set_line_wrap (true) ;
+            label_terminal_header.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -145,6 +154,7 @@ namespace iZiCodeEditor{
             button_source_map = new Gtk.Switch () ;
             button_highlight_matching_brackets = new Gtk.Switch () ;
             button_status_bar = new Gtk.Switch () ;
+            button_terminal = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_margin_pos.set_halign (Gtk.Align.END) ;
@@ -161,6 +171,7 @@ namespace iZiCodeEditor{
             button_source_map.set_halign (Gtk.Align.END) ;
             button_highlight_matching_brackets.set_halign (Gtk.Align.END) ;
             button_status_bar.set_halign (Gtk.Align.END) ;
+            button_terminal.set_halign (Gtk.Align.END) ;
 
             var scroll_scheme = new Gtk.ScrolledWindow (null, null) ;
             scroll_scheme.add (widget_scheme) ;
@@ -191,6 +202,8 @@ namespace iZiCodeEditor{
             }) ;
 
             Application.settings.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
+
+            Application.settings.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;
@@ -282,10 +295,24 @@ namespace iZiCodeEditor{
             grid_fontscolors.set_row_spacing (10) ;
             grid_fontscolors.set_column_spacing (10) ;
 
+            // Terminal Grid
+            var grid_terminal = new Gtk.Grid () ;
+            grid_terminal.attach (label_terminal_header, 0, 0, 1, 1) ;
+            grid_terminal.attach (label_terminal, 0, 1, 1, 1) ;
+            grid_terminal.attach (button_terminal, 1, 1, 1, 1) ;
+            grid_terminal.set_can_focus (false) ;
+            grid_terminal.set_margin_start (10) ;
+            grid_terminal.set_margin_end (10) ;
+            grid_terminal.set_margin_top (10) ;
+            grid_terminal.set_margin_bottom (10) ;
+            grid_terminal.set_row_spacing (10) ;
+            grid_terminal.set_column_spacing (10) ;
+
             var pref_notebook = new Gtk.Notebook () ;
             pref_notebook.append_page (grid_view, new Gtk.Label ("View")) ;
             pref_notebook.append_page (grid_editor, new Gtk.Label ("Editor")) ;
             pref_notebook.append_page (grid_fontscolors, new Gtk.Label ("Fonts & Colors")) ;
+            pref_notebook.append_page (grid_terminal, new Gtk.Label ("Terminal")) ;
             var content = preferences.get_content_area () as Gtk.Container ;
             content.add (pref_notebook) ;
             preferences.show_all () ;
