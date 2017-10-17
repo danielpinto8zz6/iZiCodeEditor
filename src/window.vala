@@ -123,7 +123,7 @@ namespace iZiCodeEditor{
             terminal = new iZiCodeEditor.Terminal () ;
 
             var label_terminal = new Gtk.Label ("Terminal") ;
-            var scrolled_terminal = (Gtk.ScrolledWindow)terminal.get_child_at (1, 0) ;
+            var scrolled_terminal = (Gtk.Scrollbar)terminal.get_child_at (1, 0) ;
 
             var terminal_switch = new Gtk.Button.from_icon_name ("terminal", Gtk.IconSize.SMALL_TOOLBAR) ;
             action_bar.pack_start (terminal_switch) ;

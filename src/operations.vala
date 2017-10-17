@@ -17,48 +17,51 @@ namespace iZiCodeEditor{
         }
 
         public void open_file(string path) {
-            try {
-                uint8[] contents ;
-                var fileopen = File.new_for_path (path) ;
-                var manager = new Gtk.SourceLanguageManager () ;
-                // mime type and source language
-                FileInfo info = fileopen.query_info ("standard::*", 0, null) ;
-                string content = info.get_content_type () ;
-                string mime = GLib.ContentType.get_mime_type (content) ;
-                Gtk.SourceLanguage lang = manager.guess_language (path, mime) ;
-                var tabs = new iZiCodeEditor.Tabs () ;
-                var view = tabs.get_current_sourceview () ;
-                var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+
+            var fileopen = File.new_for_path (path) ;
+            var manager = new Gtk.SourceLanguageManager () ;
+            var lang = manager.guess_language (fileopen.get_path (), null) ;
+            var tabs = new iZiCodeEditor.Tabs () ;
+            var view = tabs.get_current_sourceview () ;
+            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+            if( lang != null ){
                 buffer.set_language (lang) ;
-                // load file content
-                fileopen.load_contents (null, out contents, null) ;
-                buffer.begin_not_undoable_action () ;
-                buffer.set_text ((string) contents, -1) ;
-                buffer.end_not_undoable_action () ;
-                buffer.set_modified (false) ;
-                // place cursor on start
-                Gtk.TextIter iter_st ;
-                buffer.get_start_iter (out iter_st) ;
-                buffer.place_cursor (iter_st) ;
-                view.scroll_to_iter (iter_st, 0.10, false, 0, 0) ;
-                view.grab_focus () ;
-            } catch ( Error e ){
-                stderr.printf ("error: %s\n", e.message) ;
+                buffer.set_highlight_syntax (true) ;
+            } else {
+                buffer.set_highlight_syntax (false) ;
             }
+            var file = new Gtk.SourceFile () ;
+            file.location = fileopen ;
+
+            var source_file_loader = new Gtk.SourceFileLoader (buffer, file) ;
+
+            var load_cancellable = new GLib.Cancellable () ;
+
+            source_file_loader.load_async.begin (GLib.Priority.DEFAULT, load_cancellable, null) ;
+
+            buffer.set_modified (false) ;
+
+            view.grab_focus () ;
+
         }
 
         // method for saving files
         public void save_from_buffer(string filename, Gtk.SourceBuffer bf) {
-            var file = File.new_for_path (filename) ;
-            try {
-                file.replace_contents (bf.text.data, null, false, 0, null, null) ;
-                bf.set_modified (false) ;
-                //print ("debug saved: %s\n", filename) ;
-            } catch ( Error e ){
+            var filesave = File.new_for_path (filename) ;
+            var file = new Gtk.SourceFile () ;
+            file.location = filesave ;
+
+            var save_cancellable = new GLib.Cancellable () ;
+            var source_file_saver = new Gtk.SourceFileSaver (bf, file) ;
+
+            source_file_saver.save_async.begin (GLib.Priority.DEFAULT, save_cancellable, null) ;
+
+            save_cancellable.cancelled.connect (() => {
                 var dialogs = new iZiCodeEditor.Dialogs () ;
                 dialogs.save_fallback (filename) ;
-                stderr.printf ("error: %s\n", e.message) ;
-            }
+            }) ;
+
+            bf.set_modified (false) ;
         }
 
         // current file
