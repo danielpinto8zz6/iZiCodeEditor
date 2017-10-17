@@ -4,8 +4,10 @@ namespace iZiCodeEditor{
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
         public new Gtk.SourceBuffer buffer ;
         Gee.HashMap<string, string> brackets ;
-        Gee.TreeSet<Gtk.TextBuffer> buffers ;
-        string last_inserted ;
+        Gee.HashMap<uint, string> keys ;
+        const string[] valid_next_chars = {
+            "", " ", "\b", "\r", "\n", "\t", ",", ".", ";", ":"
+        } ;
 
         construct {
 
@@ -52,18 +54,24 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
-            buffers = new Gee.TreeSet<Gtk.TextBuffer> () ;
             brackets = new Gee.HashMap<string, string> () ;
-            brackets.set ("(", ")") ;
-            brackets.set ("[", "]") ;
-            brackets.set ("{", "}") ;
-            brackets.set ("<", ">") ;
-            brackets.set ("⟨", "⟩") ;
-            brackets.set ("｢", "｣") ;
-            brackets.set ("⸤", "⸥") ;
-            brackets.set ("‘", "‘") ;
-            brackets.set ("'", "'") ;
-            brackets.set ("\"", "\"") ;
+            brackets["("] = ")" ;
+            brackets["["] = "]" ;
+            brackets["{"] = "}" ;
+            brackets["'"] = "'" ;
+            brackets["\""] = "\"" ;
+            brackets["`"] = "`" ;
+
+            keys = new Gee.HashMap<uint, string> () ;
+            keys[Gdk.Key.braceleft] = "{" ;
+            keys[Gdk.Key.bracketleft] = "[" ;
+            keys[Gdk.Key.parenleft] = "(" ;
+            keys[Gdk.Key.braceright] = "}" ;
+            keys[Gdk.Key.bracketright] = "]" ;
+            keys[Gdk.Key.parenright] = ")" ;
+            keys[Gdk.Key.quoteright] = "'" ;
+            keys[Gdk.Key.quotedbl] = "\"" ;
+            keys[Gdk.Key.grave] = "`" ;
 
             // style scheme
             buffer = (Gtk.SourceBuffer) this.get_buffer () ;
@@ -72,48 +80,109 @@ namespace iZiCodeEditor{
                 buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
             }) ;
 
-            buffer.insert_text.disconnect (on_insert_text) ;
-            buffer.insert_text.connect (on_insert_text) ;
-            buffers.add (buffer) ;
-
             Application.settings.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
-
 
             //// drag and drop
             Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
 
+            if( this != null ){
+                key_press_event.disconnect (on_key_press) ;
+                backspace.disconnect (on_backspace) ;
+            }
+
+            key_press_event.connect (on_key_press) ;
+            backspace.connect (on_backspace) ;
+
         }
 
-        private void on_insert_text(ref Gtk.TextIter pos, string new_text, int new_text_length) {
-            // If you are copy/pasting a large amount of text...
-            if( new_text_length > 1 ){
-                return ;
-            }
-            // To avoid infinite loop
-            if( last_inserted == new_text ){
-                return ;
-            }
+        string get_next_char() {
+            Gtk.TextIter start, end ;
 
-            if( new_text in brackets.keys ){
-                string text = brackets.get (new_text) ;
-                int len = text.length ;
-                last_inserted = text ;
-                buffer.insert (ref pos, text, len) ;
+            buffer.get_selection_bounds (out start, out end) ;
+            end.forward_char () ;
 
-                // To make " and ' brackets work correctly (opening and closing chars are the same)
-                last_inserted = null ;
+            return buffer.get_text (start, end, true) ;
+        }
 
-                pos.backward_chars (len) ;
-                buffer.place_cursor (pos) ;
-            } else if( new_text in brackets.values ){ // Handle matching closing brackets.
-                var end_pos = pos ;
-                end_pos.forward_chars (1) ;
+        string get_previous_char() {
+            Gtk.TextIter start, end ;
 
-                if( new_text == buffer.get_text (pos, end_pos, true) ){
-                    buffer.delete (ref pos, ref end_pos) ;
-                    buffer.place_cursor (pos) ;
+            buffer.get_selection_bounds (out start, out end) ;
+            start.backward_char () ;
+
+            return buffer.get_text (start, end, true) ;
+        }
+
+        void on_backspace() {
+            if( !buffer.has_selection ){
+                string left_char = get_previous_char () ;
+                string right_char = get_next_char () ;
+
+                if( brackets.has_key (left_char) && right_char in brackets.values ){
+                    Gtk.TextIter start, end ;
+
+                    buffer.get_selection_bounds (out start, out end) ;
+                    start.backward_char () ;
+                    end.forward_char () ;
+                    buffer.select_range (start, end) ;
                 }
             }
+        }
+
+        void complete_brackets(string opening_bracket) {
+            Gtk.TextIter start, end ;
+            buffer.get_selection_bounds (out start, out end) ;
+
+            string current_selection = buffer.get_text (start, end, true) ;
+            string closing_bracket = brackets[opening_bracket] ;
+            string text = opening_bracket + current_selection + closing_bracket ;
+
+            buffer.begin_user_action () ;
+
+            buffer.delete (ref start, ref end) ;
+            buffer.insert (ref start, text, text.length) ;
+
+            buffer.get_selection_bounds (out start, out end) ;
+            end.backward_char () ;
+            start.backward_chars (current_selection.length + 1) ;
+            buffer.select_range (start, end) ;
+
+            buffer.end_user_action () ;
+        }
+
+        void skip_char() {
+            Gtk.TextIter start, end ;
+
+            buffer.get_selection_bounds (out start, out end) ;
+            end.forward_char () ;
+            buffer.place_cursor (end) ;
+        }
+
+        bool has_valid_next_char(string next_char) {
+            return next_char in valid_next_chars ||
+                   next_char in brackets.values ||
+                   brackets.has_key (next_char) ;
+        }
+
+        bool on_key_press(Gdk.EventKey event) {
+            if( keys.has_key (event.keyval) &&
+                !(Gdk.ModifierType.MOD1_MASK in event.state) &&
+                !(Gdk.ModifierType.CONTROL_MASK in event.state) ){
+
+                string bracket = keys[event.keyval] ;
+                string next_char = get_next_char () ;
+
+                if( brackets.has_key (bracket) &&
+                    (buffer.has_selection || has_valid_next_char (next_char)) ){
+                    complete_brackets (bracket) ;
+                    return true ;
+                } else if( bracket in brackets.values && next_char == bracket ){
+                    skip_char () ;
+                    return true ;
+                }
+            }
+
+            return false ;
         }
 
     }
