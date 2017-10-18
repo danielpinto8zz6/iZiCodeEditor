@@ -123,5 +123,20 @@
       <summary>terminal</summary>
       <description>Show / Hide terminal</description>
     </key>
+    <key name="font" type="s">
+      <default>'Monospace Regular 12'</default>
+      <summary>font</summary>
+      <description>Terminal font</description>
+    </key>
+    <key name="bgcolor" type="s">
+      <default>'#252E32'</default>
+      <summary>Background</summary>
+      <description>Terminal background color</description>
+    </key>
+    <key name="fgcolor" type="s">
+      <default>'#BFCCCD'</default>
+      <summary>Foreground</summary>
+      <description>Terminal foreground color</description>
+    </key>
   </schema>
 </schemalist>

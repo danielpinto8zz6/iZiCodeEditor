@@ -6,6 +6,7 @@ namespace iZiCodeEditor{
         Gtk.SpinButton button_margin_pos ;
         Gtk.SpinButton button_indent_size ;
         Gtk.SpinButton button_tab_size ;
+        Gtk.FontButton button_terminal_font ;
 
         Gtk.Switch button_numbers_show ;
         Gtk.Switch button_highlight ;
@@ -20,6 +21,9 @@ namespace iZiCodeEditor{
         Gtk.Switch button_status_bar ;
         Gtk.Switch button_terminal ;
         Gtk.Switch button_brackets_completion ;
+
+        Gtk.ColorButton button_terminal_fg ;
+        Gtk.ColorButton button_terminal_bg ;
 
         public void on_activate() {
 
@@ -54,8 +58,11 @@ namespace iZiCodeEditor{
             var label_terminal = new Gtk.Label ("Show terminal") ;
             var label_brackets_completion_header = new Gtk.Label ("<b>Completion</b>") ;
             var label_brackets_completion = new Gtk.Label ("Brackets Completion") ;
-
-
+            var label_terminal_font_header = new Gtk.Label ("<b>Font</b>") ;
+            var label_terminal_font = new Gtk.Label ("Terminal font") ;
+            var label_terminal_color_header = new Gtk.Label ("<b>Color</b>") ;
+            var label_terminal_color_bg = new Gtk.Label ("Background Color") ;
+            var label_terminal_color_fg = new Gtk.Label ("Foreground Color") ;
 
             label_font.set_halign (Gtk.Align.START) ;
             label_margin_pos.set_halign (Gtk.Align.START) ;
@@ -87,6 +94,11 @@ namespace iZiCodeEditor{
             label_terminal.set_halign (Gtk.Align.START) ;
             label_brackets_completion.set_halign (Gtk.Align.START) ;
             label_brackets_completion_header.set_halign (Gtk.Align.START) ;
+            label_terminal_font_header.set_halign (Gtk.Align.START) ;
+            label_terminal_font.set_halign (Gtk.Align.START) ;
+            label_terminal_color_header.set_halign (Gtk.Align.START) ;
+            label_terminal_color_bg.set_halign (Gtk.Align.START) ;
+            label_terminal_color_fg.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_margin_pos.set_hexpand (true) ;
@@ -118,6 +130,11 @@ namespace iZiCodeEditor{
             label_terminal.set_hexpand (true) ;
             label_brackets_completion.set_hexpand (true) ;
             label_brackets_completion_header.set_hexpand (true) ;
+            label_terminal_font_header.set_hexpand (true) ;
+            label_terminal_font.set_hexpand (true) ;
+            label_terminal_color_header.set_hexpand (true) ;
+            label_terminal_color_bg.set_hexpand (true) ;
+            label_terminal_color_fg.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -132,6 +149,8 @@ namespace iZiCodeEditor{
             label_status_bar_header.set_use_markup (true) ;
             label_terminal_header.set_use_markup (true) ;
             label_brackets_completion_header.set_use_markup (true) ;
+            label_terminal_font_header.set_use_markup (true) ;
+            label_terminal_color_header.set_use_markup (true) ;
 
             label_font_header.set_line_wrap (true) ;
             label_color_header.set_line_wrap (true) ;
@@ -146,6 +165,8 @@ namespace iZiCodeEditor{
             label_status_bar_header.set_line_wrap (true) ;
             label_terminal_header.set_line_wrap (true) ;
             label_brackets_completion.set_line_wrap (true) ;
+            label_terminal_font_header.set_line_wrap (true) ;
+            label_terminal_color_header.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -166,6 +187,9 @@ namespace iZiCodeEditor{
             button_status_bar = new Gtk.Switch () ;
             button_terminal = new Gtk.Switch () ;
             button_brackets_completion = new Gtk.Switch () ;
+            button_terminal_font = new Gtk.FontButton () ;
+            button_terminal_bg = new Gtk.ColorButton () ;
+            button_terminal_fg = new Gtk.ColorButton () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_margin_pos.set_halign (Gtk.Align.END) ;
@@ -184,6 +208,9 @@ namespace iZiCodeEditor{
             button_status_bar.set_halign (Gtk.Align.END) ;
             button_terminal.set_halign (Gtk.Align.END) ;
             button_brackets_completion.set_halign (Gtk.Align.END) ;
+            button_terminal_font.set_halign (Gtk.Align.END) ;
+            button_terminal_bg.set_halign (Gtk.Align.END) ;
+            button_terminal_fg.set_halign (Gtk.Align.END) ;
 
             var scroll_scheme = new Gtk.ScrolledWindow (null, null) ;
             scroll_scheme.add (widget_scheme) ;
@@ -214,6 +241,25 @@ namespace iZiCodeEditor{
             Application.settings_editor.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings_terminal.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT) ;
             Application.settings_editor.bind ("brackets-completion", button_brackets_completion, "active", SettingsBindFlags.DEFAULT) ;
+            button_terminal_font.set_font_name (Application.settings_terminal.get_string ("font")) ;
+            button_terminal_font.notify["font"].connect (() => {
+                Application.settings_terminal.set_string ("font", button_terminal_font.get_font ().to_string ()) ;
+            }) ;
+            string background_setting = Application.settings_terminal.get_string ("bgcolor") ;
+            Gdk.RGBA background_color = Gdk.RGBA () ;
+            background_color.parse (background_setting) ;
+            button_terminal_bg.set_rgba (background_color) ;
+            button_terminal_bg.notify["color"].connect (() => {
+                Application.settings_terminal.set_string ("bgcolor", button_terminal_bg.get_rgba ().to_string ()) ;
+            }) ;
+            string foreground_setting = Application.settings_terminal.get_string ("fgcolor") ;
+            Gdk.RGBA foreground_color = Gdk.RGBA () ;
+            foreground_color.parse (foreground_setting) ;
+            button_terminal_fg.set_rgba (foreground_color) ;
+            button_terminal_fg.notify["color"].connect (() => {
+                Application.settings_terminal.set_string ("fgcolor", button_terminal_fg.get_rgba ().to_string ()) ;
+                print ("DEBUG : %s", button_terminal_fg.get_rgba ().to_string ()) ;
+            }) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;
@@ -313,6 +359,14 @@ namespace iZiCodeEditor{
             grid_terminal.attach (label_terminal_header, 0, 0, 1, 1) ;
             grid_terminal.attach (label_terminal, 0, 1, 1, 1) ;
             grid_terminal.attach (button_terminal, 1, 1, 1, 1) ;
+            grid_terminal.attach (label_terminal_font_header, 0, 2, 1, 1) ;
+            grid_terminal.attach (label_terminal_font, 0, 3, 1, 1) ;
+            grid_terminal.attach (button_terminal_font, 1, 3, 1, 1) ;
+            grid_terminal.attach (label_terminal_color_header, 0, 4, 1, 1) ;
+            grid_terminal.attach (label_terminal_color_bg, 0, 5, 1, 1) ;
+            grid_terminal.attach (button_terminal_bg, 1, 5, 1, 1) ;
+            grid_terminal.attach (label_terminal_color_fg, 0, 6, 1, 1) ;
+            grid_terminal.attach (button_terminal_fg, 1, 6, 1, 1) ;
             grid_terminal.set_can_focus (false) ;
             grid_terminal.set_margin_start (10) ;
             grid_terminal.set_margin_end (10) ;
