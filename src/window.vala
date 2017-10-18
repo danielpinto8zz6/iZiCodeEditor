@@ -66,10 +66,10 @@ namespace iZiCodeEditor{
             window.set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height")) ;
             window.set_icon_name (ICON) ;
 
-            Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings.get_boolean ("dark-mode")) ;
+            Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode")) ;
 
-            Application.settings.changed["dark-mode"].connect (() => {
-                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings.get_boolean ("dark-mode")) ;
+            Application.settings_view.changed["dark-mode"].connect (() => {
+                Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode")) ;
             }) ;
 
             toolbar = new iZiCodeEditor.Toolbar () ;
@@ -112,13 +112,13 @@ namespace iZiCodeEditor{
             var label_terminal = new Gtk.Label ("Terminal") ;
             var scrolled_terminal = (Gtk.Scrollbar)terminal.get_child_at (1, 0) ;
 
-            if( Application.settings.get_boolean ("terminal") ){
+            if( Application.settings_terminal.get_boolean ("terminal") ){
                 bottomBar.append_page (terminal, label_terminal) ;
             } else {
                 bottomBar.remove_page (notebook.page_num (scrolled_terminal)) ;
             }
-            Application.settings.changed["terminal"].connect (() => {
-                if( Application.settings.get_boolean ("terminal") ){
+            Application.settings_terminal.changed["terminal"].connect (() => {
+                if( Application.settings_terminal.get_boolean ("terminal") ){
                     bottomBar.append_page (terminal, label_terminal) ;
                 } else {
                     bottomBar.remove_page (notebook.page_num (scrolled_terminal)) ;
@@ -137,13 +137,13 @@ namespace iZiCodeEditor{
 
             window.add (mainBox) ;
 
-            if( Application.settings.get_boolean ("status-bar") ){
+            if( Application.settings_view.get_boolean ("status-bar") ){
                 status_bar.show () ;
             } else {
                 status_bar.hide () ;
             }
-            Application.settings.changed["status-bar"].connect (() => {
-                if( Application.settings.get_boolean ("status-bar") ){
+            Application.settings_view.changed["status-bar"].connect (() => {
+                if( Application.settings_view.get_boolean ("status-bar") ){
                     status_bar.show () ;
                 } else {
                     status_bar.hide () ;

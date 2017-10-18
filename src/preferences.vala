@@ -190,34 +190,30 @@ namespace iZiCodeEditor{
             scroll_scheme.set_hexpand (true) ;
             scroll_scheme.set_vexpand (true) ;
 
-            button_font.set_font_name (Application.settings.get_string ("font")) ;
+            button_font.set_font_name (Application.settings_fonts_colors.get_string ("font")) ;
             button_font.notify["font"].connect (() => {
-                Application.settings.set_string ("font", button_font.get_font ().to_string ()) ;
+                Application.settings_fonts_colors.set_string ("font", button_font.get_font ().to_string ()) ;
             }) ;
-            Application.settings.bind ("indent-size", button_indent_size, "value", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("tab-size", button_tab_size, "value", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("numbers-show", button_numbers_show, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("highlight-current-line", button_highlight, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-show", button_margin_show, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-pos", button_margin_pos, "value", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("spaces-instead-of-tabs", button_spaces, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("auto-indent", button_auto_indent, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("pattern-show", button_pattern_show, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("status-bar", button_status_bar, "active", SettingsBindFlags.DEFAULT) ;
-
-            widget_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme")) ;
+            Application.settings_editor.bind ("indent-size", button_indent_size, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("tab-size", button_tab_size, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("numbers-show", button_numbers_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("highlight-current-line", button_highlight, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("margin-show", button_margin_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("margin-pos", button_margin_pos, "value", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("spaces-instead-of-tabs", button_spaces, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("auto-indent", button_auto_indent, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("pattern-show", button_pattern_show, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("dark-mode", button_darktheme, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("text-wrap", button_textwrap, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("source-map", button_source_map, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("status-bar", button_status_bar, "active", SettingsBindFlags.DEFAULT) ;
+            widget_scheme.style_scheme = Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings_fonts_colors.get_string ("color-scheme")) ;
             widget_scheme.notify["style-scheme"].connect (() => {
-                Application.settings.set_string ("color-scheme", widget_scheme.style_scheme.id) ;
+                Application.settings_fonts_colors.set_string ("color-scheme", widget_scheme.style_scheme.id) ;
             }) ;
-
-            Application.settings.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
-
-            Application.settings.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT) ;
-
-            Application.settings.bind ("brackets-completion", button_brackets_completion, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_terminal.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("brackets-completion", button_brackets_completion, "active", SettingsBindFlags.DEFAULT) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;

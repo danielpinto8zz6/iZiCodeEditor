@@ -11,26 +11,26 @@ namespace iZiCodeEditor{
 
         construct {
 
-            override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
-            Application.settings.changed["font"].connect (() => {
-                override_font (Pango.FontDescription.from_string (Application.settings.get_string ("font"))) ;
+            override_font (Pango.FontDescription.from_string (Application.settings_fonts_colors.get_string ("font"))) ;
+            Application.settings_fonts_colors.changed["font"].connect (() => {
+                override_font (Pango.FontDescription.from_string (Application.settings_fonts_colors.get_string ("font"))) ;
             }) ;
 
-            Application.settings.bind ("tab-size", this, "tab_width", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("indent-size", this, "indent_width", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-pos", this, "right_margin_position", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("numbers-show", this, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("highlight-current-line", this, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("margin-show", this, "show_right_margin", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("spaces-instead-of-tabs", this, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
-            Application.settings.bind ("auto-indent", this, "auto_indent", SettingsBindFlags.DEFAULT) ;
-            if( Application.settings.get_boolean ("pattern-show") ){
+            Application.settings_editor.bind ("tab-size", this, "tab_width", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("indent-size", this, "indent_width", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("margin-pos", this, "right_margin_position", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("numbers-show", this, "show_line_numbers", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("highlight-current-line", this, "highlight_current_line", SettingsBindFlags.DEFAULT) ;
+            Application.settings_view.bind ("margin-show", this, "show_right_margin", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("spaces-instead-of-tabs", this, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("auto-indent", this, "auto_indent", SettingsBindFlags.DEFAULT) ;
+            if( Application.settings_view.get_boolean ("pattern-show") ){
                 set_background_pattern (Gtk.SourceBackgroundPatternType.GRID) ;
             } else {
                 set_background_pattern (Gtk.SourceBackgroundPatternType.NONE) ;
             }
-            Application.settings.changed["pattern-show"].connect (() => {
-                if( Application.settings.get_boolean ("pattern-show") ){
+            Application.settings_view.changed["pattern-show"].connect (() => {
+                if( Application.settings_view.get_boolean ("pattern-show") ){
                     background_pattern = Gtk.SourceBackgroundPatternType.GRID ;
                 } else {
                     background_pattern = Gtk.SourceBackgroundPatternType.NONE ;
@@ -41,13 +41,13 @@ namespace iZiCodeEditor{
             set_left_margin (10) ;
             set_smart_backspace (true) ;
 
-            if( Application.settings.get_boolean ("text-wrap") ){
+            if( Application.settings_view.get_boolean ("text-wrap") ){
                 set_wrap_mode (Gtk.WrapMode.WORD) ;
             } else {
                 set_wrap_mode (Gtk.WrapMode.NONE) ;
             }
-            Application.settings.changed["pattern-show"].connect (() => {
-                if( Application.settings.get_boolean ("text-wrap") ){
+            Application.settings_view.changed["pattern-show"].connect (() => {
+                if( Application.settings_view.get_boolean ("text-wrap") ){
                     set_wrap_mode (Gtk.WrapMode.WORD) ;
                 } else {
                     set_wrap_mode (Gtk.WrapMode.NONE) ;
@@ -75,12 +75,12 @@ namespace iZiCodeEditor{
 
             // style scheme
             buffer = (Gtk.SourceBuffer) this.get_buffer () ;
-            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
-            Application.settings.changed["color-scheme"].connect (() => {
-                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings.get_string ("color-scheme"))) ;
+            buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings_fonts_colors.get_string ("color-scheme"))) ;
+            Application.settings_fonts_colors.changed["color-scheme"].connect (() => {
+                buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings_fonts_colors.get_string ("color-scheme"))) ;
             }) ;
 
-            Application.settings.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
+            Application.settings_editor.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
 
             //// drag and drop
             Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
@@ -115,7 +115,7 @@ namespace iZiCodeEditor{
         }
 
         void on_backspace() {
-            if( Application.settings.get_boolean ("brackets-completion") ){
+            if( Application.settings_editor.get_boolean ("brackets-completion") ){
                 if( !buffer.has_selection ){
                     string left_char = get_previous_char () ;
                     string right_char = get_next_char () ;
@@ -178,7 +178,7 @@ namespace iZiCodeEditor{
                     return true ;
 
                 }
-            } else if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) && Application.settings.get_boolean ("brackets-completion") ){
+            } else if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) && Application.settings_editor.get_boolean ("brackets-completion") ){
 
                 string bracket = keys[event.keyval] ;
                 string next_char = get_next_char () ;
@@ -231,29 +231,29 @@ namespace iZiCodeEditor{
             }
 
             string new_font = font + " " + font_size.to_string () ;
-            Application.settings.set_string ("font", new_font) ;
+            Application.settings_fonts_colors.set_string ("font", new_font) ;
         }
 
         public string get_current_font() {
-            string font = Application.settings.get_string ("font") ;
+            string font = Application.settings_fonts_colors.get_string ("font") ;
             string font_family = font.substring (0, font.last_index_of (" ")) ;
             return font_family ;
         }
 
         public double get_current_font_size() {
-            string font = Application.settings.get_string ("font") ;
+            string font = Application.settings_fonts_colors.get_string ("font") ;
             string font_size = font.substring (font.last_index_of (" ") + 1) ;
             return double.parse (font_size) ;
         }
 
         public string get_default_font() {
-            string font = Application.settings.get_string ("font") ;
+            string font = Application.settings_fonts_colors.get_string ("font") ;
             string font_family = font.substring (0, font.last_index_of (" ")) ;
             return font_family ;
         }
 
         public double get_default_font_size() {
-            string font = Application.settings.get_string ("font") ;
+            string font = Application.settings_fonts_colors.get_string ("font") ;
             string font_size = font.substring (font.last_index_of (" ") + 1) ;
             return double.parse (font_size) ;
         }

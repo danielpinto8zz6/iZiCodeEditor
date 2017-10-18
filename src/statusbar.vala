@@ -15,7 +15,7 @@ namespace iZiCodeEditor{
             pack_start (terminal_switch) ;
 
             terminal_switch.clicked.connect (() => {
-                Application.settings.set_boolean ("terminal", !Application.settings.get_boolean ("terminal")) ;
+                Application.settings_terminal.set_boolean ("terminal", !Application.settings_terminal.get_boolean ("terminal")) ;
             }) ;
         }
     }

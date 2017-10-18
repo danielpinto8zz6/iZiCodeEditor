@@ -26,48 +26,54 @@
       <description>Active tab position</description>
     </key>
   </schema>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/">
-    <key name="font" type="s">
-      <default>'Monospace Regular 14'</default>
-      <summary>font</summary>
-      <description>Editor font</description>
-    </key>
-    <key name="color-scheme" type="s">
-      <default>'classic'</default>
-      <summary>color-scheme</summary>
-      <description>Color scheme</description>
-    </key>
-    <key name="margin-pos" type="u">
-      <default>75</default>
-      <summary>margin-pos</summary>
-      <description>Margin width</description>
-    </key>
-    <key name="indent-size" type="i">
-      <default>4</default>
-      <summary>indent-size</summary>
-      <description>Indent width</description>
-    </key>
-    <key name="tab-size" type="u">
-      <default>4</default>
-      <summary>tab-size</summary>
-      <description>Tab width</description>
-    </key>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.view" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/view/">
     <key name="numbers-show" type="b">
       <default>true</default>
       <summary>numbers-show</summary>
       <description>Show line numbers</description>
     </key>
-    <key name="highlight-current-line" type="b">
+    <key name="pattern-show" type="b">
       <default>true</default>
-      <summary>highlight-current-line</summary>
-      <description>Highlight current line</description>
+      <summary>pattern-show</summary>
+      <description>Show grid pattern</description>
     </key>
     <key name="margin-show" type="b">
       <default>true</default>
       <summary>margin-show</summary>
       <description>Show margin on right</description>
     </key>
-
+    <key name="margin-pos" type="u">
+      <default>75</default>
+      <summary>margin-pos</summary>
+      <description>Margin width</description>
+    </key>
+    <key name="text-wrap" type="b">
+      <default>true</default>
+      <summary>text-wrap</summary>
+      <description>Text wrap</description>
+    </key>
+    <key name="dark-mode" type="b">
+      <default>false</default>
+      <summary>dark-mode</summary>
+      <description>Dark mode theme variant</description>
+    </key>
+    <key name="source-map" type="b">
+      <default>true</default>
+      <summary>source-map</summary>
+      <description>Source map</description>
+    </key>
+    <key name="status-bar" type="b">
+      <default>true</default>
+      <summary>status-bar</summary>
+      <description>Show / Hide status bar</description>
+    </key>
+  </schema>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.editor" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/editor/">
+    <key name="tab-size" type="u">
+      <default>4</default>
+      <summary>tab-size</summary>
+      <description>Tab width</description>
+    </key>
     <key name="spaces-instead-of-tabs" type="b">
       <default>true</default>
       <summary>spaces</summary>
@@ -78,45 +84,44 @@
       <summary>auto-indent</summary>
       <description>Auto indentation of text</description>
     </key>
-    <key name="pattern-show" type="b">
-      <default>true</default>
-      <summary>pattern-show</summary>
-      <description>Show grid pattern</description>
+    <key name="indent-size" type="i">
+      <default>4</default>
+      <summary>indent-size</summary>
+      <description>Indent width</description>
     </key>
-    <key name="dark-mode" type="b">
-      <default>false</default>
-      <summary>dark-mode</summary>
-      <description>Dark mode theme variant</description>
-    </key>
-    <key name="text-wrap" type="b">
+    <key name="highlight-current-line" type="b">
       <default>true</default>
-      <summary>text-wrap</summary>
-      <description>Text wrap</description>
-    </key>
-    <key name="source-map" type="b">
-      <default>true</default>
-      <summary>source-map</summary>
-      <description>Source map</description>
+      <summary>highlight-current-line</summary>
+      <description>Highlight current line</description>
     </key>
     <key name="highlight-matching-brackets" type="b">
       <default>true</default>
       <summary>highlight-matching-brackets</summary>
       <description>Highlight matching brackets</description>
     </key>
-    <key name="status-bar" type="b">
-      <default>true</default>
-      <summary>status-bar</summary>
-      <description>Show / Hide status bar</description>
-    </key>
-    <key name="terminal" type="b">
-      <default>false</default>
-      <summary>terminal</summary>
-      <description>Show / Hide terminal</description>
-    </key>
     <key name="brackets-completion" type="b">
       <default>true</default>
       <summary>brackets-completion</summary>
       <description>Complete brackets while typing</description>
+    </key>
+  </schema>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.fonts-colors" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/fonts-colors/">
+    <key name="font" type="s">
+      <default>'Monospace Regular 14'</default>
+      <summary>font</summary>
+      <description>Editor font</description>
+    </key>
+    <key name="color-scheme" type="s">
+      <default>'classic'</default>
+      <summary>color-scheme</summary>
+      <description>Color scheme</description>
+    </key>
+  </schema>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.terminal" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/terminal/">
+    <key name="terminal" type="b">
+      <default>false</default>
+      <summary>terminal</summary>
+      <description>Show / Hide terminal</description>
     </key>
   </schema>
 </schemalist>

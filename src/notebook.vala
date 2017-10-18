@@ -33,7 +33,7 @@ namespace iZiCodeEditor{
             tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
             tab_page.show_all () ;
 
-            if( Application.settings.get_boolean ("source-map") ){
+            if( Application.settings_view.get_boolean ("source-map") ){
                 source_map.show () ;
                 scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
             } else {
@@ -41,8 +41,8 @@ namespace iZiCodeEditor{
                 source_map.no_show_all = true ;
                 scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
             }
-            Application.settings.changed["source-map"].connect (() => {
-                if( Application.settings.get_boolean ("source-map") ){
+            Application.settings_view.changed["source-map"].connect (() => {
+                if( Application.settings_view.get_boolean ("source-map") ){
                     source_map.show () ;
                     scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
                 } else {

@@ -173,8 +173,14 @@ namespace iZiCodeEditor{
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
-                foreach( var key in Application.settings.settings_schema.list_keys () )
-                    Application.settings.reset (key) ;
+                foreach( var key in Application.settings_editor.settings_schema.list_keys () )
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys () )
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_terminal.settings_schema.list_keys () )
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_view.settings_schema.list_keys () )
+                    Application.settings_view.reset (key) ;
                 break ;
             }
             dialog.destroy () ;

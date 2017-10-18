@@ -33,7 +33,7 @@ namespace iZiCodeEditor{
             terminal.hexpand = true ;
 
             terminal.child_exited.connect (() => {
-                Application.settings.set_boolean ("terminal", false) ;
+                Application.settings_terminal.set_boolean ("terminal", false) ;
             }) ;
 
             show_all () ;

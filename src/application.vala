@@ -7,10 +7,28 @@ namespace iZiCodeEditor{
 
     private class Application : Gtk.Application {
 
-        private static GLib.Settings _settings = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings") ;
-        public static GLib.Settings settings {
+        private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor") ;
+        public static GLib.Settings settings_editor {
             get {
-                return _settings ;
+                return _settings_editor ;
+            }
+        }
+        private static GLib.Settings _settings_fonts_colors = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.fonts-colors") ;
+        public static GLib.Settings settings_fonts_colors {
+            get {
+                return _settings_fonts_colors ;
+            }
+        }
+        private static GLib.Settings _settings_terminal = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.terminal") ;
+        public static GLib.Settings settings_terminal {
+            get {
+                return _settings_terminal ;
+            }
+        }
+        private static GLib.Settings _settings_view = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.view") ;
+        public static GLib.Settings settings_view {
+            get {
+                return _settings_view ;
             }
         }
         private static GLib.Settings _saved_state = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.saved-state") ;
@@ -20,7 +38,7 @@ namespace iZiCodeEditor{
             }
         }
         public Application () {
-            Object (application_id: "org.vala-apps.iZiCodeEditor",
+            Object (application_id: "com.github.danielpinto8zz6.iZiCodeEditor",
                     flags : GLib.ApplicationFlags.HANDLES_OPEN) ;
         }
 
