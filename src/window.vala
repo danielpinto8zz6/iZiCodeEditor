@@ -107,28 +107,10 @@ namespace iZiCodeEditor{
             mainPane.pack1 (rightPane, true, false) ;
             mainPane.pack2 (bottomBar, false, false) ;
 
-            Gtk.ActionBar action_bar = new Gtk.ActionBar () ;
-
-            var sourceview = new iZiCodeEditor.SourceView () ;
-            Gtk.Button zoomoutButton = new Gtk.Button.from_icon_name ("zoom-out", Gtk.IconSize.SMALL_TOOLBAR) ;
-            action_bar.pack_start (zoomoutButton) ;
-            zoomoutButton.clicked.connect (sourceview.zoom_out) ;
-            Gtk.Button zoominButton = new Gtk.Button.from_icon_name ("zoom-in", Gtk.IconSize.SMALL_TOOLBAR) ;
-            action_bar.pack_start (zoominButton) ;
-            zoominButton.clicked.connect (sourceview.zoom_in) ;
-
             terminal = new iZiCodeEditor.Terminal () ;
 
             var label_terminal = new Gtk.Label ("Terminal") ;
             var scrolled_terminal = (Gtk.Scrollbar)terminal.get_child_at (1, 0) ;
-
-            var terminal_switch = new Gtk.Button.from_icon_name ("terminal", Gtk.IconSize.SMALL_TOOLBAR) ;
-            action_bar.pack_start (terminal_switch) ;
-
-            terminal_switch.clicked.connect (() => {
-                Application.settings.set_boolean ("terminal", !Application.settings.get_boolean ("terminal")) ;
-            }) ;
-
 
             if( Application.settings.get_boolean ("terminal") ){
                 bottomBar.append_page (terminal, label_terminal) ;
@@ -143,28 +125,30 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
-            if( Application.settings.get_boolean ("status-bar") ){
-                action_bar.show () ;
-            } else {
-                action_bar.hide () ;
-            }
-            Application.settings.changed["status-bar"].connect (() => {
-                if( Application.settings.get_boolean ("status-bar") ){
-                    action_bar.show () ;
-                } else {
-                    action_bar.hide () ;
-                }
-            }) ;
+            var status_bar = new iZiCodeEditor.StatusBar () ;
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
             mainBox.pack_start (mainPane, false, true, 0) ;
 
-            mainBox.pack_end (action_bar, false, false, 0) ;
+            mainBox.pack_end (status_bar, false, false, 0) ;
 
             mainBox.show_all () ;
 
             window.add (mainBox) ;
+
+            if( Application.settings.get_boolean ("status-bar") ){
+                status_bar.show () ;
+            } else {
+                status_bar.hide () ;
+            }
+            Application.settings.changed["status-bar"].connect (() => {
+                if( Application.settings.get_boolean ("status-bar") ){
+                    status_bar.show () ;
+                } else {
+                    status_bar.hide () ;
+                }
+            }) ;
 
             window.show () ;
 

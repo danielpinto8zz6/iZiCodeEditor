@@ -12,7 +12,8 @@ vala_sources = [
     'utils.vala',
     'goto.vala',
     'sourceview.vala',
-    'terminal.vala'
+    'terminal.vala',
+    'statusbar.vala'
 ]
 
 vala_args = [
