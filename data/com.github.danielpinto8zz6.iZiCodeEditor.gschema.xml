@@ -113,5 +113,10 @@
       <summary>terminal</summary>
       <description>Show / Hide terminal</description>
     </key>
+    <key name="brackets-completion" type="b">
+      <default>true</default>
+      <summary>brackets-completion</summary>
+      <description>Complete brackets while typing</description>
+    </key>
   </schema>
 </schemalist>

@@ -115,17 +115,19 @@ namespace iZiCodeEditor{
         }
 
         void on_backspace() {
-            if( !buffer.has_selection ){
-                string left_char = get_previous_char () ;
-                string right_char = get_next_char () ;
+            if( Application.settings.get_boolean ("brackets-completion") ){
+                if( !buffer.has_selection ){
+                    string left_char = get_previous_char () ;
+                    string right_char = get_next_char () ;
 
-                if( brackets.has_key (left_char) && right_char in brackets.values ){
-                    Gtk.TextIter start, end ;
+                    if( brackets.has_key (left_char) && right_char in brackets.values ){
+                        Gtk.TextIter start, end ;
 
-                    buffer.get_selection_bounds (out start, out end) ;
-                    start.backward_char () ;
-                    end.forward_char () ;
-                    buffer.select_range (start, end) ;
+                        buffer.get_selection_bounds (out start, out end) ;
+                        start.backward_char () ;
+                        end.forward_char () ;
+                        buffer.select_range (start, end) ;
+                    }
                 }
             }
         }
@@ -176,35 +178,32 @@ namespace iZiCodeEditor{
                     return true ;
 
                 }
-            } else {
-                if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) ){
+            } else if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) && Application.settings.get_boolean ("brackets-completion") ){
 
-                    string bracket = keys[event.keyval] ;
-                    string next_char = get_next_char () ;
+                string bracket = keys[event.keyval] ;
+                string next_char = get_next_char () ;
 
-                    if( brackets.has_key (bracket) &&
-                        (buffer.has_selection || has_valid_next_char (next_char)) ){
-                        complete_brackets (bracket) ;
-                        return true ;
-                    } else if( bracket in brackets.values && next_char == bracket ){
-                        skip_char () ;
-                        return true ;
-                    }
+                if( brackets.has_key (bracket) &&
+                    (buffer.has_selection || has_valid_next_char (next_char)) ){
+                    complete_brackets (bracket) ;
+                    return true ;
+                } else if( bracket in brackets.values && next_char == bracket ){
+                    skip_char () ;
+                    return true ;
                 }
             }
-
             return false ;
         }
 
-        bool on_scroll_press(Gdk.EventKey event) {
-            if( (Gdk.ModifierType.CONTROL_MASK in key_event.state) && key_event.delta_y < 0 ){
+        bool on_scroll_press(Gdk.EventScroll event) {
+            if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
                 zoom_in () ;
                 return true ;
-            } else if( (Gdk.ModifierType.CONTROL_MASK in key_event.state) && key_event.delta_y > 0 ){
+            } else if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
                 zoom_out () ;
                 return true ;
             }
-
+            return false ;
         }
 
         public void zoom_in() {

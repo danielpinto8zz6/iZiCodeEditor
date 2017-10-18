@@ -19,6 +19,7 @@ namespace iZiCodeEditor{
         Gtk.Switch button_highlight_matching_brackets ;
         Gtk.Switch button_status_bar ;
         Gtk.Switch button_terminal ;
+        Gtk.Switch button_brackets_completion ;
 
         public void on_activate() {
 
@@ -51,6 +52,9 @@ namespace iZiCodeEditor{
             var label_status_bar = new Gtk.Label ("Show status bar") ;
             var label_terminal_header = new Gtk.Label ("<b>Terminal</b>") ;
             var label_terminal = new Gtk.Label ("Show terminal") ;
+            var label_brackets_completion_header = new Gtk.Label ("<b>Completion</b>") ;
+            var label_brackets_completion = new Gtk.Label ("Brackets Completion") ;
+
 
 
             label_font.set_halign (Gtk.Align.START) ;
@@ -81,6 +85,8 @@ namespace iZiCodeEditor{
             label_status_bar.set_halign (Gtk.Align.START) ;
             label_terminal_header.set_halign (Gtk.Align.START) ;
             label_terminal.set_halign (Gtk.Align.START) ;
+            label_brackets_completion.set_halign (Gtk.Align.START) ;
+            label_brackets_completion_header.set_halign (Gtk.Align.START) ;
 
             label_font.set_hexpand (true) ;
             label_margin_pos.set_hexpand (true) ;
@@ -110,6 +116,8 @@ namespace iZiCodeEditor{
             label_status_bar.set_hexpand (true) ;
             label_terminal_header.set_hexpand (true) ;
             label_terminal.set_hexpand (true) ;
+            label_brackets_completion.set_hexpand (true) ;
+            label_brackets_completion_header.set_hexpand (true) ;
 
             label_font_header.set_use_markup (true) ;
             label_color_header.set_use_markup (true) ;
@@ -123,6 +131,7 @@ namespace iZiCodeEditor{
             label_source_map_header.set_use_markup (true) ;
             label_status_bar_header.set_use_markup (true) ;
             label_terminal_header.set_use_markup (true) ;
+            label_brackets_completion_header.set_use_markup (true) ;
 
             label_font_header.set_line_wrap (true) ;
             label_color_header.set_line_wrap (true) ;
@@ -136,6 +145,7 @@ namespace iZiCodeEditor{
             label_source_map_header.set_line_wrap (true) ;
             label_status_bar_header.set_line_wrap (true) ;
             label_terminal_header.set_line_wrap (true) ;
+            label_brackets_completion.set_line_wrap (true) ;
 
             // Buttons
             button_font = new Gtk.FontButton () ;
@@ -155,6 +165,7 @@ namespace iZiCodeEditor{
             button_highlight_matching_brackets = new Gtk.Switch () ;
             button_status_bar = new Gtk.Switch () ;
             button_terminal = new Gtk.Switch () ;
+            button_brackets_completion = new Gtk.Switch () ;
 
             button_font.set_halign (Gtk.Align.END) ;
             button_margin_pos.set_halign (Gtk.Align.END) ;
@@ -172,6 +183,7 @@ namespace iZiCodeEditor{
             button_highlight_matching_brackets.set_halign (Gtk.Align.END) ;
             button_status_bar.set_halign (Gtk.Align.END) ;
             button_terminal.set_halign (Gtk.Align.END) ;
+            button_brackets_completion.set_halign (Gtk.Align.END) ;
 
             var scroll_scheme = new Gtk.ScrolledWindow (null, null) ;
             scroll_scheme.add (widget_scheme) ;
@@ -204,6 +216,8 @@ namespace iZiCodeEditor{
             Application.settings.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT) ;
 
             Application.settings.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT) ;
+
+            Application.settings.bind ("brackets-completion", button_brackets_completion, "active", SettingsBindFlags.DEFAULT) ;
 
             // Dialog
             var preferences = new Gtk.Dialog () ;
@@ -238,20 +252,15 @@ namespace iZiCodeEditor{
             grid_view.attach (label_wrap_header, 0, 6, 1, 1) ;
             grid_view.attach (label_textwrap, 0, 7, 1, 1) ;
             grid_view.attach (button_textwrap, 1, 7, 1, 1) ;
-            grid_view.attach (label_highlight_header, 0, 8, 1, 1) ;
-            grid_view.attach (label_highlight, 0, 9, 1, 1) ;
-            grid_view.attach (button_highlight, 1, 9, 1, 1) ;
-            grid_view.attach (label_highlight_matching_brackets, 0, 10, 1, 1) ;
-            grid_view.attach (button_highlight_matching_brackets, 1, 10, 1, 1) ;
-            grid_view.attach (label_theme_header, 0, 11, 1, 1) ;
-            grid_view.attach (label_darktheme, 0, 12, 1, 1) ;
-            grid_view.attach (button_darktheme, 1, 12, 1, 1) ;
-            grid_view.attach (label_source_map_header, 0, 13, 1, 1) ;
-            grid_view.attach (label_source_map, 0, 14, 1, 1) ;
-            grid_view.attach (button_source_map, 1, 14, 1, 1) ;
-            grid_view.attach (label_status_bar_header, 0, 15, 1, 1) ;
-            grid_view.attach (label_status_bar, 0, 16, 1, 1) ;
-            grid_view.attach (button_status_bar, 1, 16, 1, 1) ;
+            grid_view.attach (label_theme_header, 0, 8, 1, 1) ;
+            grid_view.attach (label_darktheme, 0, 9, 1, 1) ;
+            grid_view.attach (button_darktheme, 1, 9, 1, 1) ;
+            grid_view.attach (label_source_map_header, 0, 10, 1, 1) ;
+            grid_view.attach (label_source_map, 0, 11, 1, 1) ;
+            grid_view.attach (button_source_map, 1, 11, 1, 1) ;
+            grid_view.attach (label_status_bar_header, 0, 12, 1, 1) ;
+            grid_view.attach (label_status_bar, 0, 13, 1, 1) ;
+            grid_view.attach (button_status_bar, 1, 13, 1, 1) ;
             grid_view.set_can_focus (false) ;
             grid_view.set_margin_start (10) ;
             grid_view.set_margin_end (10) ;
@@ -272,6 +281,14 @@ namespace iZiCodeEditor{
             grid_editor.attach (button_auto_indent, 1, 4, 1, 1) ;
             grid_editor.attach (label_indent_size, 0, 5, 1, 1) ;
             grid_editor.attach (button_indent_size, 1, 5, 1, 1) ;
+            grid_editor.attach (label_highlight_header, 0, 6, 1, 1) ;
+            grid_editor.attach (label_highlight, 0, 7, 1, 1) ;
+            grid_editor.attach (button_highlight, 1, 7, 1, 1) ;
+            grid_editor.attach (label_highlight_matching_brackets, 0, 8, 1, 1) ;
+            grid_editor.attach (button_highlight_matching_brackets, 1, 8, 1, 1) ;
+            grid_editor.attach (label_brackets_completion_header, 0, 9, 1, 1) ;
+            grid_editor.attach (label_brackets_completion, 0, 10, 1, 1) ;
+            grid_editor.attach (button_brackets_completion, 1, 10, 1, 1) ;
             grid_editor.set_can_focus (false) ;
             grid_editor.set_margin_start (10) ;
             grid_editor.set_margin_end (10) ;
