@@ -25,7 +25,8 @@ namespace iZiCodeEditor{
             popover.set_visible (true) ;
 
             popover.scroll_event.connect ((evt) => {
-                var scrolled = (Gtk.ScrolledWindow)notebook.get_nth_page (notebook.get_current_page ()) ;
+                var tab_page = (Gtk.Grid)notebook.get_nth_page (notebook.get_current_page ()) ;
+                var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
                 scrolled.scroll_event (evt) ;
                 return Gdk.EVENT_PROPAGATE ;
             }) ;
