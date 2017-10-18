@@ -92,6 +92,7 @@ namespace iZiCodeEditor{
 
             key_press_event.connect (on_key_press) ;
             backspace.connect (on_backspace) ;
+            scroll_event.connect (on_scroll_press) ;
 
         }
 
@@ -165,24 +166,97 @@ namespace iZiCodeEditor{
         }
 
         bool on_key_press(Gdk.EventKey event) {
-            if( keys.has_key (event.keyval) &&
-                !(Gdk.ModifierType.MOD1_MASK in event.state) &&
-                !(Gdk.ModifierType.CONTROL_MASK in event.state) ){
-
-                string bracket = keys[event.keyval] ;
-                string next_char = get_next_char () ;
-
-                if( brackets.has_key (bracket) &&
-                    (buffer.has_selection || has_valid_next_char (next_char)) ){
-                    complete_brackets (bracket) ;
+            if( Gdk.ModifierType.CONTROL_MASK in event.state ){
+                switch( event.keyval ){
+                case Gdk.Key.plus:
+                    zoom_in () ;
                     return true ;
-                } else if( bracket in brackets.values && next_char == bracket ){
-                    skip_char () ;
+                case Gdk.Key.minus:
+                    zoom_out () ;
                     return true ;
+
+                }
+            } else {
+                if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) ){
+
+                    string bracket = keys[event.keyval] ;
+                    string next_char = get_next_char () ;
+
+                    if( brackets.has_key (bracket) &&
+                        (buffer.has_selection || has_valid_next_char (next_char)) ){
+                        complete_brackets (bracket) ;
+                        return true ;
+                    } else if( bracket in brackets.values && next_char == bracket ){
+                        skip_char () ;
+                        return true ;
+                    }
                 }
             }
 
             return false ;
+        }
+
+        bool on_scroll_press(Gdk.EventKey event) {
+            if( (Gdk.ModifierType.CONTROL_MASK in key_event.state) && key_event.delta_y < 0 ){
+                zoom_in () ;
+                return true ;
+            } else if( (Gdk.ModifierType.CONTROL_MASK in key_event.state) && key_event.delta_y > 0 ){
+                zoom_out () ;
+                return true ;
+            }
+
+        }
+
+        public void zoom_in() {
+            zooming (Gdk.ScrollDirection.UP) ;
+        }
+
+        public void zoom_out() {
+            zooming (Gdk.ScrollDirection.DOWN) ;
+        }
+
+        private void zooming(Gdk.ScrollDirection direction) {
+            string font = get_current_font () ;
+            int font_size = (int) get_current_font_size () ;
+
+            if( direction == Gdk.ScrollDirection.DOWN ){
+                font_size-- ;
+                if( font_size < FONT_SIZE_MIN ){
+                    return ;
+                }
+            } else if( direction == Gdk.ScrollDirection.UP ){
+                font_size++ ;
+                if( font_size > FONT_SIZE_MAX ){
+                    return ;
+                }
+            }
+
+            string new_font = font + " " + font_size.to_string () ;
+            Application.settings.set_string ("font", new_font) ;
+        }
+
+        public string get_current_font() {
+            string font = Application.settings.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
+        public double get_current_font_size() {
+            string font = Application.settings.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
+        }
+
+        public string get_default_font() {
+            string font = Application.settings.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
+        public double get_default_font_size() {
+            string font = Application.settings.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
         }
 
     }

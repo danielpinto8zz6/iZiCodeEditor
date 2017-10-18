@@ -28,9 +28,7 @@ namespace iZiCodeEditor{
             { "close-all", action_close_all },
             { "pref", action_preferences },
             { "about", action_about },
-            { "quit", action_quit },
-            { "zoom-in", zoom_in },
-            { "zoom-out", zoom_out }
+            { "quit", action_quit }
         } ;
 
         public void add_main_window(Gtk.Application app) {
@@ -52,8 +50,6 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.close", { "<Primary>W" }) ;
             app.set_accels_for_action ("app.close-all", { "<Primary><Shift>W" }) ;
             app.set_accels_for_action ("app.quit", { "<Primary>Q" }) ;
-            app.set_accels_for_action ("app.zoom-in", { "<Primary>plus" }) ;
-            app.set_accels_for_action ("app.zoom-out", { "<Primary>minus" }) ;
 
             files = new GLib.List<string>() ;
 
@@ -113,12 +109,13 @@ namespace iZiCodeEditor{
 
             Gtk.ActionBar action_bar = new Gtk.ActionBar () ;
 
+            var sourceview = new iZiCodeEditor.SourceView () ;
             Gtk.Button zoomoutButton = new Gtk.Button.from_icon_name ("zoom-out", Gtk.IconSize.SMALL_TOOLBAR) ;
             action_bar.pack_start (zoomoutButton) ;
-            zoomoutButton.clicked.connect (zoom_out) ;
+            zoomoutButton.clicked.connect (sourceview.zoom_out) ;
             Gtk.Button zoominButton = new Gtk.Button.from_icon_name ("zoom-in", Gtk.IconSize.SMALL_TOOLBAR) ;
             action_bar.pack_start (zoominButton) ;
-            zoominButton.clicked.connect (zoom_in) ;
+            zoominButton.clicked.connect (sourceview.zoom_in) ;
 
             terminal = new iZiCodeEditor.Terminal () ;
 
@@ -321,58 +318,6 @@ namespace iZiCodeEditor{
 
             var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.changes_all () ;
-        }
-
-        public void zoom_in() {
-            zooming (Gdk.ScrollDirection.UP) ;
-        }
-
-        public void zoom_out() {
-            zooming (Gdk.ScrollDirection.DOWN) ;
-        }
-
-        private void zooming(Gdk.ScrollDirection direction) {
-            string font = get_current_font () ;
-            int font_size = (int) get_current_font_size () ;
-
-            if( direction == Gdk.ScrollDirection.DOWN ){
-                font_size-- ;
-                if( font_size < FONT_SIZE_MIN ){
-                    return ;
-                }
-            } else if( direction == Gdk.ScrollDirection.UP ){
-                font_size++ ;
-                if( font_size > FONT_SIZE_MAX ){
-                    return ;
-                }
-            }
-
-            string new_font = font + " " + font_size.to_string () ;
-            Application.settings.set_string ("font", new_font) ;
-        }
-
-        public string get_current_font() {
-            string font = Application.settings.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_current_font_size() {
-            string font = Application.settings.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
-        }
-
-        public string get_default_font() {
-            string font = Application.settings.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_default_font_size() {
-            string font = Application.settings.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
         }
 
     }
