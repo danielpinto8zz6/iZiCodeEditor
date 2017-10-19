@@ -214,6 +214,10 @@ namespace iZiCodeEditor{
             zooming (Gdk.ScrollDirection.DOWN) ;
         }
 
+        public void set_default_zoom() {
+            Application.settings_fonts_colors.set_string ("font", get_current_font () + " 14") ;
+        }
+
         private void zooming(Gdk.ScrollDirection direction) {
             string font = get_current_font () ;
             int font_size = (int) get_current_font_size () ;
