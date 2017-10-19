@@ -176,7 +176,9 @@ namespace iZiCodeEditor{
                 case Gdk.Key.minus:
                     zoom_out () ;
                     return true ;
-
+                case 0x30:
+                    set_default_zoom () ;
+                    return true ;
                 }
             } else if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) && Application.settings_editor.get_boolean ("brackets-completion") ){
 
