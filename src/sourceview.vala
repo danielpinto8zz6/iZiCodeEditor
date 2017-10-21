@@ -121,6 +121,18 @@ namespace iZiCodeEditor{
             this.source_views.add (src) ;
             this.search_contexts.set (src, new Gtk.SourceSearchContext (src.buffer, null)) ;
             this.current_source = src ;
+
+            buffer.notify["cursor-position"].connect (() => {
+                line_button.set_label (get_label_row_col (this)) ;
+            }) ;
+        }
+
+        public inline string get_label_row_col(Gtk.SourceView view) {
+            Gtk.TextIter iter ;
+            view.buffer.get_iter_at_mark (out iter, view.buffer.get_insert ()) ;
+            var row = iter.get_line () ;
+            var column = view.get_visual_column (iter) ;
+            return ("Ln %d, Col %u").printf (row + 1, column + 1) ;
         }
 
         public void on_selection_changed(Gtk.TextIter start, Gtk.TextIter end) {
@@ -144,6 +156,7 @@ namespace iZiCodeEditor{
         }
 
         void on_mark_set(Gtk.TextIter loc, Gtk.TextMark mar) {
+
             // Weed out user movement for text selection changes
             Gtk.TextIter start, end ;
             buffer.get_selection_bounds (out start, out end) ;

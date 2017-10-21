@@ -1,22 +1,24 @@
 namespace iZiCodeEditor{
 
+    Gtk.Button line_button ;
+
     public class StatusBar : Gtk.ActionBar {
         construct {
 
             terminal_switch () ;
-            tab_popover () ;
             zoom_popover () ;
             line_popover () ;
+            tab_popover () ;
         }
 
         private void terminal_switch() {
             var terminal_switch = new Gtk.Button.from_icon_name ("terminal", Gtk.IconSize.SMALL_TOOLBAR) ;
             terminal_switch.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            pack_start (terminal_switch) ;
 
             terminal_switch.clicked.connect (() => {
                 Application.settings_terminal.set_boolean ("terminal", !Application.settings_terminal.get_boolean ("terminal")) ;
             }) ;
+            pack_start (terminal_switch) ;
         }
 
         private void tab_popover() {
@@ -81,13 +83,13 @@ namespace iZiCodeEditor{
             tab_width_button.clicked.connect (tab_width_popover.show_all) ;
 
             pack_end (tab_width_button) ;
-
         }
 
         private void line_popover() {
 
-            var line_button = new Gtk.Button.with_label ("Linhas : 1") ;
+            line_button = new Gtk.Button.with_label ("") ;
             line_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
+
 
             var show_line_numbers_label = new Gtk.Label ("Show line numbers") ;
             show_line_numbers_label.set_halign (Gtk.Align.START) ;
@@ -143,7 +145,6 @@ namespace iZiCodeEditor{
             line_button.clicked.connect (line_popover.show_all) ;
 
             pack_end (line_button) ;
-
         }
 
         private void zoom_popover() {
@@ -179,7 +180,6 @@ namespace iZiCodeEditor{
             zoomButton.clicked.connect (zoomPopover.show_all) ;
 
             pack_end (zoomButton) ;
-
         }
 
     }
