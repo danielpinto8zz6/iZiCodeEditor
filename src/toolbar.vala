@@ -28,7 +28,7 @@ namespace iZiCodeEditor{
             section.append ("About", "app.about") ;
             section.append ("Quit", "app.quit") ;
             menu.append_section (null, section) ;
-            
+
             // app.set_app_menu (menu) ;
 
             var leftIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
@@ -40,9 +40,8 @@ namespace iZiCodeEditor{
             searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON) ;
 
             var menuButton = new Gtk.MenuButton () ;
-            menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.MENU) ;
+            menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON) ;
             menuButton.use_popover = true ;
-            menuButton.margin_start = 5 ;
             menuButton.set_menu_model (menu) ;
 
             var window = new iZiCodeEditor.MainWin () ;
