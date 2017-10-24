@@ -28,9 +28,21 @@ namespace iZiCodeEditor{
 
         construct {
 
-            override_font (Pango.FontDescription.from_string (Application.settings_fonts_colors.get_string ("font"))) ;
+            var provider = new Gtk.CssProvider () ;
+            try {
+                provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length) ;
+            } catch ( Error e ){
+                stderr.printf ("Error: %s\n", e.message) ;
+            }
+            get_style_context ().add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
+
             Application.settings_fonts_colors.changed["font"].connect (() => {
-                override_font (Pango.FontDescription.from_string (Application.settings_fonts_colors.get_string ("font"))) ;
+                try {
+                    provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length) ;
+                } catch ( Error e ){
+                    stderr.printf ("Error: %s\n", e.message) ;
+                }
+                get_style_context ().add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
             }) ;
 
             Application.settings_editor.bind ("tab-size", this, "tab_width", SettingsBindFlags.DEFAULT) ;
@@ -359,6 +371,26 @@ namespace iZiCodeEditor{
             string font = Application.settings_fonts_colors.get_string ("font") ;
             string font_size = font.substring (font.last_index_of (" ") + 1) ;
             return double.parse (font_size) ;
+        }
+
+        public string pango_font_description_to_css(string font) {
+            StringBuilder str = new StringBuilder () ;
+
+            Pango.FontDescription desc = Pango.FontDescription.from_string (font) ;
+            var family = desc.get_family () ;
+            var weight = desc.get_weight () ;
+            var style = desc.get_style () ;
+            var variant = desc.get_variant () ;
+
+            str.append_printf (" * {\n") ;
+            str.append_printf (" font-size: %dpx;\n", desc.get_size () / Pango.SCALE) ;
+            str.append_printf (" font-style: %s;\n", (style == Pango.Style.ITALIC) ? "italic" : ((style == Pango.Style.OBLIQUE) ? "oblique" : "normal")) ;
+            str.append_printf (" font-variant: %s;\n", (variant == Pango.Variant.SMALL_CAPS) ? "small-caps" : "normal") ;
+            str.append_printf (" font-weight: %s;\n", (weight <= Pango.Weight.SEMILIGHT) ? "light" : (weight >= Pango.Weight.SEMIBOLD ? "bold" : "normal")) ;
+            str.append_printf (" font-family: %s;\n", family) ;
+            str.append_printf ("}\n") ;
+            var css = str.str ;
+            return css ;
         }
 
     }
