@@ -19,17 +19,12 @@ namespace iZiCodeEditor{
         public void open_file(string path) {
 
             var fileopen = File.new_for_path (path) ;
-            var manager = new Gtk.SourceLanguageManager () ;
-            var lang = manager.guess_language (fileopen.get_path (), null) ;
             var tabs = new iZiCodeEditor.Tabs () ;
             var view = tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            if( lang != null ){
-                buffer.set_language (lang) ;
-                buffer.set_highlight_syntax (true) ;
-            } else {
-                buffer.set_highlight_syntax (false) ;
-            }
+
+            set_language (path, buffer) ;
+
             var file = new Gtk.SourceFile () ;
             file.location = fileopen ;
 
@@ -42,7 +37,18 @@ namespace iZiCodeEditor{
             buffer.set_modified (false) ;
 
             view.grab_focus () ;
+        }
 
+        public void set_language(string path, Gtk.SourceBuffer buffer) {
+            var manager = new Gtk.SourceLanguageManager () ;
+            var lang = manager.guess_language (path, null) ;
+
+            if( lang != null ){
+                buffer.set_language (lang) ;
+                buffer.set_highlight_syntax (true) ;
+            } else {
+                buffer.set_highlight_syntax (false) ;
+            }
         }
 
         // method for saving files

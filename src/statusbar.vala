@@ -1,14 +1,142 @@
 namespace iZiCodeEditor{
 
-    Gtk.Button line_button ;
+    private Gtk.Button line_button ;
 
     public class StatusBar : Gtk.ActionBar {
+
+        private Gtk.SourceLanguageManager langman ;
+
+        private const string lang_fallback = "Plain text" ;
+
+        private Gtk.ListBox lang_listbox ;
+
+        private Gtk.Button lang_button ;
+
         construct {
 
             terminal_switch () ;
             zoom_popover () ;
             line_popover () ;
             tab_popover () ;
+            language_popover () ;
+        }
+
+        public void update_statusbar(Gtk.Widget page, uint page_num) {
+            var tabs = new iZiCodeEditor.Tabs () ;
+            var view = tabs.get_sourceview_at_tab ((int) page_num) ;
+            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+
+            string path = tabs.get_path_at_tab ((int) page_num) ;
+
+            update_statusbar_language (path) ;
+            update_statusbar_line (buffer) ;
+        }
+
+        public void update_statusbar_line(Gtk.SourceBuffer buffer) {
+            var position = buffer.cursor_position ;
+            Gtk.TextIter iter ;
+            buffer.get_iter_at_offset (out iter, position) ;
+            line_button.set_label ("Ln %d, Col %d".printf (iter.get_line () + 1, iter.get_line_offset () + 1)) ;
+        }
+
+        public void update_statusbar_language(string path) {
+
+            var lang = langman.guess_language (path, null) ;
+
+            string ? lang_selected ;
+
+            if( lang != null ){
+                lang_selected = langman.get_language (lang.id).name ;
+                lang_button.set_label (lang_selected) ;
+                lang_listbox.select_row (listbox_get_row (lang.name)) ;
+            } else {
+                lang_button.set_label (lang_fallback) ;
+                lang_listbox.select_row (listbox_get_row (lang_fallback)) ;
+            }
+        }
+
+        private Gtk.ListBoxRow listbox_get_row(string lang) {
+            var selected_row = new Gtk.ListBoxRow () ;
+            lang_listbox.foreach( widget => {
+                if( lang == ((widget as Gtk.ListBoxRow).get_child () as Gtk.Label).label ){
+                    selected_row = (Gtk.ListBoxRow)widget ;
+                }
+            } ) ;
+            return selected_row ;
+        }
+
+        private void language_popover() {
+
+            lang_button = new Gtk.Button.with_label ("Vala") ;
+            lang_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
+            lang_button.width_request = 120 ;
+
+            langman = new Gtk.SourceLanguageManager () ;
+
+            lang_listbox = new Gtk.ListBox () ;
+
+            var label_fallback = new Gtk.Label (lang_fallback) ;
+            label_fallback.set_halign (Gtk.Align.START) ;
+            lang_listbox.add (label_fallback) ;
+
+            foreach( var lang_id in langman.get_language_ids () ){
+                var label = new Gtk.Label (langman.get_language (lang_id).name) ;
+                label.set_halign (Gtk.Align.START) ;
+                lang_listbox.add (label) ;
+            }
+
+            var lang_scrolled = new Gtk.ScrolledWindow (null, null) ;
+            lang_scrolled.hscrollbar_policy = Gtk.PolicyType.NEVER ;
+            lang_scrolled.height_request = 350 ;
+            lang_scrolled.expand = true ;
+            lang_scrolled.margin_top = lang_scrolled.margin_bottom = 6 ;
+            lang_scrolled.add (lang_listbox) ;
+
+            Gtk.Box box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
+            box.valign = Gtk.Align.CENTER ;
+            box.set_border_width (6) ;
+            box.pack_start (lang_scrolled, false, false, 0) ;
+
+            var lang_popover = new Gtk.Popover (lang_button) ;
+
+            lang_popover.add (box) ;
+
+            lang_button.clicked.connect (lang_popover.show_all) ;
+
+            lang_listbox.row_activated.connect (row => {
+
+                var tabs = new iZiCodeEditor.Tabs () ;
+                var view = tabs.get_current_sourceview () ;
+                var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+
+                string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
+
+                if( language != lang_fallback ){
+                    var lang = (language != null) ? get_selected_language (language) : null ;
+                    buffer.set_language (lang) ;
+                    buffer.set_highlight_syntax (true) ;
+                    lang_button.set_label (language) ;
+                } else {
+                    buffer.set_language (null) ;
+                    lang_button.set_label (lang_fallback) ;
+                    buffer.set_highlight_syntax (false) ;
+                }
+
+                lang_popover.hide () ;
+
+            }) ;
+
+            pack_end (lang_button) ;
+        }
+
+        private Gtk.SourceLanguage get_selected_language(string language) {
+            Gtk.SourceLanguage selected = null ;
+            foreach( var lang_id in langman.get_language_ids () ){
+                if( langman.get_language (lang_id).name == language ){
+                    selected = langman.get_language (lang_id) ;
+                }
+            }
+            return selected ;
         }
 
         private void terminal_switch() {
@@ -28,6 +156,7 @@ namespace iZiCodeEditor{
 
             var tab_width_button = new Gtk.Button.with_label (tab_width_string) ;
             tab_width_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
+            tab_width_button.width_request = 120 ;
 
             var space_tab_label = new Gtk.Label ("Spaces instead of tabs") ;
             space_tab_label.set_halign (Gtk.Align.START) ;
@@ -89,7 +218,7 @@ namespace iZiCodeEditor{
 
             line_button = new Gtk.Button.with_label ("") ;
             line_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-
+            line_button.width_request = 120 ;
 
             var show_line_numbers_label = new Gtk.Label ("Show line numbers") ;
             show_line_numbers_label.set_halign (Gtk.Align.START) ;
@@ -145,6 +274,7 @@ namespace iZiCodeEditor{
             line_button.clicked.connect (line_popover.show_all) ;
 
             pack_end (line_button) ;
+
         }
 
         private void zoom_popover() {

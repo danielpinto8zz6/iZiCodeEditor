@@ -11,6 +11,9 @@ namespace iZiCodeEditor{
     public int FONT_SIZE_MIN = 7 ;
 
     public class MainWin : Gtk.ApplicationWindow {
+
+        private iZiCodeEditor.StatusBar status_bar ;
+
         private const GLib.ActionEntry[] action_entries = {
 
             { "next-page", next_page },
@@ -125,7 +128,7 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
-            var status_bar = new iZiCodeEditor.StatusBar () ;
+            status_bar = new iZiCodeEditor.StatusBar () ;
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
@@ -185,7 +188,7 @@ namespace iZiCodeEditor{
                 toolbar.set_title (filename) ;
                 toolbar.set_subtitle (filelocation) ;
             }
-
+            status_bar.update_statusbar (page, page_num) ;
         }
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {
