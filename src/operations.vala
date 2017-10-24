@@ -53,7 +53,7 @@ namespace iZiCodeEditor{
             try {
                 file.replace_contents (bf.text.data, null, false, 0, null, null) ;
                 bf.set_modified (false) ;
-                //print ("debug saved: %s\n", filename) ;
+                // print ("debug saved: %s\n", filename) ;
             } catch ( Error e ){
                 var dialogs = new iZiCodeEditor.Dialogs () ;
                 dialogs.save_fallback (filename) ;

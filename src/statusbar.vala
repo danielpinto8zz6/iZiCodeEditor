@@ -307,7 +307,7 @@ namespace iZiCodeEditor{
 
         private void zoom_popover() {
             var window = new iZiCodeEditor.MainWin () ;
-            Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom", Gtk.IconSize.SMALL_TOOLBAR) ;
+            Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom-in", Gtk.IconSize.SMALL_TOOLBAR) ;
             zoomButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
 
             var minusButton = new Gtk.Button.from_icon_name ("list-remove-symbolic", Gtk.IconSize.BUTTON) ;

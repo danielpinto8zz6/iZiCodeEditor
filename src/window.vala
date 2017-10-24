@@ -34,6 +34,8 @@ namespace iZiCodeEditor{
             { "about", action_about },
             { "quit", action_quit },
             { "zoom-default", set_default_zoom },
+            { "beautify", beautify },
+            { "compile", compile }
         } ;
 
         public void add_main_window(Gtk.Application app) {
@@ -56,6 +58,8 @@ namespace iZiCodeEditor{
             app.set_accels_for_action ("app.close-all", { "<Control><Shift>W" }) ;
             app.set_accels_for_action ("app.quit", { "<Control>Q" }) ;
             app.set_accels_for_action ("app.zoom-default", { "<Control>0" }) ;
+            app.set_accels_for_action ("app.beautify", { "<Control>B" }) ;
+            app.set_accels_for_action ("app.compile", { "F6" }) ;
 
             files = new GLib.List<string>() ;
 
@@ -176,6 +180,67 @@ namespace iZiCodeEditor{
                 action_quit () ;
                 return true ;
             }) ;
+        }
+
+        public void beautify() {
+            var tabs = new iZiCodeEditor.Tabs () ;
+            string cf = tabs.get_current_path () ;
+            var view = tabs.get_current_sourceview () ;
+            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+
+            if( buffer.get_language ().name != "C" ){
+                return ;
+            } else {
+                string comand = @"clang-format $cf" ;
+                string output ;
+                try {
+                    Process.spawn_command_line_sync (comand, out output, null, null) ;
+                    buffer.set_text (output) ;
+
+                    Gtk.TextIter iter_st ;
+                    buffer.get_start_iter (out iter_st) ;
+                    buffer.place_cursor (iter_st) ;
+                    view.scroll_to_iter (iter_st, 0.10, false, 0, 0) ;
+                    view.grab_focus () ;
+
+                } catch ( SpawnError e ){
+                    stdout.printf ("Error: %s\n", e.message) ;
+                }
+            }
+        }
+
+        public void compile() {
+            var tabs = new iZiCodeEditor.Tabs () ;
+            string cf = tabs.get_current_path () ;
+            var view = tabs.get_current_sourceview () ;
+            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
+
+            if( buffer.get_language ().name != "C" ){
+                return ;
+            } else {
+                string output ;
+                string dir = Path.get_dirname (cf) ;
+
+                string comand = @"gcc -o '$dir/output' '$cf'" ;
+
+                try {
+                    Process.spawn_command_line_sync (comand, out output, null, null) ;
+                    run (dir) ;
+                } catch ( SpawnError e ){
+                    stdout.printf ("Error: %s\n", e.message) ;
+                }
+            }
+        }
+
+        public void run(string dir) {
+            string run = @"xterm -T iZiCodeEditor -hold -e '$dir/output'" ;
+            string output ;
+            try {
+                Process.spawn_command_line_sync (run, out output, null, null) ;
+
+            } catch ( SpawnError e ){
+                stdout.printf ("Error: %s\n", e.message) ;
+            }
         }
 
         public bool on_scroll_press(Gdk.EventScroll event) {
