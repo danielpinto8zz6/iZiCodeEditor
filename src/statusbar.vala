@@ -95,7 +95,15 @@ namespace iZiCodeEditor{
             Gtk.Box box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             box.valign = Gtk.Align.CENTER ;
             box.set_border_width (6) ;
+            box.width_request = 250 ;
+
+            var searchentry = new Gtk.SearchEntry () ;
+            searchentry.activate.connect (on_searchentry_activated) ;
+            searchentry.search_changed.connect (on_searchentry_activated) ;
+
+            box.pack_start (searchentry, false, false, 0) ;
             box.pack_start (lang_scrolled, false, false, 0) ;
+
 
             var lang_popover = new Gtk.Popover (lang_button) ;
 
@@ -127,6 +135,24 @@ namespace iZiCodeEditor{
             }) ;
 
             pack_end (lang_button) ;
+        }
+
+        public void on_searchentry_activated(Gtk.Entry searchentry) {
+
+            lang_listbox.show_all () ;
+
+            var text = searchentry.get_text () ;
+
+            if( text == "" ){
+                lang_listbox.show_all () ;
+            } else {
+                listbox_get_row (lang_fallback).hide () ;
+                foreach( var lang_id in langman.get_language_ids () ){
+                    if( !langman.get_language (lang_id).name.down ().contains (text.down ()) ){
+                        listbox_get_row (langman.get_language (lang_id).name).hide () ;
+                    }
+                }
+            }
         }
 
         private Gtk.SourceLanguage get_selected_language(string language) {
