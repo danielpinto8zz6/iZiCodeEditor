@@ -148,17 +148,17 @@ namespace iZiCodeEditor{
                 files.remove_link (del_item) ;
                 // print ("debug: removed %s\n", path) ;
                 if( notebook.get_n_pages () == 0 ){
-                    toolbar.set_title (NAME) ;
-                    toolbar.set_subtitle (null) ;
+                    headerbar.set_title (NAME) ;
+                    headerbar.set_subtitle (null) ;
                 } else {
                     string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
                     string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
                     if( filename == "Untitled" ){
-                        toolbar.set_title (filename) ;
-                        toolbar.set_subtitle (null) ;
+                        headerbar.set_title (filename) ;
+                        headerbar.set_subtitle (null) ;
                     } else {
-                        toolbar.set_title (filename) ;
-                        toolbar.set_subtitle (filelocation) ;
+                        headerbar.set_title (filename) ;
+                        headerbar.set_subtitle (filelocation) ;
                     }
                 }
             }

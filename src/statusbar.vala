@@ -32,14 +32,14 @@ namespace iZiCodeEditor{
             update_statusbar_line (buffer) ;
         }
 
-        public void update_statusbar_line(Gtk.SourceBuffer buffer) {
+        private void update_statusbar_line(Gtk.SourceBuffer buffer) {
             var position = buffer.cursor_position ;
             Gtk.TextIter iter ;
             buffer.get_iter_at_offset (out iter, position) ;
             line_button.set_label ("Ln %d, Col %d".printf (iter.get_line () + 1, iter.get_line_offset () + 1)) ;
         }
 
-        public void update_statusbar_language(string path) {
+        private void update_statusbar_language(string path) {
 
             var lang = langman.guess_language (path, null) ;
 

@@ -1,19 +1,18 @@
 vala_sources = [
     'application.vala',
-    'search.vala',
+    'dialogs.vala',
+    'goto.vala',
+    'headerbar.vala',
+    'notebook.vala',
     'operations.vala',
     'preferences.vala',
-    'tabs.vala',
-    'dialogs.vala',
-    'notebook.vala',
-    'window.vala',
-    'toolbar.vala',
     'replace.vala',
-    'utils.vala',
-    'goto.vala',
+    'search.vala',
     'sourceview.vala',
+    'statusbar.vala',
+    'tabs.vala',
     'terminal.vala',
-    'statusbar.vala'
+    'window.vala'
 ]
 
 vala_args = [

@@ -1,6 +1,6 @@
 namespace iZiCodeEditor{
 
-    public class Toolbar : Gtk.HeaderBar {
+    public class HeaderBar : Gtk.HeaderBar {
 
         construct {
 

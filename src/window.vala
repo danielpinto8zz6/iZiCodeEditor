@@ -3,16 +3,14 @@ namespace iZiCodeEditor{
     private Gtk.ApplicationWindow window ;
     private Gtk.Notebook notebook ;
     private Gtk.Button searchButton ;
-    public iZiCodeEditor.Toolbar toolbar ;
-    private Gtk.Notebook bottomBar ;
-    private iZiCodeEditor.Terminal terminal ;
+    public iZiCodeEditor.HeaderBar headerbar ;
 
-    public int FONT_SIZE_MAX = 72 ;
-    public int FONT_SIZE_MIN = 7 ;
 
     public class MainWin : Gtk.ApplicationWindow {
 
         private iZiCodeEditor.StatusBar status_bar ;
+        private Gtk.Notebook bottomBar ;
+        private iZiCodeEditor.Terminal terminal ;
 
         private const GLib.ActionEntry[] action_entries = {
 
@@ -75,11 +73,11 @@ namespace iZiCodeEditor{
                 Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode")) ;
             }) ;
 
-            toolbar = new iZiCodeEditor.Toolbar () ;
-            toolbar.set_show_close_button (true) ;
-            toolbar.set_title (NAME) ;
-            window.set_titlebar (toolbar) ;
-            toolbar.show_all () ;
+            headerbar = new iZiCodeEditor.HeaderBar () ;
+            headerbar.set_show_close_button (true) ;
+            headerbar.set_title (NAME) ;
+            window.set_titlebar (headerbar) ;
+            headerbar.show_all () ;
 
             if( Application.saved_state.get_boolean ("maximized") ){
                 window.maximize () ;
@@ -182,11 +180,11 @@ namespace iZiCodeEditor{
             string filename = GLib.Path.get_basename (path) ;
             string filelocation = Path.get_dirname (path) ;
             if( filename == "Untitled" ){
-                toolbar.set_title (filename) ;
-                toolbar.set_subtitle (null) ;
+                headerbar.set_title (filename) ;
+                headerbar.set_subtitle (null) ;
             } else {
-                toolbar.set_title (filename) ;
-                toolbar.set_subtitle (filelocation) ;
+                headerbar.set_title (filename) ;
+                headerbar.set_subtitle (filelocation) ;
             }
             status_bar.update_statusbar (page, page_num) ;
         }

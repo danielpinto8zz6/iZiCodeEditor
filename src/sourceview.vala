@@ -23,6 +23,9 @@ namespace iZiCodeEditor{
         Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> search_contexts ;
         iZiCodeEditor.SourceView current_source ;
 
+        private int FONT_SIZE_MAX = 72 ;
+        private int FONT_SIZE_MIN = 7 ;
+
         construct {
 
             override_font (Pango.FontDescription.from_string (Application.settings_fonts_colors.get_string ("font"))) ;
