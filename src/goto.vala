@@ -14,6 +14,7 @@ namespace iZiCodeEditor{
             entry.set_size_request (200, 30) ;
             entry.digits = 0 ;
 
+
             var gotoBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             gotoBox.pack_start (entry, false, true, 0) ;
             gotoBox.valign = Gtk.Align.CENTER ;

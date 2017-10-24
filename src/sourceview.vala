@@ -23,9 +23,6 @@ namespace iZiCodeEditor{
         Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> search_contexts ;
         iZiCodeEditor.SourceView current_source ;
 
-        private int FONT_SIZE_MAX = 72 ;
-        private int FONT_SIZE_MIN = 7 ;
-
         construct {
 
             var provider = new Gtk.CssProvider () ;
@@ -123,7 +120,6 @@ namespace iZiCodeEditor{
 
             key_press_event.connect (on_key_press) ;
             backspace.connect (on_backspace) ;
-            scroll_event.connect (on_scroll_press) ;
 
             this.source_views = new Gee.TreeSet<iZiCodeEditor.SourceView> () ;
             this.search_contexts = new Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> () ;
@@ -140,6 +136,10 @@ namespace iZiCodeEditor{
             buffer.notify["cursor-position"].connect (() => {
                 update_statusbar_line (buffer) ;
             }) ;
+
+            var window = new iZiCodeEditor.MainWin () ;
+            scroll_event.connect (window.on_scroll_press) ;
+
         }
 
         public void update_statusbar_line(Gtk.SourceBuffer buffer) {
@@ -277,100 +277,24 @@ namespace iZiCodeEditor{
         }
 
         bool on_key_press(Gdk.EventKey event) {
-            if( Gdk.ModifierType.CONTROL_MASK in event.state ){
-                switch( event.keyval ){
-                case Gdk.Key.plus:
-                    zoom_in () ;
-                    return true ;
-                case Gdk.Key.minus:
-                    zoom_out () ;
-                    return true ;
-                case 0x30:
-                    set_default_zoom () ;
-                    return true ;
-                }
-            } else if( keys.has_key (event.keyval) && !(Gdk.ModifierType.MOD1_MASK in event.state) && Application.settings_editor.get_boolean ("brackets-completion") ){
+            if( Application.settings_editor.get_boolean ("brackets-completion") ){
+                if( keys.has_key (event.keyval) &&
+                    !(Gdk.ModifierType.MOD1_MASK in event.state) &&
+                    !(Gdk.ModifierType.CONTROL_MASK in event.state) ){
+                    string bracket = keys[event.keyval] ;
+                    string next_char = get_next_char () ;
 
-                string bracket = keys[event.keyval] ;
-                string next_char = get_next_char () ;
-
-                if( brackets.has_key (bracket) &&
-                    (buffer.has_selection || has_valid_next_char (next_char)) ){
-                    complete_brackets (bracket) ;
-                    return true ;
-                } else if( bracket in brackets.values && next_char == bracket ){
-                    skip_char () ;
-                    return true ;
+                    if( brackets.has_key (bracket) &&
+                        (buffer.has_selection || has_valid_next_char (next_char)) ){
+                        complete_brackets (bracket) ;
+                        return true ;
+                    } else if( bracket in brackets.values && next_char == bracket ){
+                        skip_char () ;
+                        return true ;
+                    }
                 }
             }
             return false ;
-        }
-
-        bool on_scroll_press(Gdk.EventScroll event) {
-            if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
-                zoom_in () ;
-                return true ;
-            } else if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
-                zoom_out () ;
-                return true ;
-            }
-            return false ;
-        }
-
-        public void zoom_in() {
-            zooming (Gdk.ScrollDirection.UP) ;
-        }
-
-        public void zoom_out() {
-            zooming (Gdk.ScrollDirection.DOWN) ;
-        }
-
-        public void set_default_zoom() {
-            Application.settings_fonts_colors.set_string ("font", get_current_font () + " 14") ;
-        }
-
-        private void zooming(Gdk.ScrollDirection direction) {
-            string font = get_current_font () ;
-            int font_size = (int) get_current_font_size () ;
-
-            if( direction == Gdk.ScrollDirection.DOWN ){
-                font_size-- ;
-                if( font_size < FONT_SIZE_MIN ){
-                    return ;
-                }
-            } else if( direction == Gdk.ScrollDirection.UP ){
-                font_size++ ;
-                if( font_size > FONT_SIZE_MAX ){
-                    return ;
-                }
-            }
-
-            string new_font = font + " " + font_size.to_string () ;
-            Application.settings_fonts_colors.set_string ("font", new_font) ;
-        }
-
-        public string get_current_font() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_current_font_size() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
-        }
-
-        public string get_default_font() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_default_font_size() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
         }
 
         public string pango_font_description_to_css(string font) {

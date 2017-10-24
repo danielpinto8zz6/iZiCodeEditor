@@ -12,6 +12,9 @@ namespace iZiCodeEditor{
         private Gtk.Notebook bottomBar ;
         private iZiCodeEditor.Terminal terminal ;
 
+        private int FONT_SIZE_MAX = 72 ;
+        private int FONT_SIZE_MIN = 7 ;
+
         private const GLib.ActionEntry[] action_entries = {
 
             { "next-page", next_page },
@@ -29,28 +32,30 @@ namespace iZiCodeEditor{
             { "close-all", action_close_all },
             { "pref", action_preferences },
             { "about", action_about },
-            { "quit", action_quit }
+            { "quit", action_quit },
+            { "zoom-default", set_default_zoom },
         } ;
 
         public void add_main_window(Gtk.Application app) {
 
             app.add_action_entries (action_entries, app) ;
-            app.set_accels_for_action ("app.next-page", { "<Primary>Tab" }) ;
+            app.set_accels_for_action ("app.next-page", { "<Control>Tab" }) ;
             app.set_accels_for_action ("app.show-menu", { "F10" }) ;
-            app.set_accels_for_action ("app.undo", { "<Primary>Z" }) ;
-            app.set_accels_for_action ("app.redo", { "<Primary>Y" }) ;
-            app.set_accels_for_action ("app.open", { "<Primary>O" }) ;
-            app.set_accels_for_action ("app.save", { "<Primary>S" }) ;
-            app.set_accels_for_action ("app.new", { "<Primary>N" }) ;
-            app.set_accels_for_action ("app.save-all", { "<Primary><Shift>S" }) ;
-            app.set_accels_for_action ("app.search", { "<Primary>F" }) ;
-            app.set_accels_for_action ("app.gotoline", { "<Primary>L" }) ;
-            app.set_accels_for_action ("app.replace", { "<Primary>H" }) ;
+            app.set_accels_for_action ("app.undo", { "<Control>Z" }) ;
+            app.set_accels_for_action ("app.redo", { "<Control>Y" }) ;
+            app.set_accels_for_action ("app.open", { "<Control>O" }) ;
+            app.set_accels_for_action ("app.save", { "<Control>S" }) ;
+            app.set_accels_for_action ("app.new", { "<Control>N" }) ;
+            app.set_accels_for_action ("app.save-all", { "<Control><Shift>S" }) ;
+            app.set_accels_for_action ("app.search", { "<Control>F" }) ;
+            app.set_accels_for_action ("app.gotoline", { "<Control>L" }) ;
+            app.set_accels_for_action ("app.replace", { "<Control>H" }) ;
             app.set_accels_for_action ("app.color", { "F9" }) ;
-            app.set_accels_for_action ("app.pref", { "<Primary>P" }) ;
-            app.set_accels_for_action ("app.close", { "<Primary>W" }) ;
-            app.set_accels_for_action ("app.close-all", { "<Primary><Shift>W" }) ;
-            app.set_accels_for_action ("app.quit", { "<Primary>Q" }) ;
+            app.set_accels_for_action ("app.pref", { "<Control>P" }) ;
+            app.set_accels_for_action ("app.close", { "<Control>W" }) ;
+            app.set_accels_for_action ("app.close-all", { "<Control><Shift>W" }) ;
+            app.set_accels_for_action ("app.quit", { "<Control>Q" }) ;
+            app.set_accels_for_action ("app.zoom-default", { "<Control>0" }) ;
 
             files = new GLib.List<string>() ;
 
@@ -151,12 +156,93 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
+            window.key_press_event.connect ((key_event) => {
+                if( Gdk.ModifierType.CONTROL_MASK in key_event.state ){
+                    if( key_event.keyval == Gdk.Key.plus ){
+                        zoom_in () ;
+                        return true ;
+                    } else if( key_event.keyval == Gdk.Key.minus ){
+                        zoom_out () ;
+                        return true ;
+                    }
+                }
+
+                return false ;
+            }) ;
+
             window.show () ;
 
             window.delete_event.connect (() => {
                 action_quit () ;
                 return true ;
             }) ;
+        }
+
+        public bool on_scroll_press(Gdk.EventScroll event) {
+            if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
+                zoom_in () ;
+                return true ;
+            } else if( (Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
+                zoom_out () ;
+                return true ;
+            }
+            return false ;
+        }
+
+        public void zoom_in() {
+            zooming (Gdk.ScrollDirection.UP) ;
+        }
+
+        public void zoom_out() {
+            zooming (Gdk.ScrollDirection.DOWN) ;
+        }
+
+        public void set_default_zoom() {
+            Application.settings_fonts_colors.set_string ("font", get_current_font () + " 14") ;
+        }
+
+        private void zooming(Gdk.ScrollDirection direction) {
+            string font = get_current_font () ;
+            int font_size = (int) get_current_font_size () ;
+
+            if( direction == Gdk.ScrollDirection.DOWN ){
+                font_size-- ;
+                if( font_size < FONT_SIZE_MIN ){
+                    return ;
+                }
+            } else if( direction == Gdk.ScrollDirection.UP ){
+                font_size++ ;
+                if( font_size > FONT_SIZE_MAX ){
+                    return ;
+                }
+            }
+
+            string new_font = font + " " + font_size.to_string () ;
+            Application.settings_fonts_colors.set_string ("font", new_font) ;
+        }
+
+        public string get_current_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
+        public double get_current_font_size() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
+        }
+
+        public string get_default_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
+        public double get_default_font_size() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
         }
 
         private void on_bars_changed(Gtk.Notebook notebook) {
