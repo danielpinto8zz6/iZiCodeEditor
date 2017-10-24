@@ -113,25 +113,27 @@ namespace iZiCodeEditor{
 
             lang_listbox.row_activated.connect (row => {
 
+                string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
+
                 var tabs = new iZiCodeEditor.Tabs () ;
                 var view = tabs.get_current_sourceview () ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
-                string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
+                // Do not set same language twice
+                if( language != buffer.get_language ().name ){
 
-                if( language != lang_fallback ){
-                    var lang = (language != null) ? get_selected_language (language) : null ;
-                    buffer.set_language (lang) ;
-                    buffer.set_highlight_syntax (true) ;
-                    lang_button.set_label (language) ;
-                } else {
-                    buffer.set_language (null) ;
-                    lang_button.set_label (lang_fallback) ;
-                    buffer.set_highlight_syntax (false) ;
+                    if( language != lang_fallback && language != null ){
+                        var lang = (language != null) ? get_selected_language (language) : null ;
+                        buffer.set_language (lang) ;
+                        buffer.set_highlight_syntax (true) ;
+                        lang_button.set_label (language) ;
+                    } else {
+                        buffer.set_language (null) ;
+                        lang_button.set_label (lang_fallback) ;
+                        buffer.set_highlight_syntax (false) ;
+                    }
                 }
-
                 lang_popover.hide () ;
-
             }) ;
 
             pack_end (lang_button) ;
