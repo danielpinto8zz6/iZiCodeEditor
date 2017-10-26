@@ -4,11 +4,10 @@ namespace iZiCodeEditor{
     private Gtk.Notebook notebook ;
     private Gtk.Button searchButton ;
     public iZiCodeEditor.HeaderBar headerbar ;
-
+    public iZiCodeEditor.StatusBar status_bar ;
 
     public class MainWin : Gtk.ApplicationWindow {
 
-        private iZiCodeEditor.StatusBar status_bar ;
         private Gtk.Notebook bottomBar ;
         private iZiCodeEditor.Terminal terminal ;
 

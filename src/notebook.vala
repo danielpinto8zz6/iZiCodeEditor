@@ -125,8 +125,7 @@ namespace iZiCodeEditor{
             foreach( string uri in data.get_uris () ){
                 fileopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.create_tab (fileopen) ;
+                create_tab (fileopen) ;
                 var operations = new iZiCodeEditor.Operations () ;
                 operations.open_file (fileopen) ;
             }
@@ -148,19 +147,18 @@ namespace iZiCodeEditor{
                 files.remove_link (del_item) ;
                 // print ("debug: removed %s\n", path) ;
                 if( notebook.get_n_pages () == 0 ){
-                    headerbar.set_title (NAME) ;
+                    create_tab ("Untitled") ;
+                }
+                string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
+                string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
+                if( filename == "Untitled" ){
+                    headerbar.set_title (filename) ;
                     headerbar.set_subtitle (null) ;
                 } else {
-                    string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
-                    string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
-                    if( filename == "Untitled" ){
-                        headerbar.set_title (filename) ;
-                        headerbar.set_subtitle (null) ;
-                    } else {
-                        headerbar.set_title (filename) ;
-                        headerbar.set_subtitle (filelocation) ;
-                    }
+                    headerbar.set_title (filename) ;
+                    headerbar.set_subtitle (filelocation) ;
                 }
+                status_bar.update_statusbar (page, page_num) ;
             }
         }
 
