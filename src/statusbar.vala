@@ -26,7 +26,7 @@ namespace iZiCodeEditor{
             var view = tabs.get_sourceview_at_tab ((int) page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
-            string path = tabs.get_path_at_tab ((int) page_num) ;
+            string path = files.nth_data(page_num) ;
 
             update_statusbar_language (path) ;
             update_statusbar_line (buffer) ;

@@ -1,7 +1,7 @@
 namespace iZiCodeEditor{
     private GLib.List<string> files ;
     private Gtk.ApplicationWindow window ;
-    private Gtk.Notebook notebook ;
+    private iZiCodeEditor.Notebook notebook ;
     private Gtk.Button searchButton ;
     public iZiCodeEditor.HeaderBar headerbar ;
     public iZiCodeEditor.StatusBar status_bar ;
@@ -58,10 +58,7 @@ namespace iZiCodeEditor{
 
             files = new GLib.List<string>() ;
 
-            notebook = new Gtk.Notebook () ;
-            notebook.expand = true ;
-            notebook.popup_enable () ;
-            notebook.set_scrollable (true) ;
+            notebook = new iZiCodeEditor.Notebook () ;
             notebook.switch_page.connect (on_notebook_page_switched) ;
             notebook.page_reordered.connect (on_page_reordered) ;
 
@@ -260,8 +257,7 @@ namespace iZiCodeEditor{
         }
 
         private void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            string path = tabs.get_path_at_tab ((int) page_num) ;
+            string path = files.nth_data(page_num) ;
             string filename = GLib.Path.get_basename (path) ;
             string filelocation = Path.get_dirname (path) ;
             if( filename == "Untitled" ){
@@ -338,8 +334,7 @@ namespace iZiCodeEditor{
 
 // gear menu
         public void action_new() {
-            var nbook = new iZiCodeEditor.NBook () ;
-            nbook.create_tab ("Untitled") ;
+            notebook.create_tab ("Untitled") ;
         }
 
         public void action_save_as() {

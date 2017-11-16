@@ -52,8 +52,7 @@ namespace iZiCodeEditor{
 
         public override void activate() {
             if( files.length () == 0 ){
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.create_tab ("Untitled") ;
+                notebook.create_tab ("Untitled") ;
             }
             get_active_window ().present () ;
         }
@@ -62,8 +61,7 @@ namespace iZiCodeEditor{
             string fileopen = null ;
             foreach( File f in files ){
                 fileopen = f.get_path () ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.create_tab (fileopen) ;
+                notebook.create_tab (fileopen) ;
                 var operations = new iZiCodeEditor.Operations () ;
                 operations.open_file (fileopen) ;
             }

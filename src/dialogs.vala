@@ -9,8 +9,7 @@ namespace iZiCodeEditor{
                 "_Open",
                 Gtk.ResponseType.ACCEPT) ;
             if( notebook.get_n_pages () > 0 ){
-                var tabs = new iZiCodeEditor.Tabs () ;
-                string cf = tabs.get_current_path () ;
+                string cf = files.nth_data (notebook.get_current_page ());
                 chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
             var filter = new Gtk.FileFilter () ;
@@ -22,16 +21,15 @@ namespace iZiCodeEditor{
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
                 selected = chooser.get_filename () ;
-                var nbook = new iZiCodeEditor.NBook () ;
                 var operations = new iZiCodeEditor.Operations () ;
                 var tabs = new iZiCodeEditor.Tabs () ;
-                string path = tabs.get_path_at_tab (notebook.get_current_page ()) ;
+                string path = files.nth_data (notebook.get_current_page ()) ;
                 var view = tabs.get_sourceview_at_tab (notebook.get_current_page ()) ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 if( buffer.get_modified () == false && path == "Untitled" ){
                     operations.close_tab () ;
                 }
-                nbook.create_tab (selected) ;
+                notebook.create_tab (selected) ;
                 operations.open_file (selected) ;
             }
             chooser.destroy () ;
@@ -82,7 +80,7 @@ namespace iZiCodeEditor{
 
             for( int i = (int) files.length () - 1 ; i >= 0 ; i-- ){
                 var tabs = new iZiCodeEditor.Tabs () ;
-                string path = tabs.get_path_at_tab (i) ;
+                string path = files.nth_data (i) ;
                 var view = tabs.get_sourceview_at_tab (i) ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 if( buffer.get_modified () == false ){
@@ -109,8 +107,7 @@ namespace iZiCodeEditor{
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            string cf = tabs.get_current_path () ;
+            string cf = files.nth_data (notebook.get_current_page ());
             dialog.set_current_folder (Path.get_dirname (cf)) ;
             dialog.set_current_name (Path.get_basename (cf)) ;
             dialog.set_do_overwrite_confirmation (true) ;
