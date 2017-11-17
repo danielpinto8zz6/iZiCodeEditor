@@ -16,53 +16,78 @@ namespace iZiCodeEditor{
         public iZiCodeEditor.Replace replace ;
         public iZiCodeEditor.Preferences preferences ;
 
-        public const GLib.ActionEntry[] action_entries = {
+        public const string ACTION_PREFIX = "win." ;
+        public const string ACTION_NEXT_PAGE = "next-page" ;
+        public const string ACTION_UNDO = "undo" ;
+        public const string ACTION_REDO = "redo" ;
+        public const string ACTION_OPEN = "open" ;
+        public const string ACTION_SAVE = "save" ;
+        public const string ACTION_SEARCH = "search" ;
+        public const string ACTION_GOTOLINE = "gotoline" ;
+        public const string ACTION_NEW = "new" ;
+        public const string ACTION_SAVE_AS = "save-as" ;
+        public const string ACTION_SAVE_ALL = "save-all" ;
+        public const string ACTION_REPLACE = "replace" ;
+        public const string ACTION_CLOSE = "close" ;
+        public const string ACTION_CLOSE_ALL = "close-all" ;
+        public const string ACTION_PREFERENCES = "pref" ;
+        public const string ACTION_ABOUT = "about" ;
+        public const string ACTION_QUIT = "quit" ;
+        public const string ACTION_SET_DEFAULT_ZOOM = "zoom-default" ;
 
-            { "next-page", next_page },
-            { "undo", action_undo },
-            { "redo", action_redo },
-            { "open", action_open },
-            { "save", action_save },
-            { "search", action_search },
-            { "gotoline", action_gotoline },
-            { "new", action_new },
-            { "save-as", action_save_as },
-            { "save-all", action_save_all },
-            { "replace", action_replace },
-            { "close", action_close },
-            { "close-all", action_close_all },
-            { "pref", action_preferences },
-            { "about", action_about },
-            { "quit", action_quit },
-            { "zoom-default", set_default_zoom },
+        public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> () ;
+
+        public const GLib.ActionEntry[] action_entries = {
+            { ACTION_NEXT_PAGE, next_page },
+            { ACTION_UNDO, action_undo },
+            { ACTION_REDO, action_redo },
+            { ACTION_OPEN, action_open },
+            { ACTION_SAVE, action_save },
+            { ACTION_SEARCH, action_search },
+            { ACTION_GOTOLINE, action_gotoline },
+            { ACTION_NEW, action_new },
+            { ACTION_SAVE_AS, action_save_as },
+            { ACTION_SAVE_ALL, action_save_all },
+            { ACTION_REPLACE, action_replace },
+            { ACTION_CLOSE, action_close },
+            { ACTION_CLOSE_ALL, action_close_all },
+            { ACTION_PREFERENCES, action_preferences },
+            { ACTION_ABOUT, action_about },
+            { ACTION_QUIT, action_quit },
+            { ACTION_SET_DEFAULT_ZOOM, set_default_zoom },
         } ;
 
-        public ApplicationWindow (Gtk.Application application) {
+        public ApplicationWindow (Gtk.Application app) {
 
-            Glib.Object (
-                application: application,
+            Object (
+                application: app,
                 icon_name: ICON,
                 title: NAME
                 ) ;
 
-            application.add_action_entries (action_entries, application) ;
-            application.set_accels_for_action ("app.next-page", { "<Control>Tab" }) ;
-            application.set_accels_for_action ("app.show-menu", { "F10" }) ;
-            application.set_accels_for_action ("app.undo", { "<Control>Z" }) ;
-            application.set_accels_for_action ("app.redo", { "<Control>Y" }) ;
-            application.set_accels_for_action ("app.open", { "<Control>O" }) ;
-            application.set_accels_for_action ("app.save", { "<Control>S" }) ;
-            application.set_accels_for_action ("app.new", { "<Control>N" }) ;
-            application.set_accels_for_action ("app.save-all", { "<Control><Shift>S" }) ;
-            application.set_accels_for_action ("app.search", { "<Control>F" }) ;
-            application.set_accels_for_action ("app.gotoline", { "<Control>L" }) ;
-            application.set_accels_for_action ("app.replace", { "<Control>H" }) ;
-            application.set_accels_for_action ("app.color", { "F9" }) ;
-            application.set_accels_for_action ("app.pref", { "<Control>P" }) ;
-            application.set_accels_for_action ("app.close", { "<Control>W" }) ;
-            application.set_accels_for_action ("app.close-all", { "<Control><Shift>W" }) ;
-            application.set_accels_for_action ("app.quit", { "<Control>Q" }) ;
-            application.set_accels_for_action ("app.zoom-default", { "<Control>0" }) ;
+            action_accelerators.set (ACTION_NEXT_PAGE, "<Control>Tab") ;
+            action_accelerators.set (ACTION_UNDO, "<Control>Z") ;
+            action_accelerators.set (ACTION_REDO, "<Control>Y") ;
+            action_accelerators.set (ACTION_OPEN, "<Control>O") ;
+            action_accelerators.set (ACTION_SAVE, "<Control>S") ;
+            action_accelerators.set (ACTION_NEW, "<Control>N") ;
+            action_accelerators.set (ACTION_SAVE_ALL, "<Control><Shift>S") ;
+            action_accelerators.set (ACTION_SEARCH, "<Control>F") ;
+            action_accelerators.set (ACTION_GOTOLINE, "<Control>L") ;
+            action_accelerators.set (ACTION_REPLACE, "<Control>H") ;
+            action_accelerators.set (ACTION_PREFERENCES, "<Control>P") ;
+            action_accelerators.set (ACTION_CLOSE, "<Control>W") ;
+            action_accelerators.set (ACTION_CLOSE_ALL, "<Control><Shift>W") ;
+            action_accelerators.set (ACTION_QUIT, "<Control>Q") ;
+            action_accelerators.set (ACTION_SET_DEFAULT_ZOOM, "<Control>0") ;
+
+            var actions = new SimpleActionGroup () ;
+            actions.add_action_entries (action_entries, this) ;
+            insert_action_group ("win", actions) ;
+
+            foreach( var action in action_accelerators.get_keys ()){
+                application.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ()) ;
+            }
 
             files = new GLib.List<string>() ;
 

@@ -1,5 +1,5 @@
 namespace iZiCodeEditor{
-    public class Dialogs : Gtk.Dialog {
+    public class Dialogs : GLib.Object {
         public unowned ApplicationWindow window { get ; construct set ; }
 
         public Dialogs (iZiCodeEditor.ApplicationWindow window) {
@@ -9,7 +9,7 @@ namespace iZiCodeEditor{
         public void show_open() {
             string selected ;
             var chooser = new Gtk.FileChooserDialog (
-                "Select a file to edit", this, Gtk.FileChooserAction.OPEN,
+                "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
                 "_Cancel",
                 Gtk.ResponseType.CANCEL,
                 "_Open",

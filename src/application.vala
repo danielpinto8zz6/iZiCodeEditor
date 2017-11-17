@@ -48,8 +48,7 @@ namespace iZiCodeEditor{
             base.startup () ;
             window = new iZiCodeEditor.ApplicationWindow (this) ;
             window.present () ;
-            var operations = new iZiCodeEditor.Operations (window) ;
-            operations.add_recent_files () ;
+            window.operations.add_recent_files () ;
         }
 
         public override void activate() {
@@ -64,8 +63,7 @@ namespace iZiCodeEditor{
             foreach( File f in files ){
                 fileopen = f.get_path () ;
                 window.notebook.create_tab (fileopen) ;
-                var operations = new iZiCodeEditor.Operations (window) ;
-                operations.open_file (fileopen) ;
+                window.operations.open_file (fileopen) ;
             }
             get_active_window ().present () ;
         }
