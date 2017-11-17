@@ -9,20 +9,6 @@ namespace iZiCodeEditor{
         const string[] valid_next_chars = {
             "", " ", "\b", "\r", "\n", "\t", ",", ".", ";", ":"
         } ;
-        private const uint SELECTION_CHANGED_PAUSE = 400 ;
-
-        public signal void selection_changed(Gtk.TextIter start_iter, Gtk.TextIter end_iter) ;
-        public signal void deselected() ;
-
-        private uint selection_changed_timer = 0 ;
-        private Gtk.TextIter last_select_start_iter ;
-        private Gtk.TextIter last_select_end_iter ;
-
-        private const uint SELECTION_HIGHLIGHT_MAX_CHARS = 45 ;
-
-        Gee.TreeSet<iZiCodeEditor.SourceView> source_views ;
-        Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> search_contexts ;
-        iZiCodeEditor.SourceView current_source ;
 
         public SourceView (iZiCodeEditor.ApplicationWindow window) {
             Object (
@@ -112,8 +98,6 @@ namespace iZiCodeEditor{
 
             Application.settings_editor.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
 
-            buffer.mark_set.connect (on_mark_set) ;
-
             //// drag and drop
             Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
 
@@ -124,18 +108,6 @@ namespace iZiCodeEditor{
 
             key_press_event.connect (on_key_press) ;
             backspace.connect (on_backspace) ;
-
-            this.source_views = new Gee.TreeSet<iZiCodeEditor.SourceView> () ;
-            this.search_contexts = new Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> () ;
-
-            var src = this ;
-            src.deselected.disconnect (on_deselection) ;
-            src.deselected.connect (on_deselection) ;
-            src.selection_changed.disconnect (on_selection_changed) ;
-            src.selection_changed.connect (on_selection_changed) ;
-            this.source_views.add (src) ;
-            this.search_contexts.set (src, new Gtk.SourceSearchContext (src.buffer, null)) ;
-            this.current_source = src ;
 
             buffer.notify["cursor-position"].connect (() => {
                 window.status_bar.update_statusbar_line (buffer) ;
@@ -151,62 +123,6 @@ namespace iZiCodeEditor{
                 }
                 return false ;
             }) ;
-        }
-
-        public void on_selection_changed(Gtk.TextIter start, Gtk.TextIter end) {
-            if( this.current_source.buffer.get_has_selection ()){
-
-                string selected_text = this.current_source.buffer.get_text (start, end, false) ;
-                if( selected_text.length > SELECTION_HIGHLIGHT_MAX_CHARS ){
-                    return ;
-                }
-
-                var context = search_contexts.get (this.current_source) ;
-                context.settings.search_text = selected_text ;
-                context.set_highlight (true) ;
-            }
-        }
-
-        public void on_deselection() {
-            var context = search_contexts.get (this.current_source) ;
-            context.settings.search_text = null ;
-            context.set_highlight (false) ;
-        }
-
-        void on_mark_set(Gtk.TextIter loc, Gtk.TextMark mar) {
-
-            // Weed out user movement for text selection changes
-            Gtk.TextIter start, end ;
-            buffer.get_selection_bounds (out start, out end) ;
-
-            if( start == last_select_start_iter && end == last_select_end_iter ){
-                return ;
-            }
-
-            if( selection_changed_timer != 0 && MainContext.get_thread_default ().find_source_by_id (selection_changed_timer) != null ){
-                Source.remove (selection_changed_timer) ;
-            }
-
-            // Fire deselected immediatly
-            if( !buffer.get_has_selection ()){
-                deselected () ;
-                // Don't fire signal till we think select movement is done
-            } else {
-                selection_changed_timer = Timeout.add (SELECTION_CHANGED_PAUSE, selection_changed_event) ;
-            }
-
-        }
-
-        bool selection_changed_event() {
-            Gtk.TextIter start, end ;
-            bool selected = buffer.get_selection_bounds (out start, out end) ;
-            if( selected ){
-                selection_changed (start, end) ;
-            } else {
-                deselected () ;
-            }
-
-            return false ;
         }
 
         string get_next_char() {
