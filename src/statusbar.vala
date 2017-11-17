@@ -14,14 +14,30 @@ namespace iZiCodeEditor{
 
         private Gtk.Button line_button ;
 
+        private Gtk.Label status_label ;
+
         public StatusBar (iZiCodeEditor.ApplicationWindow window) {
             this.window = window ;
+
+            status_label = new Gtk.Label ("") ;
+            set_center_widget (status_label) ;
 
             terminal_switch () ;
             zoom_popover () ;
             line_popover () ;
             tab_popover () ;
             language_popover () ;
+        }
+
+        public void status_messages(string message) {
+            status_label.set_label (message) ;
+            /* After 1.5 seconds clear message */
+            Timeout.add (1500, clear_status_messages) ;
+        }
+
+        private bool clear_status_messages() {
+            status_label.set_label ("") ;
+            return false ;
         }
 
         public void update_statusbar(Gtk.Widget page, uint page_num) {

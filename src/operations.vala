@@ -59,7 +59,7 @@ namespace iZiCodeEditor{
             try {
                 file.replace_contents (bf.text.data, null, false, 0, null, null) ;
                 bf.set_modified (false) ;
-                // print ("debug saved: %s\n", filename) ;
+                window.status_bar.status_messages ("saving " + filename + " ...") ;
             } catch ( Error e ){
                 window.dialogs.save_fallback (filename) ;
                 stderr.printf ("error: %s\n", e.message) ;
