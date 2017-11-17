@@ -50,6 +50,8 @@ namespace iZiCodeEditor{
                 view.grab_focus () ;
             } catch ( Error e ){
                 stderr.printf ("error: %s\n", e.message) ;
+                if( Application.settings_view.get_boolean ("status-bar"))
+                    window.status_bar.status_messages ("error: " + e.message) ;
             }
         }
 
@@ -59,10 +61,13 @@ namespace iZiCodeEditor{
             try {
                 file.replace_contents (bf.text.data, null, false, 0, null, null) ;
                 bf.set_modified (false) ;
-                window.status_bar.status_messages ("saving " + filename + " ...") ;
+                if( Application.settings_view.get_boolean ("status-bar"))
+                    window.status_bar.status_messages ("saving " + filename + " ...") ;
             } catch ( Error e ){
                 window.dialogs.save_fallback (filename) ;
                 stderr.printf ("error: %s\n", e.message) ;
+                if( Application.settings_view.get_boolean ("status-bar"))
+                    window.status_bar.status_messages ("error: " + e.message) ;
             }
         }
 
