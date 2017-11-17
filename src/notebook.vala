@@ -150,21 +150,16 @@ namespace iZiCodeEditor{
                 remove_page (page_num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
-                // print ("debug: removed %s\n", path) ;
-                if( get_n_pages () == 0 ){
-                    create_tab ("Untitled") ;
-                }
+
                 string filename = GLib.Path.get_basename (files.nth_data (get_current_page ())) ;
                 string filelocation = Path.get_dirname (files.nth_data (get_current_page ())) ;
-                var headerbar = new iZiCodeEditor.HeaderBar ((iZiCodeEditor.ApplicationWindow) this.get_window ()) ;
                 if( filename == "Untitled" ){
-                    headerbar.set_title (filename) ;
-                    headerbar.set_subtitle (null) ;
+                    window.headerbar.set_title (filename) ;
+                    window.headerbar.set_subtitle (null) ;
                 } else {
-                    headerbar.set_title (filename) ;
-                    headerbar.set_subtitle (filelocation) ;
+                    window.headerbar.set_title (filename) ;
+                    window.headerbar.set_subtitle (filelocation) ;
                 }
-                window.status_bar.update_statusbar (page, page_num) ;
             }
             if( get_n_pages () == 0 )
                 create_tab ("Untitled") ;
