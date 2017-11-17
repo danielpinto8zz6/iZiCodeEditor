@@ -1,5 +1,7 @@
 namespace iZiCodeEditor{
-    public class PrefDialog : Gtk.Dialog {
+    public class Preferences : Gtk.Dialog {
+
+        public unowned ApplicationWindow window { get ; construct set ; }
 
         Gtk.FontButton button_font ;
         Gtk.SourceStyleSchemeChooserWidget widget_scheme ;
@@ -25,7 +27,11 @@ namespace iZiCodeEditor{
         Gtk.ColorButton button_terminal_fg ;
         Gtk.ColorButton button_terminal_bg ;
 
-        public void on_activate() {
+        public Preferences (iZiCodeEditor.ApplicationWindow window) {
+
+            set_title ("Preferences") ;
+            set_property ("skip-taskbar-hint", true) ;
+            set_resizable (true) ;
 
             // Labels
             var label_font = new Gtk.Label ("Editor font") ;
@@ -261,23 +267,15 @@ namespace iZiCodeEditor{
                 print ("DEBUG : %s", button_terminal_fg.get_rgba ().to_string ()) ;
             }) ;
 
-            // Dialog
-            var preferences = new Gtk.Dialog () ;
-            preferences.set_title ("Preferences") ;
-            preferences.set_transient_for (window) ;
-            preferences.set_property ("skip-taskbar-hint", true) ;
-            preferences.set_resizable (true) ;
-
             var header = new Gtk.HeaderBar () ;
             header.set_show_close_button (true) ;
             header.set_title ("Preferences") ;
-            preferences.set_titlebar (header) ;
+            set_titlebar (header) ;
 
             var menuButton = new Gtk.Button.with_label ("Reset") ;
             header.pack_end (menuButton) ;
 
-            var dialogs = new iZiCodeEditor.Dialogs () ;
-            menuButton.clicked.connect (dialogs.reset_all) ;
+            menuButton.clicked.connect (window.dialogs.reset_all) ;
 
             // View Grid
             var grid_view = new Gtk.Grid () ;
@@ -380,9 +378,9 @@ namespace iZiCodeEditor{
             pref_notebook.append_page (grid_editor, new Gtk.Label ("Editor")) ;
             pref_notebook.append_page (grid_fontscolors, new Gtk.Label ("Fonts & Colors")) ;
             pref_notebook.append_page (grid_terminal, new Gtk.Label ("Terminal")) ;
-            var content = preferences.get_content_area () as Gtk.Container ;
+            var content = get_content_area () as Gtk.Container ;
             content.add (pref_notebook) ;
-            preferences.show_all () ;
+            show_all () ;
 
         }
 

@@ -1,5 +1,6 @@
 namespace iZiCodeEditor{
     public class SourceView : Gtk.SourceView {
+        public unowned ApplicationWindow window { get ; construct set ; }
 
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
         public new Gtk.SourceBuffer buffer ;
@@ -23,7 +24,7 @@ namespace iZiCodeEditor{
         Gee.HashMap<iZiCodeEditor.SourceView, Gtk.SourceSearchContext> search_contexts ;
         iZiCodeEditor.SourceView current_source ;
 
-        construct {
+        public SourceView (iZiCodeEditor.ApplicationWindow window) {
 
             var provider = new Gtk.CssProvider () ;
             try {
@@ -50,13 +51,13 @@ namespace iZiCodeEditor{
             Application.settings_view.bind ("margin-show", this, "show_right_margin", SettingsBindFlags.DEFAULT) ;
             Application.settings_editor.bind ("spaces-instead-of-tabs", this, "insert_spaces_instead_of_tabs", SettingsBindFlags.DEFAULT) ;
             Application.settings_editor.bind ("auto-indent", this, "auto_indent", SettingsBindFlags.DEFAULT) ;
-            if( Application.settings_view.get_boolean ("pattern-show") ){
+            if( Application.settings_view.get_boolean ("pattern-show")){
                 set_background_pattern (Gtk.SourceBackgroundPatternType.GRID) ;
             } else {
                 set_background_pattern (Gtk.SourceBackgroundPatternType.NONE) ;
             }
             Application.settings_view.changed["pattern-show"].connect (() => {
-                if( Application.settings_view.get_boolean ("pattern-show") ){
+                if( Application.settings_view.get_boolean ("pattern-show")){
                     background_pattern = Gtk.SourceBackgroundPatternType.GRID ;
                 } else {
                     background_pattern = Gtk.SourceBackgroundPatternType.NONE ;
@@ -67,13 +68,13 @@ namespace iZiCodeEditor{
             set_left_margin (10) ;
             set_smart_backspace (true) ;
 
-            if( Application.settings_view.get_boolean ("text-wrap") ){
+            if( Application.settings_view.get_boolean ("text-wrap")){
                 set_wrap_mode (Gtk.WrapMode.WORD) ;
             } else {
                 set_wrap_mode (Gtk.WrapMode.NONE) ;
             }
             Application.settings_view.changed["pattern-show"].connect (() => {
-                if( Application.settings_view.get_boolean ("text-wrap") ){
+                if( Application.settings_view.get_boolean ("text-wrap")){
                     set_wrap_mode (Gtk.WrapMode.WORD) ;
                 } else {
                     set_wrap_mode (Gtk.WrapMode.NONE) ;
@@ -134,23 +135,23 @@ namespace iZiCodeEditor{
             this.current_source = src ;
 
             buffer.notify["cursor-position"].connect (() => {
-                update_statusbar_line (buffer) ;
+                window.status_bar.update_statusbar_line (buffer) ;
             }) ;
 
-            // var window = new iZiCodeEditor.ApplicationWindow () ;
-            // scroll_event.connect (window.on_scroll_press) ;
-
-        }
-
-        public void update_statusbar_line(Gtk.SourceBuffer buffer) {
-            var position = buffer.cursor_position ;
-            Gtk.TextIter iter ;
-            buffer.get_iter_at_offset (out iter, position) ;
-            line_button.set_label ("Ln %d, Col %d".printf (iter.get_line () + 1, iter.get_line_offset () + 1)) ;
+            scroll_event.connect ((event) => {
+                if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
+                    window.operations.zooming (Gdk.ScrollDirection.DOWN) ;
+                    return true ;
+                } else if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
+                    window.operations.zooming (Gdk.ScrollDirection.UP) ;
+                    return true ;
+                }
+                return false ;
+            }) ;
         }
 
         public void on_selection_changed(Gtk.TextIter start, Gtk.TextIter end) {
-            if( this.current_source.buffer.get_has_selection () ){
+            if( this.current_source.buffer.get_has_selection ()){
 
                 string selected_text = this.current_source.buffer.get_text (start, end, false) ;
                 if( selected_text.length > SELECTION_HIGHLIGHT_MAX_CHARS ){
@@ -184,7 +185,7 @@ namespace iZiCodeEditor{
             }
 
             // Fire deselected immediatly
-            if( !buffer.get_has_selection () ){
+            if( !buffer.get_has_selection ()){
                 deselected () ;
                 // Don't fire signal till we think select movement is done
             } else {
@@ -224,7 +225,7 @@ namespace iZiCodeEditor{
         }
 
         void on_backspace() {
-            if( Application.settings_editor.get_boolean ("brackets-completion") ){
+            if( Application.settings_editor.get_boolean ("brackets-completion")){
                 if( !buffer.has_selection ){
                     string left_char = get_previous_char () ;
                     string right_char = get_next_char () ;
@@ -277,15 +278,15 @@ namespace iZiCodeEditor{
         }
 
         bool on_key_press(Gdk.EventKey event) {
-            if( Application.settings_editor.get_boolean ("brackets-completion") ){
+            if( Application.settings_editor.get_boolean ("brackets-completion")){
                 if( keys.has_key (event.keyval) &&
                     !(Gdk.ModifierType.MOD1_MASK in event.state) &&
-                    !(Gdk.ModifierType.CONTROL_MASK in event.state) ){
+                    !(Gdk.ModifierType.CONTROL_MASK in event.state)){
                     string bracket = keys[event.keyval] ;
                     string next_char = get_next_char () ;
 
                     if( brackets.has_key (bracket) &&
-                        (buffer.has_selection || has_valid_next_char (next_char)) ){
+                        (buffer.has_selection || has_valid_next_char (next_char))){
                         complete_brackets (bracket) ;
                         return true ;
                     } else if( bracket in brackets.values && next_char == bracket ){

@@ -1,11 +1,14 @@
 namespace iZiCodeEditor{
     public class Search : Gtk.Popover {
+        public unowned ApplicationWindow window { get ; construct set ; }
+
         private Gtk.Entry entry ;
         private Gtk.SourceSearchContext context ;
 
-        public Search (Gtk.Widget ? widget) {
+        public Search (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
 
-            set_relative_to (widget) ;
+            set_relative_to (window.headerbar.searchButton) ;
 
             entry = new Gtk.SearchEntry () ;
             entry.set_size_request (200, 30) ;
@@ -28,7 +31,7 @@ namespace iZiCodeEditor{
             add (searchBox) ;
 
             scroll_event.connect ((evt) => {
-                var tab_page = (Gtk.Grid)notebook.get_nth_page (notebook.get_current_page ()) ;
+                var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ()) ;
                 var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
                 scrolled.scroll_event (evt) ;
                 return Gdk.EVENT_PROPAGATE ;
@@ -51,8 +54,7 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
+            var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             buffer.get_selection_bounds (out sel_st, out sel_end) ;
             var settings = new Gtk.SourceSearchSettings () ;
@@ -79,8 +81,7 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
+            var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             buffer.get_selection_bounds (out sel_st, out sel_end) ;
             var settings = new Gtk.SourceSearchSettings () ;
@@ -108,8 +109,7 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
+            var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             buffer.get_selection_bounds (out sel_st, out sel_end) ;
             var settings = new Gtk.SourceSearchSettings () ;
@@ -131,8 +131,7 @@ namespace iZiCodeEditor{
 
         // On popover hide
         private void on_popover_hide() {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
+            var view = window.tabs.get_current_sourceview () ;
             view.grab_focus () ;
 
             if( entry.get_text_length () > 0 )

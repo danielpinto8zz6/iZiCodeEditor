@@ -4,9 +4,10 @@ namespace iZiCodeEditor{
     const string DESCRIPTION = "Simple text editor written in vala" ;
     const string ICON = "accessories-text-editor" ;
     const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null } ;
-    private iZiCodeEditor.ApplicationWindow window ;
 
     private class Application : Gtk.Application {
+
+        private iZiCodeEditor.ApplicationWindow window ;
 
         private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor") ;
         public static GLib.Settings settings_editor {
@@ -47,13 +48,13 @@ namespace iZiCodeEditor{
             base.startup () ;
             window = new iZiCodeEditor.ApplicationWindow (this) ;
             window.present () ;
-            var operations = new iZiCodeEditor.Operations () ;
+            var operations = new iZiCodeEditor.Operations (window) ;
             operations.add_recent_files () ;
         }
 
         public override void activate() {
             if( files.length () == 0 ){
-                notebook.create_tab ("Untitled") ;
+                window.notebook.create_tab ("Untitled") ;
             }
             get_active_window ().present () ;
         }
@@ -62,8 +63,8 @@ namespace iZiCodeEditor{
             string fileopen = null ;
             foreach( File f in files ){
                 fileopen = f.get_path () ;
-                notebook.create_tab (fileopen) ;
-                var operations = new iZiCodeEditor.Operations () ;
+                window.notebook.create_tab (fileopen) ;
+                var operations = new iZiCodeEditor.Operations (window) ;
                 operations.open_file (fileopen) ;
             }
             get_active_window ().present () ;

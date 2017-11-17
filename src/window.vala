@@ -1,18 +1,22 @@
 namespace iZiCodeEditor{
     private GLib.List<string> files ;
-    private iZiCodeEditor.Notebook notebook ;
 
     public class ApplicationWindow : Gtk.ApplicationWindow {
 
-        private Gtk.Notebook bottomBar ;
+        public iZiCodeEditor.Notebook notebook ;
+        public Gtk.Notebook bottomBar ;
         private iZiCodeEditor.Terminal terminal ;
         public iZiCodeEditor.HeaderBar headerbar ;
         public iZiCodeEditor.StatusBar status_bar ;
+        public iZiCodeEditor.Operations operations ;
+        public iZiCodeEditor.Dialogs dialogs ;
+        public iZiCodeEditor.Tabs tabs ;
+        public iZiCodeEditor.Search search ;
+        public iZiCodeEditor.GoToLine gotoline ;
+        public iZiCodeEditor.Replace replace ;
+        public iZiCodeEditor.Preferences preferences ;
 
-        private int FONT_SIZE_MAX = 72 ;
-        private int FONT_SIZE_MIN = 7 ;
-
-        private const GLib.ActionEntry[] action_entries = {
+        public const GLib.ActionEntry[] action_entries = {
 
             { "next-page", next_page },
             { "undo", action_undo },
@@ -34,7 +38,12 @@ namespace iZiCodeEditor{
         } ;
 
         public ApplicationWindow (Gtk.Application application) {
-            GLib.Object (application: application) ;
+
+            Glib.Object (
+                application: application,
+                icon_name: ICON,
+                title: NAME
+                ) ;
 
             application.add_action_entries (action_entries, application) ;
             application.set_accels_for_action ("app.next-page", { "<Control>Tab" }) ;
@@ -57,14 +66,9 @@ namespace iZiCodeEditor{
 
             files = new GLib.List<string>() ;
 
-            notebook = new iZiCodeEditor.Notebook () ;
-            notebook.switch_page.connect (on_notebook_page_switched) ;
-            notebook.page_reordered.connect (on_page_reordered) ;
-
             // window
             window_position = Gtk.WindowPosition.CENTER ;
             set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height")) ;
-            set_icon_name (ICON) ;
 
             Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode")) ;
 
@@ -72,15 +76,22 @@ namespace iZiCodeEditor{
                 Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode")) ;
             }) ;
 
-            headerbar = new iZiCodeEditor.HeaderBar () ;
-            headerbar.set_show_close_button (true) ;
-            headerbar.set_title (NAME) ;
-            set_titlebar (headerbar) ;
-            headerbar.show_all () ;
-
             if( Application.saved_state.get_boolean ("maximized")){
                 maximize () ;
             }
+
+            headerbar = new iZiCodeEditor.HeaderBar (this) ;
+            headerbar.set_show_close_button (true) ;
+            set_titlebar (headerbar) ;
+            headerbar.show_all () ;
+
+            notebook = new iZiCodeEditor.Notebook (this) ;
+            notebook.switch_page.connect (on_notebook_page_switched) ;
+            notebook.page_reordered.connect (on_page_reordered) ;
+
+            operations = new iZiCodeEditor.Operations (this) ;
+            dialogs = new iZiCodeEditor.Dialogs (this) ;
+            tabs = new iZiCodeEditor.Tabs (this) ;
 
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
@@ -125,7 +136,7 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
-            status_bar = new iZiCodeEditor.StatusBar () ;
+            status_bar = new iZiCodeEditor.StatusBar (this) ;
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
 
@@ -169,74 +180,19 @@ namespace iZiCodeEditor{
                 return true ;
             }) ;
 
-            show_all () ;
+            show () ;
         }
 
-        public bool on_scroll_press(Gdk.EventScroll event) {
-            if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
-                zoom_in () ;
-                return true ;
-            } else if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
-                zoom_out () ;
-                return true ;
-            }
-            return false ;
+        private void zoom_in() {
+            operations.zooming (Gdk.ScrollDirection.UP) ;
         }
 
-        public void zoom_in() {
-            zooming (Gdk.ScrollDirection.UP) ;
+        private void zoom_out() {
+            operations.zooming (Gdk.ScrollDirection.DOWN) ;
         }
 
-        public void zoom_out() {
-            zooming (Gdk.ScrollDirection.DOWN) ;
-        }
-
-        public void set_default_zoom() {
-            Application.settings_fonts_colors.set_string ("font", get_current_font () + " 14") ;
-        }
-
-        private void zooming(Gdk.ScrollDirection direction) {
-            string font = get_current_font () ;
-            int font_size = (int) get_current_font_size () ;
-
-            if( direction == Gdk.ScrollDirection.DOWN ){
-                font_size-- ;
-                if( font_size < FONT_SIZE_MIN ){
-                    return ;
-                }
-            } else if( direction == Gdk.ScrollDirection.UP ){
-                font_size++ ;
-                if( font_size > FONT_SIZE_MAX ){
-                    return ;
-                }
-            }
-
-            string new_font = font + " " + font_size.to_string () ;
-            Application.settings_fonts_colors.set_string ("font", new_font) ;
-        }
-
-        public string get_current_font() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_current_font_size() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
-        }
-
-        public string get_default_font() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_family = font.substring (0, font.last_index_of (" ")) ;
-            return font_family ;
-        }
-
-        public double get_default_font_size() {
-            string font = Application.settings_fonts_colors.get_string ("font") ;
-            string font_size = font.substring (font.last_index_of (" ") + 1) ;
-            return double.parse (font_size) ;
+        private void set_default_zoom() {
+            Application.settings_fonts_colors.set_string ("font", operations.get_default_font () + " 14") ;
         }
 
         private void on_bars_changed(Gtk.Notebook notebook) {
@@ -270,7 +226,6 @@ namespace iZiCodeEditor{
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {
             // full path is in the tooltip text of Tab Label
-            var tabs = new iZiCodeEditor.Tabs () ;
             Gtk.Label l = tabs.get_label_at_tab ((int) pagenum) ;
             string path = l.get_tooltip_text () ;
             // find and update file's position in GLib.List
@@ -290,82 +245,62 @@ namespace iZiCodeEditor{
         }
 
         public void action_undo() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.undo_last () ;
         }
 
         public void action_redo() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.redo_last () ;
         }
 
-// buttons
         public void action_open() {
-            var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_open () ;
         }
 
         public void action_save() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.save_current () ;
         }
 
         public void action_search() {
-            if( notebook.get_n_pages () == 0 ){
-                return ;
-            }
-            var titlebar = get_titlebar () ;
-            var search = new iZiCodeEditor.Search (titlebar) ;
+            search = new iZiCodeEditor.Search (this) ;
             search.show_all () ;
         }
 
         public void action_gotoline() {
-            if( notebook.get_n_pages () == 0 ){
-                return ;
-            }
-            var titlebar = get_titlebar () ;
-            var gotoline = new iZiCodeEditor.GoToLine (titlebar) ;
+            gotoline = new iZiCodeEditor.GoToLine (this) ;
             gotoline.show_all () ;
         }
 
-// gear menu
         public void action_new() {
             notebook.create_tab ("Untitled") ;
         }
 
         public void action_save_as() {
-            var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_save () ;
         }
 
         public void action_save_all() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.save_all () ;
         }
 
         public void action_replace() {
-            var replace = new iZiCodeEditor.Replace () ;
-            replace.show_dialog () ;
+            replace = new iZiCodeEditor.Replace (this) ;
+            replace.show_all () ;
         }
 
         public void action_close() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.close_tab () ;
         }
 
         public void action_close_all() {
-            var operations = new iZiCodeEditor.Operations () ;
             operations.close_all_tabs () ;
         }
 
-// app menu
         public void action_preferences() {
-            var prefdialog = new iZiCodeEditor.PrefDialog () ;
-            prefdialog.on_activate () ;
+            preferences = new iZiCodeEditor.Preferences (this) ;
+            preferences.show_all () ;
         }
 
         public void action_about() {
-            var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.show_about () ;
         }
 
@@ -377,7 +312,6 @@ namespace iZiCodeEditor{
             Application.saved_state.set_int ("height", height) ;
             Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
 
-            var dialogs = new iZiCodeEditor.Dialogs () ;
             dialogs.changes_all () ;
 
             get_application ().quit () ;

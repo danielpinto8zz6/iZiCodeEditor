@@ -2,7 +2,9 @@ namespace iZiCodeEditor{
 
     public class HeaderBar : Gtk.HeaderBar {
 
-        public HeaderBar () {
+        public Gtk.Button searchButton ;
+
+        public HeaderBar (iZiCodeEditor.ApplicationWindow window) {
 
             // app menu
             var menu = new GLib.Menu () ;
@@ -37,27 +39,23 @@ namespace iZiCodeEditor{
             var openButton = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.BUTTON) ;
             var newButton = new Gtk.Button.from_icon_name ("tab-new-symbolic", Gtk.IconSize.BUTTON) ;
             var saveButton = new Gtk.Button.from_icon_name ("document-save-symbolic", Gtk.IconSize.BUTTON) ;
+            searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON) ;
 
             var menuButton = new Gtk.MenuButton () ;
             menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON) ;
             menuButton.use_popover = true ;
             menuButton.set_menu_model (menu) ;
 
-            openButton.clicked.connect (() => {
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                dialogs.show_open () ;
-            }) ;
-            newButton.clicked.connect (() => { notebook.create_tab ("Untitled") ; }) ;
-            saveButton.clicked.connect (() => {
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.save_current () ;
-            }) ;
-
+            openButton.clicked.connect (window.action_open) ;
+            newButton.clicked.connect (window.action_new) ;
+            saveButton.clicked.connect (window.action_save) ;
+            searchButton.clicked.connect (window.action_search) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;
             leftIcons.get_style_context ().add_class ("linked") ;
 
+            rightIcons.pack_start (searchButton, false, false, 0) ;
             rightIcons.pack_start (saveButton, false, false, 0) ;
             rightIcons.pack_start (menuButton, false, false, 0) ;
             rightIcons.get_style_context ().add_class ("linked") ;

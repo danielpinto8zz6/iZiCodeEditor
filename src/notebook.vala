@@ -1,13 +1,15 @@
 namespace iZiCodeEditor{
     public class Notebook : Gtk.Notebook {
+        public unowned ApplicationWindow window { get ; construct set ; }
+
         public iZiCodeEditor.SourceView tab_view ;
 
         private Gtk.SourceMap source_map ;
 
-        public Notebook () {
-          expand = true ;
-          popup_enable () ;
-          set_scrollable (true) ;
+        public Notebook (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
+            expand = true ;
+            popup_enable () ;
         }
 
         public void create_tab(string path) {
@@ -22,7 +24,7 @@ namespace iZiCodeEditor{
                 }
             }
             // Page
-            tab_view = new iZiCodeEditor.SourceView () ;
+            tab_view = new iZiCodeEditor.SourceView (window) ;
             source_map = new Gtk.SourceMap () ;
 
             tab_view.drag_data_received.connect (on_drag_data_received) ;
@@ -39,7 +41,7 @@ namespace iZiCodeEditor{
             tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
             tab_page.show_all () ;
 
-            if( Application.settings_view.get_boolean ("source-map") ){
+            if( Application.settings_view.get_boolean ("source-map")){
                 source_map.show () ;
                 scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
             } else {
@@ -48,7 +50,7 @@ namespace iZiCodeEditor{
                 scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
             }
             Application.settings_view.changed["source-map"].connect (() => {
-                if( Application.settings_view.get_boolean ("source-map") ){
+                if( Application.settings_view.get_boolean ("source-map")){
                     source_map.show () ;
                     scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
                 } else {
@@ -128,12 +130,11 @@ namespace iZiCodeEditor{
         private void on_drag_data_received(Gdk.DragContext drag_context, int x, int y,
                                            Gtk.SelectionData data, uint info, uint time) {
             string fileopen = null ;
-            foreach( string uri in data.get_uris () ){
+            foreach( string uri in data.get_uris ()){
                 fileopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
                 create_tab (fileopen) ;
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.open_file (fileopen) ;
+                window.operations.open_file (fileopen) ;
             }
             Gtk.drag_finish (drag_context, true, false, time) ;
         }
@@ -141,12 +142,10 @@ namespace iZiCodeEditor{
         // Destroy tab
         public void destroy_tab(Gtk.Widget page, string path) {
             int page_num = page_num (page) ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_sourceview_at_tab (page_num) ;
+            var view = window.tabs.get_sourceview_at_tab (page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( buffer.get_modified () == true ){
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                dialogs.changes_one (page_num, path) ;
+                window.dialogs.changes_one (page_num, path) ;
             } else {
                 remove_page (page_num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
@@ -157,7 +156,7 @@ namespace iZiCodeEditor{
                 }
                 string filename = GLib.Path.get_basename (files.nth_data (get_current_page ())) ;
                 string filelocation = Path.get_dirname (files.nth_data (get_current_page ())) ;
-                var headerbar = new iZiCodeEditor.HeaderBar();
+                var headerbar = new iZiCodeEditor.HeaderBar ((iZiCodeEditor.ApplicationWindow) this.get_window ()) ;
                 if( filename == "Untitled" ){
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (null) ;
@@ -165,9 +164,10 @@ namespace iZiCodeEditor{
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (filelocation) ;
                 }
-                var status_bar = new iZiCodeEditor.StatusBar();
-                status_bar.update_statusbar (page, page_num) ;
+                window.status_bar.update_statusbar (page, page_num) ;
             }
+            if( get_n_pages () == 0 )
+                create_tab ("Untitled") ;
         }
 
         // Update label on modified buffer
