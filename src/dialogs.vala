@@ -9,7 +9,7 @@ namespace iZiCodeEditor{
                 "_Open",
                 Gtk.ResponseType.ACCEPT) ;
             if( notebook.get_n_pages () > 0 ){
-                string cf = files.nth_data (notebook.get_current_page ());
+                string cf = files.nth_data (notebook.get_current_page ()) ;
                 chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
             var filter = new Gtk.FileFilter () ;
@@ -92,10 +92,6 @@ namespace iZiCodeEditor{
                     dialogs.changes_one (i, path) ;
                 }
             }
-            if( notebook.get_n_pages () == 0 ){
-                var mainwin = new iZiCodeEditor.MainWin () ;
-                mainwin.action_app_quit () ;
-            }
         }
 
         public void show_save() {
@@ -107,7 +103,7 @@ namespace iZiCodeEditor{
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
-            string cf = files.nth_data (notebook.get_current_page ());
+            string cf = files.nth_data (notebook.get_current_page ()) ;
             dialog.set_current_folder (Path.get_dirname (cf)) ;
             dialog.set_current_name (Path.get_basename (cf)) ;
             dialog.set_do_overwrite_confirmation (true) ;
@@ -170,13 +166,13 @@ namespace iZiCodeEditor{
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
-                foreach( var key in Application.settings_editor.settings_schema.list_keys () )
+                foreach( var key in Application.settings_editor.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys () )
+                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_terminal.settings_schema.list_keys () )
+                foreach( var key in Application.settings_terminal.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_view.settings_schema.list_keys () )
+                foreach( var key in Application.settings_view.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
                 break ;
             }

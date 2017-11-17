@@ -157,6 +157,7 @@ namespace iZiCodeEditor{
                 }
                 string filename = GLib.Path.get_basename (files.nth_data (get_current_page ())) ;
                 string filelocation = Path.get_dirname (files.nth_data (get_current_page ())) ;
+                var headerbar = new iZiCodeEditor.HeaderBar();
                 if( filename == "Untitled" ){
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (null) ;
@@ -164,6 +165,7 @@ namespace iZiCodeEditor{
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (filelocation) ;
                 }
+                var status_bar = new iZiCodeEditor.StatusBar();
                 status_bar.update_statusbar (page, page_num) ;
             }
         }

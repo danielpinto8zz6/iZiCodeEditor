@@ -12,7 +12,7 @@ namespace iZiCodeEditor{
 
         private Gtk.Button lang_button ;
 
-        construct {
+        public StatusBar () {
 
             terminal_switch () ;
             zoom_popover () ;
@@ -306,23 +306,23 @@ namespace iZiCodeEditor{
         }
 
         private void zoom_popover() {
-            var window = new iZiCodeEditor.MainWin () ;
+            // var window = new iZiCodeEditor.MainWin () ;
             Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom", Gtk.IconSize.SMALL_TOOLBAR) ;
             zoomButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
 
             var minusButton = new Gtk.Button.from_icon_name ("list-remove-symbolic", Gtk.IconSize.BUTTON) ;
             minusButton.set_can_focus (false) ;
             minusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            minusButton.clicked.connect (window.zoom_out) ;
+            // minusButton.clicked.connect (window.zoom_out) ;
 
             var plusButton = new Gtk.Button.from_icon_name ("list-add-symbolic", Gtk.IconSize.BUTTON) ;
             plusButton.set_can_focus (false) ;
             plusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            plusButton.clicked.connect (window.zoom_in) ;
+            // plusButton.clicked.connect (window.zoom_in) ;
 
             var resetButton = new Gtk.Button.with_label ("Reset") ;
             resetButton.set_can_focus (false) ;
-            resetButton.clicked.connect (window.set_default_zoom) ;
+            // resetButton.clicked.connect (window.set_default_zoom) ;
 
             Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             box.pack_start (minusButton, false, false, 0) ;

@@ -1,11 +1,10 @@
 namespace iZiCodeEditor{
-    public class GoToLine : Gtk.Dialog {
+    public class GoToLine : Gtk.Popover {
         private Gtk.SpinButton entry ;
-        private Gtk.Popover popover ;
 
-        public void show_dialog() {
-            if( notebook.get_n_pages () == 0 )
-                return ;
+        public GoToLine (Gtk.Widget ? widget) {
+
+            set_relative_to (widget) ;
 
             var tabs = new iZiCodeEditor.Tabs () ;
             var view = tabs.get_current_sourceview () ;
@@ -14,18 +13,15 @@ namespace iZiCodeEditor{
             entry.set_size_request (200, 30) ;
             entry.digits = 0 ;
 
-
             var gotoBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             gotoBox.pack_start (entry, false, true, 0) ;
             gotoBox.valign = Gtk.Align.CENTER ;
             gotoBox.set_border_width (3) ;
             gotoBox.show_all () ;
 
-            popover = new Gtk.Popover (searchButton) ;
-            popover.add (gotoBox) ;
-            popover.set_visible (true) ;
+            add (gotoBox) ;
 
-            popover.scroll_event.connect ((evt) => {
+            scroll_event.connect ((evt) => {
                 var tab_page = (Gtk.Grid)notebook.get_nth_page (notebook.get_current_page ()) ;
                 var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
                 scrolled.scroll_event (evt) ;
@@ -38,7 +34,7 @@ namespace iZiCodeEditor{
             }) ;
             entry.grab_focus () ;
 
-            popover.hide.connect (on_popover_hide) ;
+            hide.connect (on_popover_hide) ;
         }
 
         // Search forward on entry changed

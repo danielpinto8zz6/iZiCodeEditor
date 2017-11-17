@@ -137,8 +137,8 @@ namespace iZiCodeEditor{
                 update_statusbar_line (buffer) ;
             }) ;
 
-            var window = new iZiCodeEditor.MainWin () ;
-            scroll_event.connect (window.on_scroll_press) ;
+            // var window = new iZiCodeEditor.ApplicationWindow () ;
+            // scroll_event.connect (window.on_scroll_press) ;
 
         }
 

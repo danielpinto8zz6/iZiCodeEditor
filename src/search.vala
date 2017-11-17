@@ -1,12 +1,11 @@
 namespace iZiCodeEditor{
-    public class Search : Gtk.Dialog {
+    public class Search : Gtk.Popover {
         private Gtk.Entry entry ;
         private Gtk.SourceSearchContext context ;
-        private Gtk.Popover popover ;
 
-        public void show_dialog() {
-            if( notebook.get_n_pages () == 0 )
-                return ;
+        public Search (Gtk.Widget ? widget) {
+
+            set_relative_to (widget) ;
 
             entry = new Gtk.SearchEntry () ;
             entry.set_size_request (200, 30) ;
@@ -26,11 +25,9 @@ namespace iZiCodeEditor{
             searchBox.set_border_width (3) ;
             searchBox.show_all () ;
 
-            popover = new Gtk.Popover (searchButton) ;
-            popover.add (searchBox) ;
-            popover.set_visible (true) ;
+            add (searchBox) ;
 
-            popover.scroll_event.connect ((evt) => {
+            scroll_event.connect ((evt) => {
                 var tab_page = (Gtk.Grid)notebook.get_nth_page (notebook.get_current_page ()) ;
                 var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
                 scrolled.scroll_event (evt) ;
@@ -45,7 +42,7 @@ namespace iZiCodeEditor{
             nextButton.clicked.connect (forward) ;
             prevButton.clicked.connect (backward) ;
 
-            popover.hide.connect (on_popover_hide) ;
+            hide.connect (on_popover_hide) ;
         }
 
         // Search forward on entry changed

@@ -4,6 +4,7 @@ namespace iZiCodeEditor{
     const string DESCRIPTION = "Simple text editor written in vala" ;
     const string ICON = "accessories-text-editor" ;
     const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null } ;
+    private iZiCodeEditor.ApplicationWindow window ;
 
     private class Application : Gtk.Application {
 
@@ -44,8 +45,8 @@ namespace iZiCodeEditor{
 
         public override void startup() {
             base.startup () ;
-            var mainwin = new iZiCodeEditor.MainWin () ;
-            mainwin.add_main_window (this) ;
+            window = new iZiCodeEditor.ApplicationWindow (this) ;
+            window.present () ;
             var operations = new iZiCodeEditor.Operations () ;
             operations.add_recent_files () ;
         }
