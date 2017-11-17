@@ -1,16 +1,21 @@
 namespace iZiCodeEditor{
-    public class Dialogs : Gtk.Dialog {
+    public class Dialogs : GLib.Object {
+        public unowned ApplicationWindow window { get ; construct set ; }
+
+        public Dialogs (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
+        }
+
         public void show_open() {
             string selected ;
             var chooser = new Gtk.FileChooserDialog (
-                "Select a file to edit", this, Gtk.FileChooserAction.OPEN,
+                "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
                 "_Cancel",
                 Gtk.ResponseType.CANCEL,
                 "_Open",
                 Gtk.ResponseType.ACCEPT) ;
-            if( notebook.get_n_pages () > 0 ){
-                var tabs = new iZiCodeEditor.Tabs () ;
-                string cf = tabs.get_current_path () ;
+            if( window.notebook.get_n_pages () > 0 ){
+                string cf = files.nth_data (window.notebook.get_current_page ()) ;
                 chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
             var filter = new Gtk.FileFilter () ;
@@ -22,17 +27,8 @@ namespace iZiCodeEditor{
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
                 selected = chooser.get_filename () ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                var operations = new iZiCodeEditor.Operations () ;
-                var tabs = new iZiCodeEditor.Tabs () ;
-                string path = tabs.get_path_at_tab (notebook.get_current_page ()) ;
-                var view = tabs.get_sourceview_at_tab (notebook.get_current_page ()) ;
-                var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-                if( buffer.get_modified () == false && path == "Untitled" ){
-                    operations.close_tab () ;
-                }
-                nbook.create_tab (selected) ;
-                operations.open_file (selected) ;
+                window.notebook.create_tab (selected) ;
+                window.operations.open_file (selected) ;
             }
             chooser.destroy () ;
         }
@@ -49,24 +45,17 @@ namespace iZiCodeEditor{
             int response = dialog.run () ;
             switch( response ){
             case Gtk.ResponseType.NO:
-                notebook.remove_page (num) ;
+                window.notebook.remove_page (num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
-                if( notebook.get_n_pages () == 0 ){
-                    window.set_title ("") ;
-                }
                 break ;
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.save_file_at_pos (num) ;
-                notebook.remove_page (num) ;
+                window.operations.save_file_at_pos (num) ;
+                window.notebook.remove_page (num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
-                if( notebook.get_n_pages () == 0 ){
-                    window.set_title ("") ;
-                }
                 break ;
             }
             dialog.destroy () ;
@@ -81,36 +70,26 @@ namespace iZiCodeEditor{
             Application.saved_state.set_strv ("recent-files", recent_files) ;
 
             for( int i = (int) files.length () - 1 ; i >= 0 ; i-- ){
-                var tabs = new iZiCodeEditor.Tabs () ;
-                string path = tabs.get_path_at_tab (i) ;
-                var view = tabs.get_sourceview_at_tab (i) ;
+                string path = files.nth_data (i) ;
+                var view = window.tabs.get_sourceview_at_tab (i) ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 if( buffer.get_modified () == false ){
-                    notebook.remove_page (i) ;
+                    window.notebook.remove_page (i) ;
                     unowned List<string> del_item = files.find_custom (path, strcmp) ;
                     files.remove_link (del_item) ;
                 } else {
-                    var dialogs = new iZiCodeEditor.Dialogs () ;
-                    dialogs.changes_one (i, path) ;
+                    changes_one (i, path) ;
                 }
-            }
-            if( notebook.get_n_pages () == 0 ){
-                var mainwin = new iZiCodeEditor.MainWin () ;
-                mainwin.action_app_quit () ;
             }
         }
 
         public void show_save() {
-            if( notebook.get_n_pages () == 0 ){
-                return ;
-            }
             string newname ;
             var dialog = new Gtk.FileChooserDialog ("Save As...", window,
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            string cf = tabs.get_current_path () ;
+            string cf = files.nth_data (window.notebook.get_current_page ()) ;
             dialog.set_current_folder (Path.get_dirname (cf)) ;
             dialog.set_current_name (Path.get_basename (cf)) ;
             dialog.set_do_overwrite_confirmation (true) ;
@@ -118,8 +97,7 @@ namespace iZiCodeEditor{
             dialog.show () ;
             if( dialog.run () == Gtk.ResponseType.ACCEPT ){
                 newname = dialog.get_filename () ;
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.save_file_as (newname) ;
+                window.operations.save_file_as (newname) ;
             }
             dialog.destroy () ;
         }
@@ -173,13 +151,13 @@ namespace iZiCodeEditor{
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
-                foreach( var key in Application.settings_editor.settings_schema.list_keys () )
+                foreach( var key in Application.settings_editor.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys () )
+                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_terminal.settings_schema.list_keys () )
+                foreach( var key in Application.settings_terminal.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
-                foreach( var key in Application.settings_view.settings_schema.list_keys () )
+                foreach( var key in Application.settings_view.settings_schema.list_keys ())
                     Application.settings_view.reset (key) ;
                 break ;
             }

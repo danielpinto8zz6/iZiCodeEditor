@@ -1,22 +1,30 @@
 namespace iZiCodeEditor{
-    public class NBook : Gtk.Notebook {
+    public class Notebook : Gtk.Notebook {
+        public unowned ApplicationWindow window { get ; construct set ; }
+
         public iZiCodeEditor.SourceView tab_view ;
 
         private Gtk.SourceMap source_map ;
+
+        public Notebook (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
+            expand = true ;
+            popup_enable () ;
+        }
 
         public void create_tab(string path) {
 
             if( path != "Untitled" ){
                 for( int i = 0 ; i < files.length () ; i++ ){
                     if( files.nth_data (i) == path ){
-                        notebook.set_current_page (i) ;
+                        set_current_page (i) ;
                         // print("debug: refusing to add %s again\n", path);
                         return ;
                     }
                 }
             }
             // Page
-            tab_view = new iZiCodeEditor.SourceView () ;
+            tab_view = new iZiCodeEditor.SourceView (window) ;
             source_map = new Gtk.SourceMap () ;
 
             tab_view.drag_data_received.connect (on_drag_data_received) ;
@@ -33,7 +41,7 @@ namespace iZiCodeEditor{
             tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
             tab_page.show_all () ;
 
-            if( Application.settings_view.get_boolean ("source-map") ){
+            if( Application.settings_view.get_boolean ("source-map")){
                 source_map.show () ;
                 scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
             } else {
@@ -42,7 +50,7 @@ namespace iZiCodeEditor{
                 scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
             }
             Application.settings_view.changed["source-map"].connect (() => {
-                if( Application.settings_view.get_boolean ("source-map") ){
+                if( Application.settings_view.get_boolean ("source-map")){
                     source_map.show () ;
                     scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
                 } else {
@@ -99,58 +107,56 @@ namespace iZiCodeEditor{
             var menu_label = new Gtk.Label (GLib.Path.get_basename (path)) ;
             menu_label.set_alignment (0.0f, 0.5f) ;
             // Add tab and page to notebook
-            notebook.append_page_menu (tab_page, tab, menu_label) ;
-            notebook.set_tab_reorderable (tab_page, true) ;
-            notebook.set_current_page (notebook.get_n_pages () - 1) ;
-            on_tabs_changed (notebook) ;
-            notebook.show_all () ;
-            notebook.page_added.connect (() => { on_tabs_changed (notebook) ; }) ;
-            notebook.page_removed.connect (() => { on_tabs_changed (notebook) ; }) ;
+            append_page_menu (tab_page, tab, menu_label) ;
+            set_tab_reorderable (tab_page, true) ;
+            set_current_page (get_n_pages () - 1) ;
+            on_tabs_changed () ;
+            show_all () ;
+            page_added.connect (() => { on_tabs_changed () ; }) ;
+            page_removed.connect (() => { on_tabs_changed () ; }) ;
             tab_view.buffer.modified_changed.connect (() => {
                 on_modified_changed (tab_view.buffer, tab_label, path) ;
             }) ;
         }
 
-        private void on_tabs_changed(Gtk.Notebook notebook) {
-            var pages = notebook.get_n_pages () ;
-            notebook.set_show_tabs (pages > 1) ;
-            notebook.no_show_all = (pages == 0) ;
-            notebook.visible = (pages > 0) ;
+        private void on_tabs_changed() {
+            var pages = get_n_pages () ;
+            set_show_tabs (pages > 1) ;
+            no_show_all = (pages == 0) ;
+            visible = (pages > 0) ;
         }
 
         // Drag Data
         private void on_drag_data_received(Gdk.DragContext drag_context, int x, int y,
                                            Gtk.SelectionData data, uint info, uint time) {
             string fileopen = null ;
-            foreach( string uri in data.get_uris () ){
+            foreach( string uri in data.get_uris ()){
                 fileopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
                 create_tab (fileopen) ;
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.open_file (fileopen) ;
+                window.operations.open_file (fileopen) ;
             }
             Gtk.drag_finish (drag_context, true, false, time) ;
         }
 
         // Destroy tab
         public void destroy_tab(Gtk.Widget page, string path) {
-            int page_num = notebook.page_num (page) ;
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_sourceview_at_tab (page_num) ;
+            int page_num = page_num (page) ;
+            var view = window.tabs.get_sourceview_at_tab (page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( buffer.get_modified () == true ){
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                dialogs.changes_one (page_num, path) ;
+                window.dialogs.changes_one (page_num, path) ;
             } else {
-                notebook.remove_page (page_num) ;
+                remove_page (page_num) ;
                 unowned List<string> del_item = files.find_custom (path, strcmp) ;
                 files.remove_link (del_item) ;
                 // print ("debug: removed %s\n", path) ;
-                if( notebook.get_n_pages () == 0 ){
+                if( get_n_pages () == 0 ){
                     create_tab ("Untitled") ;
                 }
-                string filename = GLib.Path.get_basename (tabs.get_path_at_tab (notebook.get_current_page ())) ;
-                string filelocation = Path.get_dirname (tabs.get_path_at_tab (notebook.get_current_page ())) ;
+                string filename = GLib.Path.get_basename (files.nth_data (get_current_page ())) ;
+                string filelocation = Path.get_dirname (files.nth_data (get_current_page ())) ;
+                var headerbar = new iZiCodeEditor.HeaderBar ((iZiCodeEditor.ApplicationWindow) this.get_window ()) ;
                 if( filename == "Untitled" ){
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (null) ;
@@ -158,8 +164,10 @@ namespace iZiCodeEditor{
                     headerbar.set_title (filename) ;
                     headerbar.set_subtitle (filelocation) ;
                 }
-                status_bar.update_statusbar (page, page_num) ;
+                window.status_bar.update_statusbar (page, page_num) ;
             }
+            if( get_n_pages () == 0 )
+                create_tab ("Untitled") ;
         }
 
         // Update label on modified buffer

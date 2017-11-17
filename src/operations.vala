@@ -1,18 +1,25 @@
 namespace iZiCodeEditor{
     public class Operations : GLib.Object {
+        public unowned ApplicationWindow window { get ; construct set ; }
+
+        private int FONT_SIZE_MAX = 72 ;
+        private int FONT_SIZE_MIN = 7 ;
+
+        public Operations (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
+        }
+
         public void add_recent_files() {
             string[] recent_files = Application.saved_state.get_strv ("recent-files") ;
             if( recent_files.length > 0 ){
                 for( int i = 0 ; i < recent_files.length ; i++ ){
                     var one = GLib.File.new_for_path (recent_files[i]) ;
                     if( one.query_exists () == true ){
-                        var nbook = new iZiCodeEditor.NBook () ;
-                        var operations = new iZiCodeEditor.Operations () ;
-                        nbook.create_tab (recent_files[i]) ;
-                        operations.open_file (recent_files[i]) ;
+                        window.notebook.create_tab (recent_files[i]) ;
+                        open_file (recent_files[i]) ;
                     }
                 }
-                notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
+                window.notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
             }
         }
 
@@ -26,8 +33,7 @@ namespace iZiCodeEditor{
                 string content = info.get_content_type () ;
                 string mime = GLib.ContentType.get_mime_type (content) ;
                 Gtk.SourceLanguage lang = manager.guess_language (path, mime) ;
-                var tabs = new iZiCodeEditor.Tabs () ;
-                var view = tabs.get_current_sourceview () ;
+                var view = window.tabs.get_current_sourceview () ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 buffer.set_language (lang) ;
                 // load file content
@@ -53,26 +59,20 @@ namespace iZiCodeEditor{
             try {
                 file.replace_contents (bf.text.data, null, false, 0, null, null) ;
                 bf.set_modified (false) ;
-                //print ("debug saved: %s\n", filename) ;
+                // print ("debug saved: %s\n", filename) ;
             } catch ( Error e ){
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                dialogs.save_fallback (filename) ;
+                window.dialogs.save_fallback (filename) ;
                 stderr.printf ("error: %s\n", e.message) ;
             }
         }
 
         // current file
         public void save_current() {
-            if( notebook.get_n_pages () == 0 ){
-                return ;
-            }
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
+            var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            string cf = tabs.get_current_path () ;
+            string cf = files.nth_data (window.notebook.get_current_page ()) ;
             if( cf == "Untitled" ){
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                dialogs.show_save () ;
+                window.dialogs.show_save () ;
             } else {
                 save_from_buffer (cf, buffer) ;
             }
@@ -81,9 +81,8 @@ namespace iZiCodeEditor{
 
         // save file with new name
         public void save_file_as(string path) {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            string cf = tabs.get_current_path () ;
-            var view = tabs.get_current_sourceview () ;
+            string cf = files.nth_data (window.notebook.get_current_page ()) ;
+            var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             // check whether current name is same as path
             if( cf == path ){
@@ -93,23 +92,20 @@ namespace iZiCodeEditor{
             save_from_buffer (path, buffer) ;
             view.grab_focus () ;
             // remove current tab before creating new
-            tabs.check_notebook_for_file_name (path) ;
-            tabs.check_notebook_for_file_name (cf) ;
-            var nbook = new iZiCodeEditor.NBook () ;
-            nbook.create_tab (path) ;
+            window.tabs.check_notebook_for_file_name (path) ;
+            window.tabs.check_notebook_for_file_name (cf) ;
+            window.notebook.create_tab (path) ;
             open_file (path) ;
         }
 
         // save file with given notebook tab position
         public void save_file_at_pos(int pos) {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_sourceview_at_tab (pos) ;
+            var view = window.tabs.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            string path = tabs.get_path_at_tab (pos) ;
+            string path = files.nth_data (pos) ;
             if( path == "Untitled" ){
-                var dialogs = new iZiCodeEditor.Dialogs () ;
-                notebook.set_current_page (pos) ;
-                dialogs.show_save () ;
+                window.notebook.set_current_page (pos) ;
+                window.dialogs.show_save () ;
             } else {
                 save_from_buffer (path, buffer) ;
             }
@@ -127,8 +123,7 @@ namespace iZiCodeEditor{
         // wrap text toggle
         public void wrap_text() {
             for( int i = 0 ; i < files.length () ; i++ ){
-                var tabs = new iZiCodeEditor.Tabs () ;
-                var view = tabs.get_sourceview_at_tab (i) ;
+                var view = window.tabs.get_sourceview_at_tab (i) ;
                 if( view.get_wrap_mode () == Gtk.WrapMode.WORD ){
                     view.set_wrap_mode (Gtk.WrapMode.NONE) ;
                 } else {
@@ -137,43 +132,42 @@ namespace iZiCodeEditor{
             }
         }
 
-        // close tab
-        public void close_tab() {
-            if( notebook.get_n_pages () == 0 ){
-                return ;
+        public void zooming(Gdk.ScrollDirection direction) {
+            string font = get_current_font () ;
+            int font_size = (int) get_current_font_size () ;
+
+            if( direction == Gdk.ScrollDirection.DOWN ){
+                font_size-- ;
+                if( font_size < FONT_SIZE_MIN ){
+                    return ;
+                }
+            } else if( direction == Gdk.ScrollDirection.UP ){
+                font_size++ ;
+                if( font_size > FONT_SIZE_MAX ){
+                    return ;
+                }
             }
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var tab_page = (Gtk.Grid)notebook.get_nth_page (
-                notebook.get_current_page ()) ;
-            string path = tabs.get_current_path () ;
-            var nbook = new iZiCodeEditor.NBook () ;
-            nbook.destroy_tab (tab_page, path) ;
+
+            string new_font = font + " " + font_size.to_string () ;
+            Application.settings_fonts_colors.set_string ("font", new_font) ;
         }
 
-        // close all tab
-        public void close_all_tabs() {
-            for( uint i = files.length () ; i > 0 ; i-- ){
-                var tabs = new iZiCodeEditor.Tabs () ;
-                var tab_page = (Gtk.Grid)notebook.get_nth_page (
-                    notebook.get_current_page ()) ;
-                string path = tabs.get_current_path () ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.destroy_tab (tab_page, path) ;
-            }
+        private string get_current_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
         }
 
-        // undo last
-        public void undo_last() {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
-            view.undo () ;
+        private double get_current_font_size() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
         }
 
-        // redo last
-        public void redo_last() {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_current_sourceview () ;
-            view.redo () ;
+        public string get_default_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
         }
 
     }

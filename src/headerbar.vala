@@ -2,34 +2,34 @@ namespace iZiCodeEditor{
 
     public class HeaderBar : Gtk.HeaderBar {
 
-        construct {
+        public Gtk.Button searchButton ;
+
+        public HeaderBar (iZiCodeEditor.ApplicationWindow window) {
 
             // app menu
             var menu = new GLib.Menu () ;
             var section = new GLib.Menu () ;
-            section.append ("Save As...", "app.save-as") ;
-            section.append ("Save All", "app.save-all") ;
+            section.append ("Save As...", "win.save-as") ;
+            section.append ("Save All", "win.save-all") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("Search...", "app.search") ;
-            section.append ("Replace...", "app.replace") ;
+            section.append ("Search...", "win.search") ;
+            section.append ("Replace...", "win.replace") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("Go to line...", "app.gotoline") ;
+            section.append ("Go to line...", "win.gotoline") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("Close", "app.close") ;
-            section.append ("Close All", "app.close-all") ;
+            section.append ("Close", "win.close") ;
+            section.append ("Close All", "win.close-all") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("Preferences", "app.pref") ;
+            section.append ("Preferences", "win.pref") ;
             menu.append_section (null, section) ;
             section = new GLib.Menu () ;
-            section.append ("About", "app.about") ;
-            section.append ("Quit", "app.quit") ;
+            section.append ("About", "win.about") ;
+            section.append ("Quit", "win.quit") ;
             menu.append_section (null, section) ;
-
-            // app.set_app_menu (menu) ;
 
             var leftIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
@@ -44,7 +44,6 @@ namespace iZiCodeEditor{
             menuButton.use_popover = true ;
             menuButton.set_menu_model (menu) ;
 
-            var window = new iZiCodeEditor.MainWin () ;
             openButton.clicked.connect (window.action_open) ;
             newButton.clicked.connect (window.action_new) ;
             saveButton.clicked.connect (window.action_save) ;
@@ -63,5 +62,6 @@ namespace iZiCodeEditor{
             pack_end (rightIcons) ;
 
         }
+
     }
 }

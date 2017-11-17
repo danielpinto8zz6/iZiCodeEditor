@@ -7,6 +7,8 @@ namespace iZiCodeEditor{
 
     private class Application : Gtk.Application {
 
+        private iZiCodeEditor.ApplicationWindow window ;
+
         private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor") ;
         public static GLib.Settings settings_editor {
             get {
@@ -44,16 +46,14 @@ namespace iZiCodeEditor{
 
         public override void startup() {
             base.startup () ;
-            var mainwin = new iZiCodeEditor.MainWin () ;
-            mainwin.add_main_window (this) ;
-            var operations = new iZiCodeEditor.Operations () ;
-            operations.add_recent_files () ;
+            window = new iZiCodeEditor.ApplicationWindow (this) ;
+            window.present () ;
+            window.operations.add_recent_files () ;
         }
 
         public override void activate() {
             if( files.length () == 0 ){
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.create_tab ("Untitled") ;
+                window.notebook.create_tab ("Untitled") ;
             }
             get_active_window ().present () ;
         }
@@ -62,10 +62,8 @@ namespace iZiCodeEditor{
             string fileopen = null ;
             foreach( File f in files ){
                 fileopen = f.get_path () ;
-                var nbook = new iZiCodeEditor.NBook () ;
-                nbook.create_tab (fileopen) ;
-                var operations = new iZiCodeEditor.Operations () ;
-                operations.open_file (fileopen) ;
+                window.notebook.create_tab (fileopen) ;
+                window.operations.open_file (fileopen) ;
             }
             get_active_window ().present () ;
         }

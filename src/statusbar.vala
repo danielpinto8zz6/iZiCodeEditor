@@ -1,8 +1,8 @@
 namespace iZiCodeEditor{
 
-    private Gtk.Button line_button ;
-
     public class StatusBar : Gtk.ActionBar {
+
+        public unowned ApplicationWindow window { get ; construct set ; }
 
         private Gtk.SourceLanguageManager langman ;
 
@@ -12,7 +12,10 @@ namespace iZiCodeEditor{
 
         private Gtk.Button lang_button ;
 
-        construct {
+        private Gtk.Button line_button ;
+
+        public StatusBar (iZiCodeEditor.ApplicationWindow window) {
+            this.window = window ;
 
             terminal_switch () ;
             zoom_popover () ;
@@ -22,17 +25,16 @@ namespace iZiCodeEditor{
         }
 
         public void update_statusbar(Gtk.Widget page, uint page_num) {
-            var tabs = new iZiCodeEditor.Tabs () ;
-            var view = tabs.get_sourceview_at_tab ((int) page_num) ;
+            var view = window.tabs.get_sourceview_at_tab ((int) page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
-            string path = tabs.get_path_at_tab ((int) page_num) ;
+            string path = files.nth_data (page_num) ;
 
             update_statusbar_language (path) ;
             update_statusbar_line (buffer) ;
         }
 
-        private void update_statusbar_line(Gtk.SourceBuffer buffer) {
+        public void update_statusbar_line(Gtk.SourceBuffer buffer) {
             var position = buffer.cursor_position ;
             Gtk.TextIter iter ;
             buffer.get_iter_at_offset (out iter, position) ;
@@ -79,7 +81,7 @@ namespace iZiCodeEditor{
             label_fallback.set_halign (Gtk.Align.START) ;
             lang_listbox.add (label_fallback) ;
 
-            foreach( var lang_id in langman.get_language_ids () ){
+            foreach( var lang_id in langman.get_language_ids ()){
                 var label = new Gtk.Label (langman.get_language (lang_id).name) ;
                 label.set_halign (Gtk.Align.START) ;
                 lang_listbox.add (label) ;
@@ -115,8 +117,7 @@ namespace iZiCodeEditor{
 
                 string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
 
-                var tabs = new iZiCodeEditor.Tabs () ;
-                var view = tabs.get_current_sourceview () ;
+                var view = window.tabs.get_current_sourceview () ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
                 // Do not set same language twice
@@ -149,8 +150,8 @@ namespace iZiCodeEditor{
                 lang_listbox.show_all () ;
             } else {
                 listbox_get_row (lang_fallback).hide () ;
-                foreach( var lang_id in langman.get_language_ids () ){
-                    if( !langman.get_language (lang_id).name.down ().contains (text.down ()) ){
+                foreach( var lang_id in langman.get_language_ids ()){
+                    if( !langman.get_language (lang_id).name.down ().contains (text.down ())){
                         listbox_get_row (langman.get_language (lang_id).name).hide () ;
                     }
                 }
@@ -159,7 +160,7 @@ namespace iZiCodeEditor{
 
         private Gtk.SourceLanguage get_selected_language(string language) {
             Gtk.SourceLanguage selected = null ;
-            foreach( var lang_id in langman.get_language_ids () ){
+            foreach( var lang_id in langman.get_language_ids ()){
                 if( langman.get_language (lang_id).name == language ){
                     selected = langman.get_language (lang_id) ;
                 }
@@ -306,23 +307,21 @@ namespace iZiCodeEditor{
         }
 
         private void zoom_popover() {
-            var window = new iZiCodeEditor.MainWin () ;
             Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom", Gtk.IconSize.SMALL_TOOLBAR) ;
             zoomButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
 
             var minusButton = new Gtk.Button.from_icon_name ("list-remove-symbolic", Gtk.IconSize.BUTTON) ;
             minusButton.set_can_focus (false) ;
             minusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            minusButton.clicked.connect (window.zoom_out) ;
+            minusButton.clicked.connect (() => { window.operations.zooming (Gdk.ScrollDirection.DOWN) ; }) ;
 
             var plusButton = new Gtk.Button.from_icon_name ("list-add-symbolic", Gtk.IconSize.BUTTON) ;
             plusButton.set_can_focus (false) ;
             plusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            plusButton.clicked.connect (window.zoom_in) ;
-
+            plusButton.clicked.connect (() => { window.operations.zooming (Gdk.ScrollDirection.UP) ; }) ;
             var resetButton = new Gtk.Button.with_label ("Reset") ;
             resetButton.set_can_focus (false) ;
-            resetButton.clicked.connect (window.set_default_zoom) ;
+            resetButton.clicked.connect (() => { Application.settings_fonts_colors.set_string ("font", window.operations.get_default_font () + " 14") ; }) ;
 
             Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             box.pack_start (minusButton, false, false, 0) ;
