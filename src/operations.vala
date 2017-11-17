@@ -6,7 +6,8 @@ namespace iZiCodeEditor{
         private int FONT_SIZE_MIN = 7 ;
 
         public Operations (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
+            Object (
+                window: window) ;
         }
 
         public void add_recent_files() {

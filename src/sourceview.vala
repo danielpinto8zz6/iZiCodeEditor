@@ -25,7 +25,14 @@ namespace iZiCodeEditor{
         iZiCodeEditor.SourceView current_source ;
 
         public SourceView (iZiCodeEditor.ApplicationWindow window) {
+            Object (
+                window: window,
+                cursor_visible: true,
+                left_margin: 10,
+                smart_backspace: true) ;
+        }
 
+        construct {
             var provider = new Gtk.CssProvider () ;
             try {
                 provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length) ;
@@ -63,10 +70,6 @@ namespace iZiCodeEditor{
                     background_pattern = Gtk.SourceBackgroundPatternType.NONE ;
                 }
             }) ;
-            // default
-            set_cursor_visible (true) ;
-            set_left_margin (10) ;
-            set_smart_backspace (true) ;
 
             if( Application.settings_view.get_boolean ("text-wrap")){
                 set_wrap_mode (Gtk.WrapMode.WORD) ;

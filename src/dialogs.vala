@@ -3,7 +3,8 @@ namespace iZiCodeEditor{
         public unowned ApplicationWindow window { get ; construct set ; }
 
         public Dialogs (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
+            Object (
+                window: window) ;
         }
 
         public void show_open() {

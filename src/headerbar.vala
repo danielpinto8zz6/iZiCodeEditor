@@ -1,10 +1,17 @@
 namespace iZiCodeEditor{
 
     public class HeaderBar : Gtk.HeaderBar {
+        public unowned ApplicationWindow window { get ; construct set ; }
 
         public Gtk.Button searchButton ;
 
         public HeaderBar (iZiCodeEditor.ApplicationWindow window) {
+            Object (
+                window: window,
+                show_close_button: true) ;
+        }
+
+        construct {
 
             // app menu
             var menu = new GLib.Menu () ;

@@ -7,9 +7,9 @@ namespace iZiCodeEditor{
         private Gtk.SourceMap source_map ;
 
         public Notebook (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
-            expand = true ;
-            popup_enable () ;
+            Object (
+                window: window,
+                expand: true) ;
         }
 
         public void create_tab(string path) {

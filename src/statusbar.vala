@@ -17,7 +17,11 @@ namespace iZiCodeEditor{
         private Gtk.Label status_label ;
 
         public StatusBar (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
+            Object (
+                window: window) ;
+        }
+
+        construct {
 
             status_label = new Gtk.Label ("") ;
             set_center_widget (status_label) ;

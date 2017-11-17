@@ -3,35 +3,52 @@ namespace iZiCodeEditor{
 
         public unowned ApplicationWindow window { get ; construct set ; }
 
-        Gtk.FontButton button_font ;
-        Gtk.SourceStyleSchemeChooserWidget widget_scheme ;
-        Gtk.SpinButton button_margin_pos ;
-        Gtk.SpinButton button_indent_size ;
-        Gtk.SpinButton button_tab_size ;
-        Gtk.FontButton button_terminal_font ;
+        private Gtk.FontButton button_font ;
+        private Gtk.SourceStyleSchemeChooserWidget widget_scheme ;
+        private Gtk.SpinButton button_margin_pos ;
+        private Gtk.SpinButton button_indent_size ;
+        private Gtk.SpinButton button_tab_size ;
+        private Gtk.FontButton button_terminal_font ;
 
-        Gtk.Switch button_numbers_show ;
-        Gtk.Switch button_highlight ;
-        Gtk.Switch button_margin_show ;
-        Gtk.Switch button_spaces ;
-        Gtk.Switch button_auto_indent ;
-        Gtk.Switch button_pattern_show ;
-        Gtk.Switch button_darktheme ;
-        Gtk.Switch button_textwrap ;
-        Gtk.Switch button_source_map ;
-        Gtk.Switch button_highlight_matching_brackets ;
-        Gtk.Switch button_status_bar ;
-        Gtk.Switch button_terminal ;
-        Gtk.Switch button_brackets_completion ;
+        private Gtk.Switch button_numbers_show ;
+        private Gtk.Switch button_highlight ;
+        private Gtk.Switch button_margin_show ;
+        private Gtk.Switch button_spaces ;
+        private Gtk.Switch button_auto_indent ;
+        private Gtk.Switch button_pattern_show ;
+        private Gtk.Switch button_darktheme ;
+        private Gtk.Switch button_textwrap ;
+        private Gtk.Switch button_source_map ;
+        private Gtk.Switch button_highlight_matching_brackets ;
+        private Gtk.Switch button_status_bar ;
+        private Gtk.Switch button_terminal ;
+        private Gtk.Switch button_brackets_completion ;
 
-        Gtk.ColorButton button_terminal_fg ;
-        Gtk.ColorButton button_terminal_bg ;
+        private Gtk.ColorButton button_terminal_fg ;
+        private Gtk.ColorButton button_terminal_bg ;
+
+        private Gtk.HeaderBar header ;
 
         public Preferences (iZiCodeEditor.ApplicationWindow window) {
-
-            set_title ("Preferences") ;
+            Object (
+                window: window,
+                transient_for: window,
+                resizable: true
+                ) ;
+            header = new Gtk.HeaderBar () ;
+            header.set_show_close_button (true) ;
+            header.set_title ("Preferences") ;
+            set_titlebar (header) ;
             set_property ("skip-taskbar-hint", true) ;
-            set_resizable (true) ;
+
+            var menuButton = new Gtk.Button.with_label ("Reset") ;
+            header.pack_end (menuButton) ;
+
+            menuButton.clicked.connect (window.dialogs.reset_all) ;
+
+        }
+
+        construct {
 
             // Labels
             var label_font = new Gtk.Label ("Editor font") ;
@@ -267,16 +284,6 @@ namespace iZiCodeEditor{
                 print ("DEBUG : %s", button_terminal_fg.get_rgba ().to_string ()) ;
             }) ;
 
-            var header = new Gtk.HeaderBar () ;
-            header.set_show_close_button (true) ;
-            header.set_title ("Preferences") ;
-            set_titlebar (header) ;
-
-            var menuButton = new Gtk.Button.with_label ("Reset") ;
-            header.pack_end (menuButton) ;
-
-            menuButton.clicked.connect (window.dialogs.reset_all) ;
-
             // View Grid
             var grid_view = new Gtk.Grid () ;
             grid_view.attach (label_source_header, 0, 0, 1, 1) ;
@@ -380,7 +387,6 @@ namespace iZiCodeEditor{
             pref_notebook.append_page (grid_terminal, new Gtk.Label ("Terminal")) ;
             var content = get_content_area () as Gtk.Container ;
             content.add (pref_notebook) ;
-            show_all () ;
 
         }
 

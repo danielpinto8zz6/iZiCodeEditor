@@ -3,7 +3,8 @@ namespace iZiCodeEditor{
         public unowned ApplicationWindow window { get ; construct set ; }
 
         public Tabs (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
+            Object (
+                window: window) ;
         }
 
         public Gtk.SourceView get_sourceview_at_tab(int pos) {

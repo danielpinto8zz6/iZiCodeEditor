@@ -89,6 +89,10 @@ namespace iZiCodeEditor{
                 application.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ()) ;
             }
 
+        }
+
+        construct {
+
             files = new GLib.List<string>() ;
 
             // window
@@ -106,7 +110,6 @@ namespace iZiCodeEditor{
             }
 
             headerbar = new iZiCodeEditor.HeaderBar (this) ;
-            headerbar.set_show_close_button (true) ;
             set_titlebar (headerbar) ;
             headerbar.show_all () ;
 

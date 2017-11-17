@@ -5,10 +5,12 @@ namespace iZiCodeEditor{
         private Gtk.SpinButton entry ;
 
         public GoToLine (iZiCodeEditor.ApplicationWindow window) {
-            this.window = window ;
+            Object (
+                window: window,
+                relative_to: window.headerbar.searchButton) ;
+        }
 
-            set_relative_to (window.headerbar.searchButton) ;
-
+        construct {
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             entry = new Gtk.SpinButton.with_range (1, buffer.get_line_count (), 1) ;
