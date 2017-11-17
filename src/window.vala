@@ -270,11 +270,11 @@ namespace iZiCodeEditor{
         }
 
         public void action_undo() {
-            operations.undo_last () ;
+            tabs.get_current_sourceview ().undo () ;
         }
 
         public void action_redo() {
-            operations.redo_last () ;
+            tabs.get_current_sourceview ().redo () ;
         }
 
         public void action_open() {
@@ -313,11 +313,13 @@ namespace iZiCodeEditor{
         }
 
         public void action_close() {
-            operations.close_tab () ;
+            notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
         }
 
         public void action_close_all() {
-            operations.close_all_tabs () ;
+            for( uint i = files.length () ; i > 0 ; i-- ){
+                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
+            }
         }
 
         public void action_preferences() {

@@ -27,12 +27,6 @@ namespace iZiCodeEditor{
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
                 selected = chooser.get_filename () ;
-                string path = files.nth_data (window.notebook.get_current_page ()) ;
-                var view = window.tabs.get_sourceview_at_tab (window.notebook.get_current_page ()) ;
-                var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-                if( buffer.get_modified () == false && path == "Untitled" ){
-                    window.operations.close_tab () ;
-                }
                 window.notebook.create_tab (selected) ;
                 window.operations.open_file (selected) ;
             }

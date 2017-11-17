@@ -132,36 +132,6 @@ namespace iZiCodeEditor{
             }
         }
 
-        // close tab
-        public void close_tab() {
-            var tab_page = (Gtk.Grid)window.notebook.get_nth_page (
-                window.notebook.get_current_page ()) ;
-            string path = files.nth_data (window.notebook.get_current_page ()) ;
-            window.notebook.destroy_tab (tab_page, path) ;
-        }
-
-        // close all tab
-        public void close_all_tabs() {
-            for( uint i = files.length () ; i > 0 ; i-- ){
-                var tab_page = (Gtk.Grid)window.notebook.get_nth_page (
-                    window.notebook.get_current_page ()) ;
-                string path = files.nth_data (window.notebook.get_current_page ()) ;
-                window.notebook.destroy_tab (tab_page, path) ;
-            }
-        }
-
-        // undo last
-        public void undo_last() {
-            var view = window.tabs.get_current_sourceview () ;
-            view.undo () ;
-        }
-
-        // redo last
-        public void redo_last() {
-            var view = window.tabs.get_current_sourceview () ;
-            view.redo () ;
-        }
-
         public void zooming(Gdk.ScrollDirection direction) {
             string font = get_current_font () ;
             int font_size = (int) get_current_font_size () ;
