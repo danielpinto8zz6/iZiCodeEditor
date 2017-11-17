@@ -15,7 +15,7 @@ namespace iZiCodeEditor{
                 "_Open",
                 Gtk.ResponseType.ACCEPT) ;
             if( window.notebook.get_n_pages () > 0 ){
-                string cf = files.nth_data (window.notebook.get_current_page ()) ;
+                string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
                 chooser.set_current_folder (Path.get_dirname (cf)) ;
             }
             var filter = new Gtk.FileFilter () ;
@@ -46,16 +46,16 @@ namespace iZiCodeEditor{
             switch( response ){
             case Gtk.ResponseType.NO:
                 window.notebook.remove_page (num) ;
-                unowned List<string> del_item = files.find_custom (path, strcmp) ;
-                files.remove_link (del_item) ;
+                unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
+                window.files.remove_link (del_item) ;
                 break ;
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
                 window.operations.save_file_at_pos (num) ;
                 window.notebook.remove_page (num) ;
-                unowned List<string> del_item = files.find_custom (path, strcmp) ;
-                files.remove_link (del_item) ;
+                unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
+                window.files.remove_link (del_item) ;
                 break ;
             }
             dialog.destroy () ;
@@ -63,20 +63,20 @@ namespace iZiCodeEditor{
 
         public void changes_all() {
             string[] recent_files = {} ;
-            for( int i = 0 ; i < files.length () ; i++ ){
-                if( files.nth_data (i) != "Untitled" )
-                    recent_files += files.nth_data (i) ;
+            for( int i = 0 ; i < window.files.length () ; i++ ){
+                if( window.files.nth_data (i) != "Untitled" )
+                    recent_files += window.files.nth_data (i) ;
             }
             Application.saved_state.set_strv ("recent-files", recent_files) ;
 
-            for( int i = (int) files.length () - 1 ; i >= 0 ; i-- ){
-                string path = files.nth_data (i) ;
+            for( int i = (int) window.files.length () - 1 ; i >= 0 ; i-- ){
+                string path = window.files.nth_data (i) ;
                 var view = window.tabs.get_sourceview_at_tab (i) ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 if( buffer.get_modified () == false ){
                     window.notebook.remove_page (i) ;
-                    unowned List<string> del_item = files.find_custom (path, strcmp) ;
-                    files.remove_link (del_item) ;
+                    unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
+                    window.files.remove_link (del_item) ;
                 } else {
                     changes_one (i, path) ;
                 }
@@ -89,7 +89,7 @@ namespace iZiCodeEditor{
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
                                                     "Save", Gtk.ResponseType.ACCEPT) ;
-            string cf = files.nth_data (window.notebook.get_current_page ()) ;
+            string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
             dialog.set_current_folder (Path.get_dirname (cf)) ;
             dialog.set_current_name (Path.get_basename (cf)) ;
             dialog.set_do_overwrite_confirmation (true) ;

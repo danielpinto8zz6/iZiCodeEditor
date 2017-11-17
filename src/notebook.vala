@@ -15,8 +15,8 @@ namespace iZiCodeEditor{
         public void create_tab(string path) {
 
             if( path != "Untitled" ){
-                for( int i = 0 ; i < files.length () ; i++ ){
-                    if( files.nth_data (i) == path ){
+                for( int i = 0 ; i < window.files.length () ; i++ ){
+                    if( window.files.nth_data (i) == path ){
                         set_current_page (i) ;
                         // print("debug: refusing to add %s again\n", path);
                         return ;
@@ -102,7 +102,7 @@ namespace iZiCodeEditor{
             tab.attach (tab_button, 1, 0, 1, 1) ;
             tab.set_hexpand (false) ;
             tab.show_all () ;
-            files.append (path) ;
+            window.files.append (path) ;
             // print ("debug: added %s\n", path) ;
             var menu_label = new Gtk.Label (GLib.Path.get_basename (path)) ;
             menu_label.set_alignment (0.0f, 0.5f) ;
@@ -148,11 +148,11 @@ namespace iZiCodeEditor{
                 window.dialogs.changes_one (page_num, path) ;
             } else {
                 remove_page (page_num) ;
-                unowned List<string> del_item = files.find_custom (path, strcmp) ;
-                files.remove_link (del_item) ;
+                unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
+                window.files.remove_link (del_item) ;
 
-                string filename = GLib.Path.get_basename (files.nth_data (get_current_page ())) ;
-                string filelocation = Path.get_dirname (files.nth_data (get_current_page ())) ;
+                string filename = GLib.Path.get_basename (window.files.nth_data (get_current_page ())) ;
+                string filelocation = Path.get_dirname (window.files.nth_data (get_current_page ())) ;
                 if( filename == "Untitled" ){
                     window.headerbar.set_title (filename) ;
                     window.headerbar.set_subtitle (null) ;

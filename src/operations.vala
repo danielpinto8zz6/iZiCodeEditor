@@ -75,7 +75,7 @@ namespace iZiCodeEditor{
         public void save_current() {
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            string cf = files.nth_data (window.notebook.get_current_page ()) ;
+            string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
             if( cf == "Untitled" ){
                 window.dialogs.show_save () ;
             } else {
@@ -86,7 +86,7 @@ namespace iZiCodeEditor{
 
         // save file with new name
         public void save_file_as(string path) {
-            string cf = files.nth_data (window.notebook.get_current_page ()) ;
+            string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             // check whether current name is same as path
@@ -107,7 +107,7 @@ namespace iZiCodeEditor{
         public void save_file_at_pos(int pos) {
             var view = window.tabs.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            string path = files.nth_data (pos) ;
+            string path = window.files.nth_data (pos) ;
             if( path == "Untitled" ){
                 window.notebook.set_current_page (pos) ;
                 window.dialogs.show_save () ;
@@ -120,14 +120,14 @@ namespace iZiCodeEditor{
         // save all files
         public void save_all() {
             int i ;
-            for( i = (int) files.length () - 1 ; i >= 0 ; i-- ){
+            for( i = (int) window.files.length () - 1 ; i >= 0 ; i-- ){
                 save_file_at_pos (i) ;
             }
         }
 
         // wrap text toggle
         public void wrap_text() {
-            for( int i = 0 ; i < files.length () ; i++ ){
+            for( int i = 0 ; i < window.files.length () ; i++ ){
                 var view = window.tabs.get_sourceview_at_tab (i) ;
                 if( view.get_wrap_mode () == Gtk.WrapMode.WORD ){
                     view.set_wrap_mode (Gtk.WrapMode.NONE) ;

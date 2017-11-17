@@ -1,6 +1,4 @@
 namespace iZiCodeEditor{
-    private GLib.List<string> files ;
-
     public class ApplicationWindow : Gtk.ApplicationWindow {
 
         public iZiCodeEditor.Notebook notebook ;
@@ -15,6 +13,8 @@ namespace iZiCodeEditor{
         public iZiCodeEditor.GoToLine gotoline ;
         public iZiCodeEditor.Replace replace ;
         public iZiCodeEditor.Preferences preferences ;
+        public GLib.List<string> files ;
+
 
         public const string ACTION_PREFIX = "win." ;
         public const string ACTION_NEXT_PAGE = "next-page" ;

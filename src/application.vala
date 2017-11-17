@@ -52,7 +52,7 @@ namespace iZiCodeEditor{
         }
 
         public override void activate() {
-            if( files.length () == 0 ){
+            if( window.files.length () == 0 ){
                 window.notebook.create_tab ("Untitled") ;
             }
             get_active_window ().present () ;
