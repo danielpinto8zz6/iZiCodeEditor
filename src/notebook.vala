@@ -134,7 +134,7 @@ namespace iZiCodeEditor{
                 fileopen = uri.replace ("file://", "") ;
                 fileopen = Uri.unescape_string (fileopen) ;
                 create_tab (fileopen) ;
-                window.operations.open_file (fileopen) ;
+                window.operations.open_file.begin (fileopen) ;
             }
             Gtk.drag_finish (drag_context, true, false, time) ;
         }

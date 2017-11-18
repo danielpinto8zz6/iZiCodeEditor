@@ -29,7 +29,7 @@ namespace iZiCodeEditor{
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
                 selected = chooser.get_filename () ;
                 window.notebook.create_tab (selected) ;
-                window.operations.open_file (selected) ;
+                window.operations.open_file.begin (selected) ;
             }
             chooser.destroy () ;
         }
