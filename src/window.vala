@@ -116,7 +116,6 @@ namespace iZiCodeEditor{
             notebook = new iZiCodeEditor.Notebook (this) ;
             notebook.switch_page.connect (on_notebook_page_switched) ;
             notebook.page_reordered.connect (on_page_reordered) ;
-            notebook.page_removed.connect (on_notebook_page_removed) ;
 
             operations = new iZiCodeEditor.Operations (this) ;
             dialogs = new iZiCodeEditor.Dialogs (this) ;
@@ -253,11 +252,6 @@ namespace iZiCodeEditor{
             status_bar.update_statusbar (page, page_num) ;
         }
 
-        private void on_notebook_page_removed() {
-            if( notebook.get_n_pages () == 0 )
-                notebook.create_tab ("Untitled") ;
-        }
-
         void on_page_reordered(Gtk.Widget page, uint pagenum) {
             // full path is in the tooltip text of Tab Label
             Gtk.Label l = tabs.get_label_at_tab ((int) pagenum) ;
@@ -322,7 +316,8 @@ namespace iZiCodeEditor{
         }
 
         public void action_close() {
-            notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
+            if( notebook.get_n_pages () > 0 )
+                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
         }
 
         public void action_close_all() {

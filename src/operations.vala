@@ -80,6 +80,9 @@ namespace iZiCodeEditor{
 
         // current file
         public void save_current() {
+            if( window.notebook.get_n_pages () == 0 ){
+                return ;
+            }
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = window.files.nth_data (window.notebook.get_current_page ()) ;

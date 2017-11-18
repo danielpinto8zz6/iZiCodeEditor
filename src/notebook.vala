@@ -150,6 +150,10 @@ namespace iZiCodeEditor{
                 unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
                 window.files.remove_link (del_item) ;
                 remove_page (page_num) ;
+                if( get_n_pages () == 0 ){
+                    window.headerbar.set_title (NAME) ;
+                    window.headerbar.set_subtitle (null) ;
+                }
             }
         }
 

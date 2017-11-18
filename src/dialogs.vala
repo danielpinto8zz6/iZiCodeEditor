@@ -85,6 +85,9 @@ namespace iZiCodeEditor{
         }
 
         public void show_save() {
+            if( window.notebook.get_n_pages () == 0 ){
+                return ;
+            }
             var dialog = new Gtk.FileChooserDialog ("Save As...", window,
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
