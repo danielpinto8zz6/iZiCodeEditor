@@ -54,9 +54,9 @@ namespace iZiCodeEditor{
                 break ;
             case Gtk.ResponseType.YES:
                 window.operations.save_file_at_pos (num) ;
-                window.notebook.remove_page (num) ;
                 unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
                 window.files.remove_link (del_item) ;
+                window.notebook.remove_page (num) ;
                 break ;
             }
             dialog.destroy () ;

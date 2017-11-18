@@ -116,6 +116,7 @@ namespace iZiCodeEditor{
             notebook = new iZiCodeEditor.Notebook (this) ;
             notebook.switch_page.connect (on_notebook_page_switched) ;
             notebook.page_reordered.connect (on_page_reordered) ;
+            notebook.page_removed.connect (on_notebook_page_removed) ;
 
             operations = new iZiCodeEditor.Operations (this) ;
             dialogs = new iZiCodeEditor.Dialogs (this) ;
@@ -240,16 +241,21 @@ namespace iZiCodeEditor{
 
         private void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
             string path = files.nth_data (page_num) ;
-            string filename = GLib.Path.get_basename (path) ;
-            string filelocation = Path.get_dirname (path) ;
-            if( filename == "Untitled" ){
-                headerbar.set_title (filename) ;
-                headerbar.set_subtitle (null) ;
-            } else {
+            if( path != "Untitled" ){
+                string filename = GLib.Path.get_basename (path) ;
+                string filelocation = Path.get_dirname (path) ;
                 headerbar.set_title (filename) ;
                 headerbar.set_subtitle (filelocation) ;
+            } else {
+                headerbar.set_title (path) ;
+                headerbar.set_subtitle (null) ;
             }
             status_bar.update_statusbar (page, page_num) ;
+        }
+
+        private void on_notebook_page_removed() {
+            if( notebook.get_n_pages () == 0 )
+                notebook.create_tab ("Untitled") ;
         }
 
         void on_page_reordered(Gtk.Widget page, uint pagenum) {

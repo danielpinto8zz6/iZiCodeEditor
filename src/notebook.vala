@@ -147,22 +147,10 @@ namespace iZiCodeEditor{
             if( buffer.get_modified () == true ){
                 window.dialogs.changes_one (page_num, path) ;
             } else {
-                remove_page (page_num) ;
                 unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
                 window.files.remove_link (del_item) ;
-
-                string filename = GLib.Path.get_basename (window.files.nth_data (get_current_page ())) ;
-                string filelocation = Path.get_dirname (window.files.nth_data (get_current_page ())) ;
-                if( filename == "Untitled" ){
-                    window.headerbar.set_title (filename) ;
-                    window.headerbar.set_subtitle (null) ;
-                } else {
-                    window.headerbar.set_title (filename) ;
-                    window.headerbar.set_subtitle (filelocation) ;
-                }
+                remove_page (page_num) ;
             }
-            if( get_n_pages () == 0 )
-                create_tab ("Untitled") ;
         }
 
         // Update label on modified buffer
