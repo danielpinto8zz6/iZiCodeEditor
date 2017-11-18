@@ -77,7 +77,7 @@ namespace iZiCodeEditor{
             // Close tab with middle click
             eventbox.button_press_event.connect ((event) => {
                 if( event.button == 2 ){
-                    destroy_tab (tab_page, path) ;
+                    destroy_tab (tab_page) ;
                 }
                 return false ;
             }) ;
@@ -95,7 +95,7 @@ namespace iZiCodeEditor{
             tab_button.get_style_context ().add_provider (provider,
                                                           Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
             tab_button.clicked.connect (() => {
-                destroy_tab (tab_page, path) ;
+                destroy_tab (tab_page) ;
             }) ;
             var tab = new Gtk.Grid () ;
             tab.attach (eventbox, 0, 0, 1, 1) ;
@@ -140,8 +140,9 @@ namespace iZiCodeEditor{
         }
 
         // Destroy tab
-        public void destroy_tab(Gtk.Widget page, string path) {
+        public void destroy_tab(Gtk.Widget page) {
             int page_num = page_num (page) ;
+            string path = window.files.nth_data (page_num) ;
             var view = window.tabs.get_sourceview_at_tab (page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( buffer.get_modified () == true ){
@@ -153,7 +154,7 @@ namespace iZiCodeEditor{
 
                 string filename = GLib.Path.get_basename (window.files.nth_data (get_current_page ())) ;
                 string filelocation = Path.get_dirname (window.files.nth_data (get_current_page ())) ;
-                if( filename == "Untitled" ){
+                if( path == "Untitled" ){
                     window.headerbar.set_title (filename) ;
                     window.headerbar.set_subtitle (null) ;
                 } else {
