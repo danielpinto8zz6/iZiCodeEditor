@@ -58,52 +58,64 @@ namespace iZiCodeEditor{
             return true ;
         }
 
-        // method for saving files
-        public void save_from_buffer(string filename, Gtk.SourceBuffer bf) {
-            var file = File.new_for_path (filename) ;
+        public async bool save(string filename, Gtk.SourceBuffer buffer) {
+            var filesave = File.new_for_path (filename) ;
+            var file = new Gtk.SourceFile () ;
+            file.location = filesave ;
+
             try {
-                file.replace_contents (bf.text.data, null, false, 0, null, null) ;
-                bf.set_modified (false) ;
-                if( Application.settings_view.get_boolean ("status-bar"))
-                    window.status_bar.status_messages ("saving " + filename + " ...") ;
+                var source_file_saver = new Gtk.SourceFileSaver (buffer, file) ;
+
+                yield source_file_saver.save_async(GLib.Priority.DEFAULT, null, null) ;
+
             } catch ( Error e ){
                 window.dialogs.save_fallback (filename) ;
                 stderr.printf ("error: %s\n", e.message) ;
-                if( Application.settings_view.get_boolean ("status-bar"))
-                    window.status_bar.status_messages ("error: " + e.message) ;
+                return false ;
             }
+            buffer.set_modified (false) ;
+
+            return true ;
         }
 
         // current file
         public void save_current() {
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
-            if( cf == "Untitled" ){
+            string path = window.files.nth_data (window.notebook.get_current_page ()) ;
+            if( path == "Untitled" ){
                 window.dialogs.show_save () ;
             } else {
-                save_from_buffer (cf, buffer) ;
+                save.begin (path, buffer) ;
             }
             view.grab_focus () ;
         }
 
         // save file with new name
-        public void save_file_as(string path) {
-            string cf = window.files.nth_data (window.notebook.get_current_page ()) ;
+        public async bool save_as(string newpath) {
+            string oldpath = window.files.nth_data (window.notebook.get_current_page ()) ;
             var view = window.tabs.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             // check whether current name is same as path
-            if( cf == path ){
+            if( oldpath == newpath ){
                 save_current () ;
-                return ;
+                return false ;
             }
-            save_from_buffer (path, buffer) ;
-            view.grab_focus () ;
-            // remove current tab before creating new
-            window.tabs.check_notebook_for_file_name (path) ;
-            window.tabs.check_notebook_for_file_name (cf) ;
-            window.notebook.create_tab (path) ;
-            open_file.begin (path) ;
+            var is_saved = yield save(newpath, buffer) ;
+
+            if( is_saved )
+                update_tab (oldpath, newpath) ;
+
+            return is_saved ;
+        }
+
+        public void update_tab(string oldpath, string newpath) {
+            unowned List<string> del_item = window.files.find_custom (oldpath, strcmp) ;
+            window.files.remove_link (del_item) ;
+            window.notebook.remove_page (window.notebook.get_current_page ()) ;
+
+            window.notebook.create_tab (newpath) ;
+            open_file.begin (newpath) ;
         }
 
         // save file with given notebook tab position
@@ -115,7 +127,7 @@ namespace iZiCodeEditor{
                 window.notebook.set_current_page (pos) ;
                 window.dialogs.show_save () ;
             } else {
-                save_from_buffer (path, buffer) ;
+                save.begin (path, buffer) ;
             }
             view.grab_focus () ;
         }

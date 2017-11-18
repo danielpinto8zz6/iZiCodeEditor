@@ -85,7 +85,6 @@ namespace iZiCodeEditor{
         }
 
         public void show_save() {
-            string newname ;
             var dialog = new Gtk.FileChooserDialog ("Save As...", window,
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
@@ -97,8 +96,7 @@ namespace iZiCodeEditor{
             dialog.set_modal (true) ;
             dialog.show () ;
             if( dialog.run () == Gtk.ResponseType.ACCEPT ){
-                newname = dialog.get_filename () ;
-                window.operations.save_file_as (newname) ;
+                window.operations.save_as.begin (dialog.get_filename ()) ;
             }
             dialog.destroy () ;
         }

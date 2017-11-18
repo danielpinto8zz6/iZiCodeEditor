@@ -39,16 +39,5 @@ namespace iZiCodeEditor{
             return label ;
         }
 
-        public void check_notebook_for_file_name(string path) {
-            window.notebook.get_current_page () ;
-            for( int i = 0 ; i < window.files.length () ; i++ ){
-                if( window.files.nth_data (i) == path ){
-                    var tab_page = (Gtk.Grid)window.notebook.get_nth_page (i) ;
-                    window.notebook.destroy_tab (tab_page, path) ;
-                    // print ("debug: removed tab number %d with: %s\n", i, path) ;
-                }
-            }
-        }
-
     }
 }
