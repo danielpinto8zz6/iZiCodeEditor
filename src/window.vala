@@ -242,7 +242,7 @@ namespace iZiCodeEditor{
             string path = files.nth_data (page_num) ;
             string filename = GLib.Path.get_basename (path) ;
             string filelocation = Path.get_dirname (path) ;
-            if( path == "Untitled" ){
+            if( filename == "Untitled" ){
                 headerbar.set_title (filename) ;
                 headerbar.set_subtitle (null) ;
             } else {
@@ -316,12 +316,12 @@ namespace iZiCodeEditor{
         }
 
         public void action_close() {
-            notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ())) ;
+            notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
         }
 
         public void action_close_all() {
             for( uint i = files.length () ; i > 0 ; i-- ){
-                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ())) ;
+                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
             }
         }
 
