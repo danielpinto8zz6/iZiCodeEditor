@@ -101,6 +101,12 @@ namespace iZiCodeEditor{
             set_tab_reorderable (tab_page, true) ;
             set_current_page (get_n_pages () - 1) ;
             on_tabs_changed () ;
+
+            window.status_bar.insmode_label.set_label (tab_view.overwrite ? "OVR" : "INS") ;
+
+            tab_view.notify["overwrite"].connect (() => {
+                window.status_bar.insmode_label.set_label (tab_view.overwrite ? "OVR" : "INS") ;
+            }) ;
             show_all () ;
         }
 

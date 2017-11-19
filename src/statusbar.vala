@@ -16,6 +16,8 @@ namespace iZiCodeEditor{
 
         private Gtk.Label status_label ;
 
+        public Gtk.Label insmode_label ;
+
         public StatusBar (iZiCodeEditor.ApplicationWindow window) {
             Object (
                 window: window) ;
@@ -25,6 +27,9 @@ namespace iZiCodeEditor{
 
             status_label = new Gtk.Label ("") ;
             set_center_widget (status_label) ;
+
+            insmode_label = new Gtk.Label ("") ;
+            pack_end (insmode_label) ;
 
             terminal_switch () ;
             zoom_popover () ;
@@ -52,6 +57,11 @@ namespace iZiCodeEditor{
 
             update_statusbar_language (path) ;
             update_statusbar_line (buffer) ;
+            update_statusbar_insmode (view) ;
+        }
+
+        private void update_statusbar_insmode(Gtk.SourceView view) {
+            insmode_label.set_label (view.overwrite ? "OVR" : "INS") ;
         }
 
         public void update_statusbar_line(Gtk.SourceBuffer buffer) {
