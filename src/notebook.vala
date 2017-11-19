@@ -9,7 +9,8 @@ namespace iZiCodeEditor{
         public Notebook (iZiCodeEditor.ApplicationWindow window) {
             Object (
                 window: window,
-                expand: true) ;
+                expand: true,
+                show_border: false) ;
         }
 
         public void create_tab(string path) {
