@@ -102,11 +102,43 @@ namespace iZiCodeEditor{
             set_current_page (get_n_pages () - 1) ;
             on_tabs_changed () ;
             show_all () ;
-            page_added.connect (() => { on_tabs_changed () ; }) ;
-            page_removed.connect (() => { on_tabs_changed () ; }) ;
         }
 
-        private void on_tabs_changed() {
+        public void on_page_reordered(Gtk.Widget page, uint pagenum) {
+            // full path is in the tooltip text of Tab Label
+            var tab_page = (Gtk.Grid)window.notebook.get_nth_page ((int) pagenum) ;
+            var grid = (Gtk.Grid)window.notebook.get_tab_label (tab_page) ;
+            var eventbox = (Gtk.EventBox)grid.get_child_at (0, 0) ;
+            var label = (Gtk.Label)eventbox.get_child () ;
+
+            string path = label.get_tooltip_text () ;
+            // find and update file's position in GLib.List
+            for( int i = 0 ; i < window.files.length () ; i++ ){
+                if( window.files.nth_data (i) == path ){
+                    // remove from files list
+                    unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
+                    window.files.remove_link (del_item) ;
+                    // insert in new position
+                    window.files.insert (path, (int) pagenum) ;
+                }
+            }
+        }
+
+        public void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
+            string path = window.files.nth_data (page_num) ;
+            if( path != "Untitled" ){
+                string filename = GLib.Path.get_basename (path) ;
+                string filelocation = Path.get_dirname (path) ;
+                window.headerbar.set_title (filename) ;
+                window.headerbar.set_subtitle (filelocation) ;
+            } else {
+                window.headerbar.set_title (path) ;
+                window.headerbar.set_subtitle (null) ;
+            }
+            window.status_bar.update_statusbar (page, page_num) ;
+        }
+
+        public void on_tabs_changed() {
             var pages = get_n_pages () ;
             set_show_tabs (pages > 1) ;
             no_show_all = (pages == 0) ;
@@ -143,5 +175,6 @@ namespace iZiCodeEditor{
                 }
             }
         }
+
     }
 }

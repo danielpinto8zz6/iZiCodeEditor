@@ -114,8 +114,10 @@ namespace iZiCodeEditor{
             headerbar.show_all () ;
 
             notebook = new iZiCodeEditor.Notebook (this) ;
-            notebook.switch_page.connect (on_notebook_page_switched) ;
-            notebook.page_reordered.connect (on_page_reordered) ;
+            notebook.switch_page.connect (notebook.on_notebook_page_switched) ;
+            notebook.page_reordered.connect (notebook.on_page_reordered) ;
+            notebook.page_added.connect (notebook.on_tabs_changed) ;
+            notebook.page_removed.connect (notebook.on_tabs_changed) ;
 
             operations = new iZiCodeEditor.Operations (this) ;
             dialogs = new iZiCodeEditor.Dialogs (this) ;
@@ -235,40 +237,6 @@ namespace iZiCodeEditor{
                 notebook.set_current_page (0) ;
             } else {
                 notebook.next_page () ;
-            }
-        }
-
-        private void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
-            string path = files.nth_data (page_num) ;
-            if( path != "Untitled" ){
-                string filename = GLib.Path.get_basename (path) ;
-                string filelocation = Path.get_dirname (path) ;
-                headerbar.set_title (filename) ;
-                headerbar.set_subtitle (filelocation) ;
-            } else {
-                headerbar.set_title (path) ;
-                headerbar.set_subtitle (null) ;
-            }
-            status_bar.update_statusbar (page, page_num) ;
-        }
-
-        void on_page_reordered(Gtk.Widget page, uint pagenum) {
-            // full path is in the tooltip text of Tab Label
-            Gtk.Label l = tabs.get_label_at_tab ((int) pagenum) ;
-            string path = l.get_tooltip_text () ;
-            // find and update file's position in GLib.List
-            for( int i = 0 ; i < files.length () ; i++ ){
-                if( files.nth_data (i) == path ){
-                    // remove from files list
-                    unowned List<string> del_item = files.find_custom (path, strcmp) ;
-                    files.remove_link (del_item) ;
-                    // insert in new position
-                    files.insert (path, (int) pagenum) ;
-                }
-            }
-            for( int i = 0 ; i < files.length () ; i++ ){
-                print ("NEW LIST %s\n", files.nth_data (i)) ;
-
             }
         }
 
