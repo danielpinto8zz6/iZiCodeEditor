@@ -61,6 +61,12 @@ namespace iZiCodeEditor{
             }
             buffer.set_modified (false) ;
 
+            // place cursor on start
+            Gtk.TextIter iter_st ;
+            buffer.get_start_iter (out iter_st) ;
+            buffer.place_cursor (iter_st) ;
+            view.scroll_to_iter (iter_st, 0.10, false, 0, 0) ;
+
             view.grab_focus () ;
 
             return true ;
