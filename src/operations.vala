@@ -35,10 +35,23 @@ namespace iZiCodeEditor{
             }
         }
 
+        private string mime_type(File file) {
+            string mime_type = "" ;
+            try {
+                var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null) ;
+                var content_type = info.get_content_type () ;
+                mime_type = ContentType.get_mime_type (content_type) ;
+            } catch ( Error e ){
+                debug (e.message) ;
+            }
+            return mime_type ;
+        }
+
         public async bool open_file(string path) {
             var fileopen = File.new_for_path (path) ;
             var manager = new Gtk.SourceLanguageManager () ;
-            var lang = manager.guess_language (fileopen.get_path (), null) ;
+
+            var lang = manager.guess_language (fileopen.get_path (), mime_type (fileopen)) ;
             var view = window.notebook.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( lang != null ){
