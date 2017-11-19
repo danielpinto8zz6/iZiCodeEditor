@@ -14,16 +14,6 @@ namespace iZiCodeEditor{
 
         public void create_tab(string path) {
 
-            if( path != "Untitled" ){
-                for( int i = 0 ; i < window.files.length () ; i++ ){
-                    if( window.files.nth_data (i) == path ){
-                        set_current_page (i) ;
-                        // print("debug: refusing to add %s again\n", path);
-                        return ;
-                    }
-                }
-            }
-            // Page
             tab_view = new iZiCodeEditor.SourceView (window) ;
             source_map = new Gtk.SourceMap () ;
 

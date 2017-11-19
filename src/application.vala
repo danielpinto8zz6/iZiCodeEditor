@@ -62,8 +62,7 @@ namespace iZiCodeEditor{
             string fileopen = null ;
             foreach( File f in files ){
                 fileopen = f.get_path () ;
-                window.notebook.create_tab (fileopen) ;
-                window.operations.open_file.begin (fileopen) ;
+                window.operations.open (fileopen) ;
             }
             get_active_window ().present () ;
         }

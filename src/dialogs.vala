@@ -8,7 +8,6 @@ namespace iZiCodeEditor{
         }
 
         public void show_open() {
-            string selected ;
             var chooser = new Gtk.FileChooserDialog (
                 "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
                 "_Cancel",
@@ -27,9 +26,7 @@ namespace iZiCodeEditor{
             chooser.set_filter (filter) ;
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
-                selected = chooser.get_filename () ;
-                window.notebook.create_tab (selected) ;
-                window.operations.open_file.begin (selected) ;
+                window.operations.open (chooser.get_filename ()) ;
             }
             chooser.destroy () ;
         }

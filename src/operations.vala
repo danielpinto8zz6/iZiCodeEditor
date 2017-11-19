@@ -10,14 +10,25 @@ namespace iZiCodeEditor{
                 window: window) ;
         }
 
+        public void open(string path) {
+            for( int i = 0 ; i < window.files.length () ; i++ ){
+                if( window.files.nth_data (i) == path ){
+                    window.notebook.set_current_page (i) ;
+                    stderr.printf ("This file is already loaded: %s\n", path) ;
+                    return ;
+                }
+            }
+            window.notebook.create_tab (path) ;
+            open_file.begin (path) ;
+        }
+
         public void add_recent_files() {
             string[] recent_files = Application.saved_state.get_strv ("recent-files") ;
             if( recent_files.length > 0 ){
                 for( int i = 0 ; i < recent_files.length ; i++ ){
                     var one = GLib.File.new_for_path (recent_files[i]) ;
                     if( one.query_exists () == true ){
-                        window.notebook.create_tab (recent_files[i]) ;
-                        open_file.begin (recent_files[i]) ;
+                        open (recent_files[i]) ;
                     }
                 }
                 window.notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
@@ -25,7 +36,6 @@ namespace iZiCodeEditor{
         }
 
         public async bool open_file(string path) {
-
             var fileopen = File.new_for_path (path) ;
             var manager = new Gtk.SourceLanguageManager () ;
             var lang = manager.guess_language (fileopen.get_path (), null) ;
@@ -47,8 +57,6 @@ namespace iZiCodeEditor{
 
             } catch ( Error e ){
                 stderr.printf ("error: %s\n", e.message) ;
-                if( Application.settings_view.get_boolean ("status-bar"))
-                    window.status_bar.status_messages ("error: " + e.message) ;
                 return false ;
             }
             buffer.set_modified (false) ;
@@ -117,8 +125,7 @@ namespace iZiCodeEditor{
             window.files.remove_link (del_item) ;
             window.notebook.remove_page (window.notebook.get_current_page ()) ;
 
-            window.notebook.create_tab (newpath) ;
-            open_file.begin (newpath) ;
+            open (newpath) ;
         }
 
         // save file with given notebook tab position
