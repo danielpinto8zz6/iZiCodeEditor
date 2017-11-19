@@ -15,7 +15,7 @@ namespace iZiCodeEditor{
 
         construct {
 
-            view = window.tabs.get_current_sourceview () ;
+            view = window.notebook.get_current_sourceview () ;
             context = new Gtk.SourceSearchContext (view.buffer as Gtk.SourceBuffer, null) ;
 
             entry = new Gtk.SearchEntry () ;

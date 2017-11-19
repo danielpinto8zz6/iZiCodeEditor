@@ -69,7 +69,7 @@ namespace iZiCodeEditor{
 
             for( int i = (int) window.files.length () - 1 ; i >= 0 ; i-- ){
                 string path = window.files.nth_data (i) ;
-                var view = window.tabs.get_sourceview_at_tab (i) ;
+                var view = window.notebook.get_sourceview_at_tab (i) ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
                 if( buffer.get_modified () == false ){
                     window.notebook.remove_page (i) ;

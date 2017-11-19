@@ -39,7 +39,7 @@ namespace iZiCodeEditor{
             var fileopen = File.new_for_path (path) ;
             var manager = new Gtk.SourceLanguageManager () ;
             var lang = manager.guess_language (fileopen.get_path (), null) ;
-            var view = window.tabs.get_current_sourceview () ;
+            var view = window.notebook.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( lang != null ){
                 buffer.set_language (lang) ;
@@ -91,7 +91,7 @@ namespace iZiCodeEditor{
             if( window.notebook.get_n_pages () == 0 ){
                 return ;
             }
-            var view = window.tabs.get_current_sourceview () ;
+            var view = window.notebook.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = window.files.nth_data (window.notebook.get_current_page ()) ;
             if( path == "Untitled" ){
@@ -105,7 +105,7 @@ namespace iZiCodeEditor{
         // save file with new name
         public async bool save_as(string newpath) {
             string oldpath = window.files.nth_data (window.notebook.get_current_page ()) ;
-            var view = window.tabs.get_current_sourceview () ;
+            var view = window.notebook.get_current_sourceview () ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             // check whether current name is same as path
             if( oldpath == newpath ){
@@ -130,7 +130,7 @@ namespace iZiCodeEditor{
 
         // save file with given notebook tab position
         public void save_file_at_pos(int pos) {
-            var view = window.tabs.get_sourceview_at_tab (pos) ;
+            var view = window.notebook.get_sourceview_at_tab (pos) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             string path = window.files.nth_data (pos) ;
             if( path == "Untitled" ){
@@ -153,7 +153,7 @@ namespace iZiCodeEditor{
         // wrap text toggle
         public void wrap_text() {
             for( int i = 0 ; i < window.files.length () ; i++ ){
-                var view = window.tabs.get_sourceview_at_tab (i) ;
+                var view = window.notebook.get_sourceview_at_tab (i) ;
                 if( view.get_wrap_mode () == Gtk.WrapMode.WORD ){
                     view.set_wrap_mode (Gtk.WrapMode.NONE) ;
                 } else {

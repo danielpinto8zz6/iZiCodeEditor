@@ -10,7 +10,6 @@ vala_sources = [
     'search.vala',
     'sourceview.vala',
     'statusbar.vala',
-    'tabs.vala',
     'terminal.vala',
     'window.vala'
 ]

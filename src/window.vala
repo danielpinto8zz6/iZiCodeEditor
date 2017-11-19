@@ -8,7 +8,6 @@ namespace iZiCodeEditor{
         public iZiCodeEditor.StatusBar status_bar ;
         public iZiCodeEditor.Operations operations ;
         public iZiCodeEditor.Dialogs dialogs ;
-        public iZiCodeEditor.Tabs tabs ;
         public iZiCodeEditor.Search search ;
         public iZiCodeEditor.GoToLine gotoline ;
         public iZiCodeEditor.Replace replace ;
@@ -121,7 +120,6 @@ namespace iZiCodeEditor{
 
             operations = new iZiCodeEditor.Operations (this) ;
             dialogs = new iZiCodeEditor.Dialogs (this) ;
-            tabs = new iZiCodeEditor.Tabs (this) ;
 
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
@@ -241,11 +239,11 @@ namespace iZiCodeEditor{
         }
 
         public void action_undo() {
-            tabs.get_current_sourceview ().undo () ;
+            notebook.get_current_sourceview ().undo () ;
         }
 
         public void action_redo() {
-            tabs.get_current_sourceview ().redo () ;
+            notebook.get_current_sourceview ().redo () ;
         }
 
         public void action_open() {

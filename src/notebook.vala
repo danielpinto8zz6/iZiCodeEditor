@@ -161,7 +161,7 @@ namespace iZiCodeEditor{
         // Destroy tab
         public void destroy_tab(Gtk.Widget page, string path) {
             int page_num = page_num (page) ;
-            var view = window.tabs.get_sourceview_at_tab (page_num) ;
+            var view = get_sourceview_at_tab (page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             if( buffer.get_modified () == true ){
                 window.dialogs.changes_one (page_num, path) ;
@@ -174,6 +174,20 @@ namespace iZiCodeEditor{
                     window.headerbar.set_subtitle (null) ;
                 }
             }
+        }
+
+        public Gtk.SourceView get_sourceview_at_tab(int pos) {
+            var tab_page = (Gtk.Grid)window.notebook.get_nth_page (pos) ;
+            var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
+            var view = (Gtk.SourceView)scrolled.get_child () ;
+            return view ;
+        }
+
+        public Gtk.SourceView get_current_sourceview() {
+            var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ()) ;
+            var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
+            var view = (Gtk.SourceView)scrolled.get_child () ;
+            return view ;
         }
 
     }

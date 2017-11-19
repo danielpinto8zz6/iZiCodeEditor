@@ -45,7 +45,7 @@ namespace iZiCodeEditor{
         }
 
         public void update_statusbar(Gtk.Widget page, uint page_num) {
-            var view = window.tabs.get_sourceview_at_tab ((int) page_num) ;
+            var view = window.notebook.get_sourceview_at_tab ((int) page_num) ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
             string path = window.files.nth_data (page_num) ;
@@ -137,7 +137,7 @@ namespace iZiCodeEditor{
 
                 string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
 
-                var view = window.tabs.get_current_sourceview () ;
+                var view = window.notebook.get_current_sourceview () ;
                 var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
 
                 // Do not set same language twice
