@@ -107,7 +107,19 @@ namespace iZiCodeEditor{
             tab_view.notify["overwrite"].connect (() => {
                 window.status_bar.insmode_label.set_label (tab_view.overwrite ? "OVR" : "INS") ;
             }) ;
+            var buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
+            buffer.modified_changed.connect (() => {
+                on_modified_changed (buffer, tab_label, path) ;
+            }) ;
             show_all () ;
+        }
+
+        public void on_modified_changed(Gtk.SourceBuffer buffer, Gtk.Label lab, string p) {
+            if( buffer.get_modified () == true ){
+                lab.set_text (GLib.Path.get_basename (p) + " *") ;
+            } else {
+                lab.set_text (GLib.Path.get_basename (p)) ;
+            }
         }
 
         public void on_page_reordered(Gtk.Widget page, uint pagenum) {
