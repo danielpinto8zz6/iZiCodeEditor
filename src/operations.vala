@@ -35,7 +35,7 @@ namespace iZiCodeEditor{
             }
         }
 
-        private string mime_type(File file) {
+        public string mime_type(File file) {
             string mime_type = "" ;
             try {
                 var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null) ;

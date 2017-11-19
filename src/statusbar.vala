@@ -63,7 +63,9 @@ namespace iZiCodeEditor{
 
         private void update_statusbar_language(string path) {
 
-            var lang = langman.guess_language (path, null) ;
+            var file = File.new_for_path (path) ;
+
+            var lang = langman.guess_language (path, window.operations.mime_type (file)) ;
 
             string ? lang_selected ;
 
@@ -89,7 +91,7 @@ namespace iZiCodeEditor{
 
         private void language_popover() {
 
-            lang_button = new Gtk.Button.with_label ("Vala") ;
+            lang_button = new Gtk.Button.with_label (lang_fallback) ;
             lang_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
             lang_button.width_request = 120 ;
 
@@ -125,7 +127,6 @@ namespace iZiCodeEditor{
 
             box.pack_start (searchentry, false, false, 0) ;
             box.pack_start (lang_scrolled, false, false, 0) ;
-
 
             var lang_popover = new Gtk.Popover (lang_button) ;
 
