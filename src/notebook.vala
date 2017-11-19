@@ -104,9 +104,6 @@ namespace iZiCodeEditor{
             show_all () ;
             page_added.connect (() => { on_tabs_changed () ; }) ;
             page_removed.connect (() => { on_tabs_changed () ; }) ;
-            tab_view.buffer.modified_changed.connect (() => {
-                on_modified_changed (tab_view.buffer, tab_label, path) ;
-            }) ;
         }
 
         private void on_tabs_changed() {
@@ -146,15 +143,5 @@ namespace iZiCodeEditor{
                 }
             }
         }
-
-        // Update label on modified buffer
-        public void on_modified_changed(Gtk.SourceBuffer bf, Gtk.Label lab, string p) {
-            if( bf.get_modified () == true ){
-                lab.set_text (GLib.Path.get_basename (p) + " *") ;
-            } else {
-                lab.set_text (GLib.Path.get_basename (p)) ;
-            }
-        }
-
     }
 }
