@@ -21,12 +21,13 @@ namespace iZiCodeEditor{
             var filter = new Gtk.FileFilter () ;
             filter.add_mime_type ("text/plain") ;
 
-            chooser.set_select_multiple (false) ;
+            chooser.set_select_multiple (true) ;
             chooser.set_modal (true) ;
             chooser.set_filter (filter) ;
             chooser.show () ;
             if( chooser.run () == Gtk.ResponseType.ACCEPT ){
-                window.operations.open (chooser.get_filename ()) ;
+                foreach( string filename in chooser.get_filenames ())
+                    window.operations.open (filename) ;
             }
             chooser.destroy () ;
         }
