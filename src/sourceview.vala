@@ -3,7 +3,6 @@ namespace iZiCodeEditor{
         public unowned ApplicationWindow window { get ; construct set ; }
 
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
-        public new Gtk.SourceBuffer buffer ;
         Gee.HashMap<string, string> brackets ;
         Gee.HashMap<uint, string> keys ;
         const string[] valid_next_chars = {
@@ -90,7 +89,8 @@ namespace iZiCodeEditor{
             keys[Gdk.Key.grave] = "`" ;
 
             // style scheme
-            buffer = (Gtk.SourceBuffer) this.get_buffer () ;
+            var buffer = new Gtk.SourceBuffer (null) ;
+            set_buffer (buffer) ;
             buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings_fonts_colors.get_string ("color-scheme"))) ;
             Application.settings_fonts_colors.changed["color-scheme"].connect (() => {
                 buffer.set_style_scheme (Gtk.SourceStyleSchemeManager.get_default ().get_scheme (Application.settings_fonts_colors.get_string ("color-scheme"))) ;
