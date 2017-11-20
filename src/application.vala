@@ -49,6 +49,14 @@ namespace iZiCodeEditor{
             window = new iZiCodeEditor.ApplicationWindow (this) ;
             window.present () ;
             window.operations.add_recent_files () ;
+
+            try {
+                var provider = new Gtk.CssProvider () ;
+                var css_stuff = """ .close-tab-button { padding :0; } """ ;
+                provider.load_from_data (css_stuff, css_stuff.length) ;
+            } catch ( Error e ){
+                stderr.printf ("Error: %s\n", e.message) ;
+            }
         }
 
         public override void activate() {

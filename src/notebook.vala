@@ -72,19 +72,12 @@ namespace iZiCodeEditor{
                 }
                 return false ;
             }) ;
-            var provider = new Gtk.CssProvider () ;
-            var css_stuff = """ * { padding :0; } """ ;
-            try {
-                provider.load_from_data (css_stuff, css_stuff.length) ;
-            } catch ( Error e ){
-                stderr.printf ("Error: %s\n", e.message) ;
-            }
+
             var tab_button = new Gtk.Button.from_icon_name ("window-close-symbolic",
                                                             Gtk.IconSize.MENU) ;
             tab_button.set_relief (Gtk.ReliefStyle.NONE) ;
             tab_button.set_hexpand (false) ;
-            tab_button.get_style_context ().add_provider (provider,
-                                                          Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) ;
+            tab_button.get_style_context ().add_class ("close-tab-button") ;
             tab_button.clicked.connect (() => {
                 destroy_tab (tab_page, path) ;
             }) ;
