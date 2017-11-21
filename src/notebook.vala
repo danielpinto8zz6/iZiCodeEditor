@@ -54,11 +54,9 @@ namespace iZiCodeEditor{
 
         public void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
             var doc = (Document) page ;
-            string title = doc.file.get_basename () ;
-            string subtitle = doc.file.get_parse_name () ;
 
-            window.headerbar.set_title (title) ;
-            window.headerbar.set_subtitle (subtitle) ;
+            window.headerbar.set_title (doc.file_name) ;
+            window.headerbar.set_subtitle (doc.file_parse_name) ;
 
             window.status_bar.update_statusbar (doc) ;
         }
@@ -78,6 +76,14 @@ namespace iZiCodeEditor{
             }
 
             Gtk.drag_finish (ctx, true, false, time) ;
+        }
+
+        public void new_tab() {
+            var doc = new Document (null) ;
+            doc.new_doc () ;
+            append_page (doc, doc.tab_label) ;
+            set_current_page (page_num (doc)) ;
+            set_tab_reorderable (doc, true) ;
         }
 
         public void save_opened(Document doc) {

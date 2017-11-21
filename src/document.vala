@@ -25,6 +25,28 @@ namespace iZiCodeEditor{
             }
         }
 
+        public string ? _file_name = null ;
+
+        public string ? file_name {
+            get {
+                return _file_name ;
+            }
+            set {
+                _file_name = value ;
+            }
+        }
+
+        public string ? _file_parse_name = null ;
+
+        public string ? file_parse_name {
+            get {
+                return _file_parse_name ;
+            }
+            set {
+                _file_parse_name = value ;
+            }
+        }
+
         private string ? _mime_type = null ;
         public string ? mime_type {
             get {
@@ -49,6 +71,13 @@ namespace iZiCodeEditor{
 
         public Document (File ? file = null) {
             this.file = file ;
+            if( file != null ){
+                _file_name = file.get_basename () ;
+                _file_parse_name = file.get_parse_name () ;
+            } else {
+                _file_name = "New Document" ;
+                _file_parse_name = null ;
+            }
         }
 
         construct {
@@ -120,13 +149,20 @@ namespace iZiCodeEditor{
             show_all () ;
         }
 
-        public void set_label() {
-            string fname = file.get_basename () ;
-            string path = file.get_parse_name () ;
-            if( fname.length > 18 )
-                fname = fname.substring (0, 15) + "..." ;
-            label.label = fname ;
-            label.tooltip_text = path ;
+        public void new_doc() {
+
+            sourceview.buffer.modified_changed.connect (() => {
+                set_status () ;
+            }) ;
+
+            label.label = file_name ;
+
+            Gtk.TextIter iter_st ;
+            sourceview.buffer.get_start_iter (out iter_st) ;
+            sourceview.buffer.place_cursor (iter_st) ;
+            sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0) ;
+
+            sourceview.grab_focus () ;
         }
 
         public async bool open() {
@@ -152,11 +188,13 @@ namespace iZiCodeEditor{
 
             sourceview.buffer.set_modified (false) ;
 
-            set_label () ;
-
             sourceview.buffer.modified_changed.connect (() => {
                 set_status () ;
             }) ;
+
+            label.label = file_name ;
+            label.tooltip_text = file_parse_name ;
+
             sourceview.sensitive = true ;
 
             Gtk.TextIter iter_st ;
@@ -170,6 +208,9 @@ namespace iZiCodeEditor{
         }
 
         public async bool save() {
+            if( file == null ){
+                save_as () ;
+            }
             try {
                 var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile) ;
 
@@ -217,16 +258,24 @@ namespace iZiCodeEditor{
             dialog.set_modal (true) ;
             dialog.show () ;
             if( dialog.run () == Gtk.ResponseType.ACCEPT ){
-                this.file = File.new_for_uri (dialog.get_file ().get_uri ()) ;
+                file = File.new_for_uri (dialog.get_file ().get_uri ()) ;
 
                 sourceview.buffer.set_modified (true) ;
                 var is_saved = yield save() ;
 
                 if( is_saved ){
                     sourceview.set_language_from_file (file) ;
-                    Application.instance.get_last_window ().headerbar.set_title (file.get_basename ()) ;
-                    Application.instance.get_last_window ().headerbar.set_subtitle (file.get_parse_name ()) ;
-                    set_label () ;
+
+                    Application.instance.get_last_window ().status_bar.update_statusbar_language (this) ;
+
+                    _file_name = file.get_basename () ;
+                    _file_parse_name = file.get_parse_name () ;
+
+                    Application.instance.get_last_window ().headerbar.set_title (file_name) ;
+                    Application.instance.get_last_window ().headerbar.set_subtitle (file_parse_name) ;
+
+                    label.label = file_name ;
+                    label.tooltip_text = file_parse_name ;
                 }
 
                 dialog.destroy () ;

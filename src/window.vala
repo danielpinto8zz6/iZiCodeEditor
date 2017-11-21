@@ -306,7 +306,7 @@ namespace iZiCodeEditor{
         }
 
         public void action_new() {
-            // notebook.create_tab ("Untitled") ;
+            notebook.new_tab () ;
         }
 
         public void action_save_as() {
