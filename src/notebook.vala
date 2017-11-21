@@ -89,7 +89,7 @@ namespace iZiCodeEditor{
         public void save_opened(Document doc) {
             var dialog = new Gtk.MessageDialog (window,
                                                 Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
-                                                "The file '%s' is not saved.\nDo you want to save it before closing?", doc.file.get_parse_name ()) ;
+                                                "The file '%s' is not saved.\nDo you want to save it before closing?", doc.file_name) ;
             dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
             dialog.add_button ("Save", Gtk.ResponseType.YES) ;
@@ -162,8 +162,7 @@ namespace iZiCodeEditor{
                 remove_page (page_num (doc)) ;
             }
             if( get_n_pages () == 0 ){
-                window.headerbar.set_title (NAME) ;
-                window.headerbar.set_subtitle (null) ;
+                new_tab () ;
             }
         }
 
@@ -180,6 +179,7 @@ namespace iZiCodeEditor{
                 if( sel_doc == null ){
                     continue ;
                 }
+                close (sel_doc) ;
                 recent_files += sel_doc.file.get_uri () ;
             }
             Application.saved_state.set_strv ("recent-files", recent_files) ;
@@ -211,7 +211,7 @@ namespace iZiCodeEditor{
         public void text_wrap_mode() {
             for( int n = 0 ; n <= docs.length () ; n++ ){
                 var sel_doc = docs.nth_data (n) ;
-                if( sel_doc == null ){
+                if( sel_doc == null && sel_doc.file == null ){
                     continue ;
                 }
                 if( sel_doc.sourceview.get_wrap_mode () == Gtk.WrapMode.WORD ){

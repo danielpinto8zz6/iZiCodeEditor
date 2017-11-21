@@ -59,7 +59,7 @@ namespace iZiCodeEditor{
             base.startup () ;
             window = new ApplicationWindow (this) ;
             window.present () ;
-            window.notebook.add_recent_files () ;
+            // window.notebook.add_recent_files () ;
 
             try {
                 var provider = new Gtk.CssProvider () ;
@@ -71,9 +71,9 @@ namespace iZiCodeEditor{
         }
 
         public override void activate() {
-            // if( window.files.length () == 0 ){
-            // window.notebook.create_tab ("Untitled") ;
-            // }
+          if( window.notebook.get_n_pages () == 0 ){
+              window.notebook.new_tab () ;
+          }
             get_last_window ().present () ;
         }
 

@@ -156,6 +156,7 @@ namespace iZiCodeEditor{
             }) ;
 
             label.label = file_name ;
+            label.tooltip_text = file_parse_name ;
 
             Gtk.TextIter iter_st ;
             sourceview.buffer.get_start_iter (out iter_st) ;
@@ -209,7 +210,7 @@ namespace iZiCodeEditor{
 
         public async bool save() {
             if( file == null ){
-                save_as () ;
+                save_as.begin () ;
             }
             try {
                 var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile) ;
@@ -217,7 +218,7 @@ namespace iZiCodeEditor{
                 yield source_file_saver.save_async(GLib.Priority.DEFAULT, null, null) ;
 
             } catch ( Error e ){
-                // Application.instance.get_last_window ().dialogs.save_fallback (filename) ;
+                save_fallback () ;
                 stderr.printf ("error: %s\n", e.message) ;
                 return false ;
             }

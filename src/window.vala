@@ -356,10 +356,8 @@ namespace iZiCodeEditor{
             Application.saved_state.set_int ("height", height) ;
             Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
 
-            notebook.set_recent_files () ;
-            if( notebook.get_n_pages () > 0 ){
-                notebook.close_all () ;
-            }
+            // notebook.set_recent_files () ;
+            notebook.close_all () ;
 
             get_application ().quit () ;
         }
