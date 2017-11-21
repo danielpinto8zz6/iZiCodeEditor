@@ -155,6 +155,10 @@ namespace iZiCodeEditor{
             } else {
                 remove_page (page_num (doc)) ;
             }
+            if( get_n_pages () == 0 ){
+                window.headerbar.set_title (NAME) ;
+                window.headerbar.set_subtitle (null) ;
+            }
         }
 
         public void close_all() {
