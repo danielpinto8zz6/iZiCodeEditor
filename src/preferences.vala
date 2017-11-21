@@ -1,8 +1,5 @@
 namespace iZiCodeEditor{
     public class Preferences : Gtk.Dialog {
-
-        public unowned ApplicationWindow window { get ; construct set ; }
-
         private Gtk.FontButton button_font ;
         private Gtk.SourceStyleSchemeChooserWidget widget_scheme ;
         private Gtk.SpinButton button_margin_pos ;
@@ -29,10 +26,9 @@ namespace iZiCodeEditor{
 
         private Gtk.HeaderBar header ;
 
-        public Preferences (iZiCodeEditor.ApplicationWindow window) {
+        public Preferences () {
             Object (
-                window: window,
-                transient_for: window,
+                transient_for: Application.instance.get_last_window (),
                 resizable: true
                 ) ;
             header = new Gtk.HeaderBar () ;
@@ -44,7 +40,7 @@ namespace iZiCodeEditor{
             var menuButton = new Gtk.Button.with_label ("Reset") ;
             header.pack_end (menuButton) ;
 
-            menuButton.clicked.connect (window.dialogs.reset_all) ;
+            menuButton.clicked.connect (reset_all) ;
 
         }
 
@@ -388,6 +384,32 @@ namespace iZiCodeEditor{
             var content = get_content_area () as Gtk.Container ;
             content.add (pref_notebook) ;
 
+        }
+
+        public void reset_all() {
+            var dialog = new Gtk.MessageDialog (Application.instance.get_last_window (),
+                                                Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
+                                                "Are you sure you want to reset all preferences?") ;
+            dialog.add_button ("Yes", Gtk.ResponseType.YES) ;
+            dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
+            dialog.set_resizable (false) ;
+            dialog.set_default_response (Gtk.ResponseType.YES) ;
+            int response = dialog.run () ;
+            switch( response ){
+            case Gtk.ResponseType.CANCEL:
+                break ;
+            case Gtk.ResponseType.YES:
+                foreach( var key in Application.settings_editor.settings_schema.list_keys ())
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_fonts_colors.settings_schema.list_keys ())
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_terminal.settings_schema.list_keys ())
+                    Application.settings_view.reset (key) ;
+                foreach( var key in Application.settings_view.settings_schema.list_keys ())
+                    Application.settings_view.reset (key) ;
+                break ;
+            }
+            dialog.destroy () ;
         }
 
     }

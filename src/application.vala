@@ -7,7 +7,18 @@ namespace iZiCodeEditor{
 
     private class Application : Gtk.Application {
 
-        private iZiCodeEditor.ApplicationWindow window ;
+        private ApplicationWindow window ;
+
+        public static Application _instance = null ;
+
+        public static Application instance {
+            get {
+                if( _instance == null ){
+                    _instance = new Application () ;
+                }
+                return _instance ;
+            }
+        }
 
         private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor") ;
         public static GLib.Settings settings_editor {
@@ -46,9 +57,9 @@ namespace iZiCodeEditor{
 
         public override void startup() {
             base.startup () ;
-            window = new iZiCodeEditor.ApplicationWindow (this) ;
+            window = new ApplicationWindow (this) ;
             window.present () ;
-            window.operations.add_recent_files () ;
+            window.notebook.add_recent_files () ;
 
             try {
                 var provider = new Gtk.CssProvider () ;
@@ -60,23 +71,26 @@ namespace iZiCodeEditor{
         }
 
         public override void activate() {
-            if( window.files.length () == 0 ){
-                window.notebook.create_tab ("Untitled") ;
-            }
-            get_active_window ().present () ;
+            // if( window.files.length () == 0 ){
+            // window.notebook.create_tab ("Untitled") ;
+            // }
+            get_last_window ().present () ;
         }
 
         public override void open(File[] files, string hint) {
-            string fileopen = null ;
-            foreach( File f in files ){
-                fileopen = f.get_path () ;
-                window.operations.open (fileopen) ;
+            foreach( File file in files ){
+                window.notebook.open (file) ;
             }
             get_active_window ().present () ;
         }
 
+        public ApplicationWindow ? get_last_window () {
+            unowned List<weak Gtk.Window> window = get_windows () ;
+            return window.length () > 0 ? window.last ().data as ApplicationWindow : null ;
+        }
+
         private static int main(string[] args) {
-            iZiCodeEditor.Application app = new iZiCodeEditor.Application () ;
+            Application app = Application.instance ;
             return app.run (args) ;
         }
 

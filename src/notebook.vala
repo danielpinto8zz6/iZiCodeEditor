@@ -2,9 +2,13 @@ namespace iZiCodeEditor{
     public class Notebook : Gtk.Notebook {
         public unowned ApplicationWindow window { get ; construct set ; }
 
-        public iZiCodeEditor.SourceView tab_view ;
+        public Document current_doc {
+            get {
+                return (Document) get_nth_page (window.notebook.get_current_page ()) ;
+            }
+        }
 
-        private Gtk.SourceMap source_map ;
+        public GLib.List<Document> docs ;
 
         public Notebook (iZiCodeEditor.ApplicationWindow window) {
             Object (
@@ -13,141 +17,50 @@ namespace iZiCodeEditor{
                 show_border: false) ;
         }
 
-        public void create_tab(string path) {
+        construct {
+            docs = new GLib.List<Document> () ;
 
-            tab_view = new iZiCodeEditor.SourceView (window) ;
-            source_map = new Gtk.SourceMap () ;
-
-            tab_view.drag_data_received.connect (on_drag_data_received) ;
-
-            var scroll = new Gtk.ScrolledWindow (null, null) ;
-            scroll.add (tab_view) ;
-            scroll.set_hexpand (true) ;
-            scroll.set_vexpand (true) ;
-
-            source_map.set_view (tab_view) ;
-
-            var tab_page = new Gtk.Grid () ;
-            tab_page.attach (scroll, 0, 0, 1, 1) ;
-            tab_page.attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
-            tab_page.show_all () ;
-
-            if( Application.settings_view.get_boolean ("source-map")){
-                source_map.show () ;
-                scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
-            } else {
-                source_map.hide () ;
-                source_map.no_show_all = true ;
-                scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
-            }
-            Application.settings_view.changed["source-map"].connect (() => {
-                if( Application.settings_view.get_boolean ("source-map")){
-                    source_map.show () ;
-                    scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL ;
-                } else {
-                    source_map.hide () ;
-                    source_map.no_show_all = true ;
-                    scroll.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC ;
-                }
+            Application.settings_view.changed["text-wrap"].connect (() => {
+                text_wrap_mode () ;
             }) ;
 
-            // File name
-
-            string fname = GLib.Path.get_basename (path) ;
-            if( fname.length > 18 ){
-                fname = fname.substring (0, 15) + "..." ;
-            }
-            // Tab
-            var tab_label = new Gtk.Label (fname) ;
-            tab_label.set_tooltip_text (path) ;
-            tab_label.set_alignment (0, 0.5f) ;
-            tab_label.set_hexpand (true) ;
-            tab_label.set_size_request (100, -1) ;
-            var eventbox = new Gtk.EventBox () ;
-            eventbox.add (tab_label) ;
-            // Close tab with middle click
-            eventbox.button_press_event.connect ((event) => {
-                if( event.button == 2 ){
-                    destroy_tab (tab_page, path) ;
-                }
-                return false ;
-            }) ;
-
-            var tab_button = new Gtk.Button.from_icon_name ("window-close-symbolic",
-                                                            Gtk.IconSize.MENU) ;
-            tab_button.set_relief (Gtk.ReliefStyle.NONE) ;
-            tab_button.set_hexpand (false) ;
-            tab_button.get_style_context ().add_class ("close-tab-button") ;
-            tab_button.clicked.connect (() => {
-                destroy_tab (tab_page, path) ;
-            }) ;
-            var tab = new Gtk.Grid () ;
-            tab.attach (eventbox, 0, 0, 1, 1) ;
-            tab.attach (tab_button, 1, 0, 1, 1) ;
-            tab.set_hexpand (false) ;
-            tab.show_all () ;
-            window.files.append (path) ;
-            // print ("debug: added %s\n", path) ;
-            var menu_label = new Gtk.Label (GLib.Path.get_basename (path)) ;
-            menu_label.set_alignment (0.0f, 0.5f) ;
-            // Add tab and page to notebook
-            append_page_menu (tab_page, tab, menu_label) ;
-            set_tab_reorderable (tab_page, true) ;
-            set_current_page (get_n_pages () - 1) ;
             on_tabs_changed () ;
-
-            window.status_bar.insmode_label.set_label (tab_view.overwrite ? "OVR" : "INS") ;
-
-            tab_view.notify["overwrite"].connect (() => {
-                window.status_bar.insmode_label.set_label (tab_view.overwrite ? "OVR" : "INS") ;
-            }) ;
-            var buffer = (Gtk.SourceBuffer)tab_view.get_buffer () ;
-            buffer.modified_changed.connect (() => {
-                on_modified_changed (buffer, tab_label, path) ;
-            }) ;
-            show_all () ;
+            page_added.connect (on_doc_added) ;
+            page_removed.connect (on_doc_removed) ;
+            switch_page.connect (on_notebook_page_switched) ;
+            page_reordered.connect (on_doc_reordered) ;
         }
 
-        public void on_modified_changed(Gtk.SourceBuffer buffer, Gtk.Label lab, string p) {
-            if( buffer.get_modified () == true ){
-                lab.set_text (GLib.Path.get_basename (p) + " *") ;
-            } else {
-                lab.set_text (GLib.Path.get_basename (p)) ;
-            }
+        private void on_doc_removed(Gtk.Widget tab, uint page_num) {
+            var doc = (Document) tab ;
+            docs.remove (doc) ;
+            doc.sourceview.drag_data_received.disconnect (drag_received) ;
+            on_tabs_changed () ;
         }
 
-        public void on_page_reordered(Gtk.Widget page, uint pagenum) {
-            // full path is in the tooltip text of Tab Label
-            var tab_page = (Gtk.Grid)window.notebook.get_nth_page ((int) pagenum) ;
-            var grid = (Gtk.Grid)window.notebook.get_tab_label (tab_page) ;
-            var eventbox = (Gtk.EventBox)grid.get_child_at (0, 0) ;
-            var label = (Gtk.Label)eventbox.get_child () ;
+        private void on_doc_added(Gtk.Widget tab, uint page_num) {
+            var doc = (Document) tab ;
+            docs.append (doc) ;
+            doc.sourceview.drag_data_received.connect (drag_received) ;
+            on_tabs_changed () ;
+        }
 
-            string path = label.get_tooltip_text () ;
-            // find and update file's position in GLib.List
-            for( int i = 0 ; i < window.files.length () ; i++ ){
-                if( window.files.nth_data (i) == path ){
-                    // remove from files list
-                    unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
-                    window.files.remove_link (del_item) ;
-                    // insert in new position
-                    window.files.insert (path, (int) pagenum) ;
-                }
-            }
+        private void on_doc_reordered(Gtk.Widget tab, uint new_pos) {
+            var doc = (Document) tab ;
+
+            docs.remove (doc) ;
+            docs.insert (doc, (int) new_pos) ;
         }
 
         public void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
-            string path = window.files.nth_data (page_num) ;
-            if( path != "Untitled" ){
-                string filename = GLib.Path.get_basename (path) ;
-                string filelocation = Path.get_dirname (path) ;
-                window.headerbar.set_title (filename) ;
-                window.headerbar.set_subtitle (filelocation) ;
-            } else {
-                window.headerbar.set_title (path) ;
-                window.headerbar.set_subtitle (null) ;
-            }
-            window.status_bar.update_statusbar (page, page_num) ;
+            var doc = (Document) page ;
+            string title = doc.file.get_basename () ;
+            string subtitle = doc.file.get_parse_name () ;
+
+            window.headerbar.set_title (title) ;
+            window.headerbar.set_subtitle (subtitle) ;
+
+            window.status_bar.update_statusbar (doc) ;
         }
 
         public void on_tabs_changed() {
@@ -157,49 +70,147 @@ namespace iZiCodeEditor{
             visible = (pages > 0) ;
         }
 
-        // Drag Data
-        private void on_drag_data_received(Gdk.DragContext drag_context, int x, int y,
-                                           Gtk.SelectionData data, uint info, uint time) {
-            string fileopen = null ;
-            foreach( string uri in data.get_uris ()){
-                fileopen = uri.replace ("file://", "") ;
-                fileopen = Uri.unescape_string (fileopen) ;
-                create_tab (fileopen) ;
-                window.operations.open_file.begin (fileopen) ;
+        private void drag_received(Gtk.Widget w, Gdk.DragContext ctx, int x, int y, Gtk.SelectionData sel, uint info, uint time) {
+            var uris = sel.get_uris () ;
+            foreach( var filename in uris ){
+                var file = File.new_for_uri (filename) ;
+                open (file) ;
             }
-            Gtk.drag_finish (drag_context, true, false, time) ;
+
+            Gtk.drag_finish (ctx, true, false, time) ;
         }
 
-        // Destroy tab
-        public void destroy_tab(Gtk.Widget page, string path) {
-            int page_num = page_num (page) ;
-            var view = get_sourceview_at_tab (page_num) ;
-            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            if( buffer.get_modified () == true ){
-                window.dialogs.changes_one (page_num, path) ;
-            } else {
-                unowned List<string> del_item = window.files.find_custom (path, strcmp) ;
-                window.files.remove_link (del_item) ;
-                remove_page (page_num) ;
-                if( get_n_pages () == 0 ){
-                    window.headerbar.set_title (NAME) ;
-                    window.headerbar.set_subtitle (null) ;
+        public void save_opened(Document doc) {
+            var dialog = new Gtk.MessageDialog (window,
+                                                Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
+                                                "The file '%s' is not saved.\nDo you want to save it before closing?", doc.file.get_parse_name ()) ;
+            dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
+            dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
+            dialog.add_button ("Save", Gtk.ResponseType.YES) ;
+            dialog.set_resizable (false) ;
+            dialog.set_default_response (Gtk.ResponseType.YES) ;
+            int response = dialog.run () ;
+            switch( response ){
+            case Gtk.ResponseType.NO:
+                remove_page (page_num (doc)) ;
+                break ;
+            case Gtk.ResponseType.CANCEL:
+                break ;
+            case Gtk.ResponseType.YES:
+                doc.save.begin () ;
+                remove_page (page_num (doc)) ;
+                break ;
+            }
+            dialog.destroy () ;
+        }
+
+        public void open_dialog() {
+            var chooser = new Gtk.FileChooserDialog (
+                "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
+                "_Cancel",
+                Gtk.ResponseType.CANCEL,
+                "_Open",
+                Gtk.ResponseType.ACCEPT) ;
+            var filter = new Gtk.FileFilter () ;
+            filter.add_mime_type ("text/plain") ;
+
+            chooser.set_select_multiple (true) ;
+            chooser.set_modal (true) ;
+            chooser.set_filter (filter) ;
+            chooser.show () ;
+            if( chooser.run () == Gtk.ResponseType.ACCEPT ){
+                foreach( string uri in chooser.get_uris ()){
+                    var file = File.new_for_uri (uri) ;
+                    open (file) ;
                 }
             }
+            chooser.destroy () ;
         }
 
-        public Gtk.SourceView get_sourceview_at_tab(int pos) {
-            var tab_page = (Gtk.Grid)window.notebook.get_nth_page (pos) ;
-            var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
-            var view = (Gtk.SourceView)scrolled.get_child () ;
-            return view ;
+        public void open(File file) {
+            for( int n = 0 ; n <= docs.length () ; n++ ){
+                var sel_doc = docs.nth_data (n) ;
+                if( sel_doc == null ){
+                    continue ;
+                }
+
+                if( sel_doc.file != null && sel_doc.file.get_uri () == file.get_uri ()){
+                    set_current_page (page_num (sel_doc)) ;
+                    stderr.printf ("This file is already loaded: %s\n", file.get_parse_name ()) ;
+                    return ;
+                }
+            }
+            var doc = new Document (file) ;
+            doc.open.begin () ;
+            append_page (doc, doc.tab_label) ;
+            set_current_page (page_num (doc)) ;
+            set_tab_reorderable (doc, true) ;
         }
 
-        public Gtk.SourceView get_current_sourceview() {
-            var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ()) ;
-            var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
-            var view = (Gtk.SourceView)scrolled.get_child () ;
-            return view ;
+        public void close(Gtk.Widget tab) {
+            var doc = (Document) tab ;
+
+            if( doc.sourceview.buffer.get_modified () == true ){
+                save_opened (doc) ;
+            } else {
+                remove_page (page_num (doc)) ;
+            }
+        }
+
+        public void close_all() {
+            for( uint i = docs.length () ; i > 0 ; i-- ){
+                close (current_doc) ;
+            }
+        }
+
+        public void set_recent_files() {
+            string[] recent_files = {} ;
+            for( int i = 0 ; i < docs.length () ; i++ ){
+                var sel_doc = docs.nth_data (i) ;
+                if( sel_doc == null ){
+                    continue ;
+                }
+                recent_files += sel_doc.file.get_uri () ;
+            }
+            Application.saved_state.set_strv ("recent-files", recent_files) ;
+        }
+
+        public void add_recent_files() {
+            string[] recent_files = Application.saved_state.get_strv ("recent-files") ;
+            if( recent_files.length > 0 ){
+                for( int i = 0 ; i < recent_files.length ; i++ ){
+                    var one = GLib.File.new_for_uri (recent_files[i]) ;
+                    if( one.query_exists () == true ){
+                        window.notebook.open (one) ;
+                    }
+                }
+                window.notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
+            }
+        }
+
+        public void save_all() {
+            for( int n = 0 ; n <= docs.length () ; n++ ){
+                var sel_doc = docs.nth_data (n) ;
+                if( sel_doc == null ){
+                    continue ;
+                }
+                sel_doc.save.begin () ;
+            }
+        }
+
+        public void text_wrap_mode() {
+            for( int n = 0 ; n <= docs.length () ; n++ ){
+                var sel_doc = docs.nth_data (n) ;
+                if( sel_doc == null ){
+                    continue ;
+                }
+                if( sel_doc.sourceview.get_wrap_mode () == Gtk.WrapMode.WORD ){
+                    sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.NONE) ;
+                } else {
+                    sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.WORD) ;
+                }
+
+            }
         }
 
     }

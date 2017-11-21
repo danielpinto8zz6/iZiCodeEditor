@@ -1,24 +1,24 @@
 vala_sources = [
     'application.vala',
-    'dialogs.vala',
     'goto.vala',
     'headerbar.vala',
     'notebook.vala',
-    'operations.vala',
     'preferences.vala',
     'replace.vala',
     'search.vala',
     'sourceview.vala',
     'statusbar.vala',
     'terminal.vala',
-    'window.vala'
+    'window.vala',
+    'document.vala'
 ]
 
 vala_args = [
     '--pkg=gtk+-3.0',
     '--pkg=gtksourceview-3.0',
     '--pkg=gee-0.8',
-    '--pkg=vte-2.91'
+    '--pkg=vte-2.91',
+    '--enable-checking'
 ]
 
 iZiCodeEditor = executable('iZiCodeEditor',

@@ -1,6 +1,5 @@
 namespace iZiCodeEditor{
     public class SourceView : Gtk.SourceView {
-        public unowned ApplicationWindow window { get ; construct set ; }
 
         private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } } ;
         Gee.HashMap<string, string> brackets ;
@@ -8,16 +7,27 @@ namespace iZiCodeEditor{
         const string[] valid_next_chars = {
             "", " ", "\b", "\r", "\n", "\t", ",", ".", ";", ":"
         } ;
+        public Gtk.SourceLanguageManager manager ;
 
-        public SourceView (iZiCodeEditor.ApplicationWindow window) {
+        public Gtk.SourceLanguage ? language {
+            set {
+                ((Gtk.SourceBuffer)buffer).language = value ;
+            }
+            get {
+                return ((Gtk.SourceBuffer)buffer).language ;
+            }
+        }
+
+        public SourceView () {
             Object (
-                window: window,
                 cursor_visible: true,
                 left_margin: 10,
                 smart_backspace: true) ;
         }
 
         construct {
+            manager = Gtk.SourceLanguageManager.get_default () ;
+
             var provider = new Gtk.CssProvider () ;
             try {
                 provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length) ;
@@ -98,8 +108,7 @@ namespace iZiCodeEditor{
 
             Application.settings_editor.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT) ;
 
-            //// drag and drop
-            Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY) ;
+            Gtk.drag_dest_add_uri_targets (this) ;
 
             if( this != null ){
                 key_press_event.disconnect (on_key_press) ;
@@ -109,20 +118,25 @@ namespace iZiCodeEditor{
             key_press_event.connect (on_key_press) ;
             backspace.connect (on_backspace) ;
 
-            buffer.notify["cursor-position"].connect (() => {
-                window.status_bar.update_statusbar_line (buffer) ;
-            }) ;
-
             scroll_event.connect ((event) => {
                 if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0 ){
-                    window.operations.zooming (Gdk.ScrollDirection.DOWN) ;
+                    Application.instance.get_last_window ().zooming (Gdk.ScrollDirection.DOWN) ;
                     return true ;
                 } else if((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0 ){
-                    window.operations.zooming (Gdk.ScrollDirection.UP) ;
+                    Application.instance.get_last_window ().zooming (Gdk.ScrollDirection.UP) ;
                     return true ;
                 }
                 return false ;
             }) ;
+
+            Application.instance.get_last_window ().status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS") ;
+
+            notify["overwrite"].connect (() => {
+                Application.instance.get_last_window ().status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS") ;
+            }) ;
+
+            show_all () ;
+
         }
 
         string get_next_char() {
@@ -235,6 +249,16 @@ namespace iZiCodeEditor{
             str.append_printf ("}\n") ;
             var css = str.str ;
             return css ;
+        }
+
+        public void set_language_from_file(File file) {
+            try {
+                var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null) ;
+                var mime_type = ContentType.get_mime_type (info.get_attribute_as_string (FileAttribute.STANDARD_CONTENT_TYPE)) ;
+                language = manager.guess_language (file.get_path (), mime_type) ;
+            } catch ( Error e ){
+                critical (e.message) ;
+            }
         }
 
     }

@@ -11,7 +11,7 @@ namespace iZiCodeEditor{
         }
 
         construct {
-            var view = window.notebook.get_current_sourceview () ;
+            var view = window.notebook.current_doc.sourceview ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             entry = new Gtk.SpinButton.with_range (1, buffer.get_line_count (), 1) ;
             entry.set_size_request (200, 30) ;
@@ -44,7 +44,7 @@ namespace iZiCodeEditor{
         // Search forward on entry changed
         public void go_to(int line) {
             Gtk.TextIter it ;
-            var view = window.notebook.get_current_sourceview () ;
+            var view = window.notebook.current_doc.sourceview ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
             buffer.get_iter_at_line (out it, line - 1) ;
             view.scroll_to_iter (it, 0, false, 0, 0) ;
@@ -53,7 +53,7 @@ namespace iZiCodeEditor{
 
         // On popover hide
         private void on_popover_hide() {
-            var view = window.notebook.get_current_sourceview () ;
+            var view = window.notebook.current_doc.sourceview ;
             view.grab_focus () ;
         }
 

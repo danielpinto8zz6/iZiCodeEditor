@@ -1,13 +1,10 @@
 namespace iZiCodeEditor{
 
     public class HeaderBar : Gtk.HeaderBar {
-        public unowned ApplicationWindow window { get ; construct set ; }
-
         public Gtk.Button searchButton ;
 
-        public HeaderBar (iZiCodeEditor.ApplicationWindow window) {
+        public HeaderBar () {
             Object (
-                window: window,
                 show_close_button: true) ;
         }
 
@@ -42,19 +39,21 @@ namespace iZiCodeEditor{
             var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
 
             var openButton = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.BUTTON) ;
+            openButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_OPEN;
+
             var newButton = new Gtk.Button.from_icon_name ("tab-new-symbolic", Gtk.IconSize.BUTTON) ;
+            newButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_NEW;
+
             var saveButton = new Gtk.Button.from_icon_name ("document-save-symbolic", Gtk.IconSize.BUTTON) ;
+            saveButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SAVE;
+
             searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON) ;
+            searchButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SEARCH;
 
             var menuButton = new Gtk.MenuButton () ;
             menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON) ;
             menuButton.use_popover = true ;
             menuButton.set_menu_model (menu) ;
-
-            openButton.clicked.connect (window.action_open) ;
-            newButton.clicked.connect (window.action_new) ;
-            saveButton.clicked.connect (window.action_save) ;
-            searchButton.clicked.connect (window.action_search) ;
 
             leftIcons.pack_start (openButton, false, false, 0) ;
             leftIcons.pack_start (newButton, false, false, 0) ;

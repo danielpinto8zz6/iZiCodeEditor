@@ -31,7 +31,7 @@ namespace iZiCodeEditor{
 
         construct {
 
-            view = window.notebook.get_current_sourceview () ;
+            view = window.notebook.current_doc.sourceview ;
             context = new Gtk.SourceSearchContext (view.buffer as Gtk.SourceBuffer, null) ;
             context.settings.set_wrap_around (true) ;
 

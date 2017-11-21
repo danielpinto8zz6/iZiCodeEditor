@@ -6,14 +6,14 @@ namespace iZiCodeEditor{
         private iZiCodeEditor.Terminal terminal ;
         public iZiCodeEditor.HeaderBar headerbar ;
         public iZiCodeEditor.StatusBar status_bar ;
-        public iZiCodeEditor.Operations operations ;
-        public iZiCodeEditor.Dialogs dialogs ;
         public iZiCodeEditor.Search search ;
         public iZiCodeEditor.GoToLine gotoline ;
         public iZiCodeEditor.Replace replace ;
         public iZiCodeEditor.Preferences preferences ;
         public GLib.List<string> files ;
 
+        private int FONT_SIZE_MAX = 72 ;
+        private int FONT_SIZE_MIN = 7 ;
 
         public const string ACTION_PREFIX = "win." ;
         public const string ACTION_NEXT_PAGE = "next-page" ;
@@ -108,18 +108,11 @@ namespace iZiCodeEditor{
                 maximize () ;
             }
 
-            headerbar = new iZiCodeEditor.HeaderBar (this) ;
+            headerbar = new iZiCodeEditor.HeaderBar () ;
             set_titlebar (headerbar) ;
             headerbar.show_all () ;
 
             notebook = new iZiCodeEditor.Notebook (this) ;
-            notebook.switch_page.connect (notebook.on_notebook_page_switched) ;
-            notebook.page_reordered.connect (notebook.on_page_reordered) ;
-            notebook.page_added.connect (notebook.on_tabs_changed) ;
-            notebook.page_removed.connect (notebook.on_tabs_changed) ;
-
-            operations = new iZiCodeEditor.Operations (this) ;
-            dialogs = new iZiCodeEditor.Dialogs (this) ;
 
             var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) ;
             content.width_request = 200 ;
@@ -212,15 +205,15 @@ namespace iZiCodeEditor{
         }
 
         private void zoom_in() {
-            operations.zooming (Gdk.ScrollDirection.UP) ;
+            zooming (Gdk.ScrollDirection.UP) ;
         }
 
         private void zoom_out() {
-            operations.zooming (Gdk.ScrollDirection.DOWN) ;
+            zooming (Gdk.ScrollDirection.DOWN) ;
         }
 
         private void set_default_zoom() {
-            Application.settings_fonts_colors.set_string ("font", operations.get_default_font () + " 14") ;
+            Application.settings_fonts_colors.set_string ("font", get_default_font () + " 14") ;
         }
 
         private void on_bars_changed(Gtk.Notebook notebook) {
@@ -238,67 +231,121 @@ namespace iZiCodeEditor{
             }
         }
 
+        public void zooming(Gdk.ScrollDirection direction) {
+            string font = get_current_font () ;
+            int font_size = (int) get_current_font_size () ;
+
+            if( direction == Gdk.ScrollDirection.DOWN ){
+                font_size-- ;
+                if( font_size < FONT_SIZE_MIN ){
+                    return ;
+                }
+            } else if( direction == Gdk.ScrollDirection.UP ){
+                font_size++ ;
+                if( font_size > FONT_SIZE_MAX ){
+                    return ;
+                }
+            }
+
+            string new_font = font + " " + font_size.to_string () ;
+            Application.settings_fonts_colors.set_string ("font", new_font) ;
+        }
+
+        private string get_current_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
+        private double get_current_font_size() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_size = font.substring (font.last_index_of (" ") + 1) ;
+            return double.parse (font_size) ;
+        }
+
+        public string get_default_font() {
+            string font = Application.settings_fonts_colors.get_string ("font") ;
+            string font_family = font.substring (0, font.last_index_of (" ")) ;
+            return font_family ;
+        }
+
         public void action_undo() {
-            notebook.get_current_sourceview ().undo () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.current_doc.sourceview.undo () ;
+            }
         }
 
         public void action_redo() {
-            notebook.get_current_sourceview ().redo () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.current_doc.sourceview.redo () ;
+            }
         }
 
         public void action_open() {
-            dialogs.show_open () ;
+            notebook.open_dialog () ;
         }
 
         public void action_save() {
-            operations.save_current () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.current_doc.save.begin () ;
+            }
         }
 
         public void action_search() {
-            search = new iZiCodeEditor.Search (this) ;
-            search.show_all () ;
+            if( notebook.get_n_pages () > 0 ){
+                search = new iZiCodeEditor.Search (this) ;
+                search.show_all () ;
+            }
         }
 
         public void action_gotoline() {
-            gotoline = new iZiCodeEditor.GoToLine (this) ;
-            gotoline.show_all () ;
+            if( notebook.get_n_pages () > 0 ){
+                gotoline = new iZiCodeEditor.GoToLine (this) ;
+                gotoline.show_all () ;
+            }
         }
 
         public void action_new() {
-            notebook.create_tab ("Untitled") ;
+            // notebook.create_tab ("Untitled") ;
         }
 
         public void action_save_as() {
-            dialogs.show_save () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.current_doc.save_as.begin () ;
+            }
         }
 
         public void action_save_all() {
-            operations.save_all () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.save_all () ;
+            }
         }
 
         public void action_replace() {
-            replace = new iZiCodeEditor.Replace (this) ;
-            replace.show_all () ;
+            if( notebook.get_n_pages () > 0 ){
+                replace = new iZiCodeEditor.Replace (this) ;
+                replace.show_all () ;
+            }
         }
 
         public void action_close() {
             if( notebook.get_n_pages () > 0 )
-                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
+                notebook.close (notebook.get_nth_page (notebook.get_current_page ())) ;
         }
 
         public void action_close_all() {
-            for( uint i = files.length () ; i > 0 ; i-- ){
-                notebook.destroy_tab (notebook.get_nth_page (notebook.get_current_page ()), files.nth_data (notebook.get_current_page ())) ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.close_all () ;
             }
         }
 
         public void action_preferences() {
-            preferences = new iZiCodeEditor.Preferences (this) ;
+            preferences = new iZiCodeEditor.Preferences () ;
             preferences.show_all () ;
         }
 
         public void action_about() {
-            dialogs.show_about () ;
+            show_about () ;
         }
 
         public void action_quit() {
@@ -309,9 +356,29 @@ namespace iZiCodeEditor{
             Application.saved_state.set_int ("height", height) ;
             Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
 
-            dialogs.changes_all () ;
+            notebook.set_recent_files () ;
+            if( notebook.get_n_pages () > 0 ){
+                notebook.close_all () ;
+            }
 
             get_application ().quit () ;
+        }
+
+        public void show_about() {
+            var about = new Gtk.AboutDialog () ;
+            about.set_program_name (NAME) ;
+            about.set_version (VERSION) ;
+            about.set_comments (DESCRIPTION) ;
+            about.set_logo_icon_name (ICON) ;
+            about.set_icon_name (ICON) ;
+            about.set_authors (AUTHORS) ;
+            about.set_copyright ("Copyright \xc2\xa9 2017") ;
+            about.set_website ("https://github.com/danielpinto8zz6") ;
+            about.set_property ("skip-taskbar-hint", true) ;
+            about.set_transient_for (this) ;
+            about.license_type = Gtk.License.GPL_3_0 ;
+            about.run () ;
+            about.hide () ;
         }
 
     }
