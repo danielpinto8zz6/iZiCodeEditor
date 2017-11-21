@@ -79,8 +79,38 @@ namespace iZiCodeEditor{
 
         public override void open(File[] files, string hint) {
             foreach( File file in files ){
-                window.notebook.open (file) ;
+                try {
+
+                    var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null) ;
+                    string reason = "" ;
+
+                    switch( info.get_file_type ()){
+                    case FileType.REGULAR:
+                        break ;
+                    case FileType.MOUNTABLE:
+                        reason = "It is a mountable location." ;
+                        break ;
+                    case FileType.DIRECTORY:
+                        reason = "It is a directory." ;
+                        break ;
+                    case FileType.SPECIAL:
+                        reason = "It is a \"special\" file such as a socket,\n fifo, block device, or character device." ;
+                        break ;
+                    default:
+                        reason = "It is an \"unknown\" file type." ;
+                        break ;
+                    }
+
+                    if( reason.length > 0 ){
+                        stderr.printf ("File %s cannot be opened.\n%s\n\n", file.get_parse_name (), reason) ;
+                    } else {
+                        window.notebook.open (file) ;
+                    }
+                } catch ( Error e ){
+                    debug (e.message) ;
+                }
             }
+
             get_active_window ().present () ;
         }
 
