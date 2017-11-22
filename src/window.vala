@@ -354,10 +354,9 @@ namespace iZiCodeEditor{
             Application.saved_state.set_boolean ("maximized", is_maximized) ;
             Application.saved_state.set_int ("width", width) ;
             Application.saved_state.set_int ("height", height) ;
-            Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
+            // Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
 
             // notebook.set_recent_files () ;
-            notebook.close_all () ;
 
             get_application ().quit () ;
         }

@@ -87,9 +87,10 @@ namespace iZiCodeEditor{
         }
 
         public void save_opened(Document doc) {
+            set_current_page (page_num (doc)) ;
             var dialog = new Gtk.MessageDialog (window,
                                                 Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
-                                                "The file '%s' is not saved.\nDo you want to save it before closing?", doc.file_name) ;
+                                                "The file '%s' is not saved.\nDo you want to save it?", doc.file_name) ;
             dialog.add_button ("Don't save", Gtk.ResponseType.NO) ;
             dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL) ;
             dialog.add_button ("Save", Gtk.ResponseType.YES) ;
@@ -98,13 +99,11 @@ namespace iZiCodeEditor{
             int response = dialog.run () ;
             switch( response ){
             case Gtk.ResponseType.NO:
-                remove_page (page_num (doc)) ;
                 break ;
             case Gtk.ResponseType.CANCEL:
                 break ;
             case Gtk.ResponseType.YES:
                 doc.save.begin () ;
-                remove_page (page_num (doc)) ;
                 break ;
             }
             dialog.destroy () ;
@@ -156,13 +155,11 @@ namespace iZiCodeEditor{
         public void close(Gtk.Widget tab) {
             var doc = (Document) tab ;
 
-            if( doc.sourceview.buffer.get_modified () == true ){
+            if( doc.sourceview.buffer.get_modified ()){
                 save_opened (doc) ;
+                remove_page (page_num (doc)) ;
             } else {
                 remove_page (page_num (doc)) ;
-            }
-            if( get_n_pages () == 0 ){
-                new_tab () ;
             }
         }
 
@@ -194,7 +191,7 @@ namespace iZiCodeEditor{
                         window.notebook.open (one) ;
                     }
                 }
-                window.notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
+                set_current_page ((int) Application.saved_state.get_uint ("active-tab")) ;
             }
         }
 
@@ -204,7 +201,13 @@ namespace iZiCodeEditor{
                 if( sel_doc == null ){
                     continue ;
                 }
-                sel_doc.save.begin () ;
+                if( sel_doc.sourceview.buffer.get_modified ()){
+                    if( sel_doc.file != null ){
+                        sel_doc.save.begin () ;
+                    } else {
+                        save_opened (sel_doc) ;
+                    }
+                }
             }
         }
 
