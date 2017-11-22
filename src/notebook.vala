@@ -86,6 +86,7 @@ namespace iZiCodeEditor{
             set_tab_reorderable (doc, true) ;
 
             doc.close_tab.connect (close) ;
+            doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
         }
 
         public void save_opened(Document doc) {
@@ -154,6 +155,7 @@ namespace iZiCodeEditor{
             set_tab_reorderable (doc, true) ;
 
             doc.close_tab.connect (close) ;
+            doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
         }
 
         public void close(Gtk.Widget tab) {

@@ -70,6 +70,7 @@ namespace iZiCodeEditor{
         }
 
         public signal void close_tab(Document doc) ;
+        public signal void cursor_position(Document doc) ;
 
         public Document (File ? file = null) {
             this.file = file ;
@@ -142,7 +143,7 @@ namespace iZiCodeEditor{
             }) ;
 
             sourceview.buffer.notify["cursor-position"].connect (() => {
-                Application.instance.get_last_window ().status_bar.update_statusbar_line (this) ;
+                cursor_position (this) ;
             }) ;
 
             attach (scroll, 0, 0, 1, 1) ;
