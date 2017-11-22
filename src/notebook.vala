@@ -87,6 +87,7 @@ namespace iZiCodeEditor{
 
             doc.close_tab.connect (close) ;
             doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
+            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
         }
 
         public void save_opened(Document doc) {
@@ -156,6 +157,7 @@ namespace iZiCodeEditor{
 
             doc.close_tab.connect (close) ;
             doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
+            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
         }
 
         public void close(Gtk.Widget tab) {

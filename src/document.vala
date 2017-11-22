@@ -71,6 +71,7 @@ namespace iZiCodeEditor{
 
         public signal void close_tab(Document doc) ;
         public signal void cursor_position(Document doc) ;
+        public signal void language_changed(Document doc) ;
 
         public Document (File ? file = null) {
             this.file = file ;
@@ -188,7 +189,7 @@ namespace iZiCodeEditor{
 
             sourceview.set_language_from_file (file) ;
 
-            Application.instance.get_last_window ().status_bar.update_statusbar_language (this) ;
+            language_changed (this) ;
 
             sourceview.buffer.set_modified (false) ;
 
