@@ -36,6 +36,11 @@ namespace iZiCodeEditor{
             docs.remove (doc) ;
             doc.sourceview.drag_data_received.disconnect (drag_received) ;
             on_tabs_changed () ;
+            if( get_n_pages () == 0 ){
+                window.headerbar.set_title (NAME) ;
+                window.headerbar.set_subtitle (null) ;
+            }
+
         }
 
         private void on_doc_added(Gtk.Widget tab, uint page_num) {
@@ -85,9 +90,7 @@ namespace iZiCodeEditor{
             set_current_page (page_num (doc)) ;
             set_tab_reorderable (doc, true) ;
 
-            doc.close_tab.connect (close) ;
-            doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
-            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
+            set_doc_signals (doc) ;
         }
 
         public void save_opened(Document doc) {
@@ -154,10 +157,6 @@ namespace iZiCodeEditor{
             append_page (doc, doc.tab_label) ;
             set_current_page (page_num (doc)) ;
             set_tab_reorderable (doc, true) ;
-
-            doc.close_tab.connect (close) ;
-            doc.cursor_position.connect (window.status_bar.update_statusbar_line) ;
-            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
         }
 
         public void close(Gtk.Widget tab) {
@@ -232,6 +231,14 @@ namespace iZiCodeEditor{
                 }
 
             }
+        }
+
+        private void set_doc_signals(Document doc) {
+            doc.close.connect (close) ;
+            doc.cursor_position_changed.connect (window.status_bar.update_statusbar_line) ;
+            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
+            doc.filename_changed.connect (window.headerbar.set_title) ;
+            doc.fileparsename_changed.connect (window.headerbar.set_subtitle) ;
         }
 
     }

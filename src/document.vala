@@ -69,9 +69,11 @@ namespace iZiCodeEditor{
             }
         }
 
-        public signal void close_tab(Document doc) ;
-        public signal void cursor_position(Document doc) ;
+        public signal void close(Document doc) ;
+        public signal void cursor_position_changed(Document doc) ;
         public signal void language_changed(Document doc) ;
+        public signal void filename_changed(string title) ;
+        public signal void fileparsename_changed(string subtitle) ;
 
         public Document (File ? file = null) {
             this.file = file ;
@@ -92,7 +94,7 @@ namespace iZiCodeEditor{
             eventbox.add (label) ;
             eventbox.button_press_event.connect ((event) => {
                 if( event.button == 2 ){
-                    close_tab (this) ;
+                    close (this) ;
                 }
                 return false ;
             }) ;
@@ -102,7 +104,7 @@ namespace iZiCodeEditor{
             tab_button.set_hexpand (false) ;
             tab_button.get_style_context ().add_class ("close-tab-button") ;
             tab_button.clicked.connect (() => {
-                close_tab (this) ;
+                close (this) ;
             }) ;
             _tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             _tab_label.pack_start (eventbox) ;
@@ -144,7 +146,7 @@ namespace iZiCodeEditor{
             }) ;
 
             sourceview.buffer.notify["cursor-position"].connect (() => {
-                cursor_position (this) ;
+                cursor_position_changed (this) ;
             }) ;
 
             attach (scroll, 0, 0, 1, 1) ;
@@ -271,13 +273,13 @@ namespace iZiCodeEditor{
                 if( is_saved ){
                     sourceview.set_language_from_file (file) ;
 
-                    Application.instance.get_last_window ().status_bar.update_statusbar_language (this) ;
+                    language_changed (this) ;
 
                     _file_name = file.get_basename () ;
                     _file_parse_name = file.get_parse_name () ;
 
-                    Application.instance.get_last_window ().headerbar.set_title (file_name) ;
-                    Application.instance.get_last_window ().headerbar.set_subtitle (file_parse_name) ;
+                    filename_changed (file_name) ;
+                    fileparsename_changed (file_parse_name) ;
 
                     label.label = file_name ;
                     label.tooltip_text = file_parse_name ;
