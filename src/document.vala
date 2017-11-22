@@ -69,6 +69,8 @@ namespace iZiCodeEditor{
             }
         }
 
+        public signal void close_tab(Document doc) ;
+
         public Document (File ? file = null) {
             this.file = file ;
             if( file != null ){
@@ -88,7 +90,7 @@ namespace iZiCodeEditor{
             eventbox.add (label) ;
             eventbox.button_press_event.connect ((event) => {
                 if( event.button == 2 ){
-                    Application.instance.get_last_window ().notebook.close (this) ;
+                    close_tab (this) ;
                 }
                 return false ;
             }) ;
@@ -98,7 +100,7 @@ namespace iZiCodeEditor{
             tab_button.set_hexpand (false) ;
             tab_button.get_style_context ().add_class ("close-tab-button") ;
             tab_button.clicked.connect (() => {
-                Application.instance.get_last_window ().notebook.close (this) ;
+                close_tab (this) ;
             }) ;
             _tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             _tab_label.pack_start (eventbox) ;

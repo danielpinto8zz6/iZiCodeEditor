@@ -84,6 +84,8 @@ namespace iZiCodeEditor{
             append_page (doc, doc.tab_label) ;
             set_current_page (page_num (doc)) ;
             set_tab_reorderable (doc, true) ;
+
+            doc.close_tab.connect (close) ;
         }
 
         public void save_opened(Document doc) {
@@ -150,6 +152,8 @@ namespace iZiCodeEditor{
             append_page (doc, doc.tab_label) ;
             set_current_page (page_num (doc)) ;
             set_tab_reorderable (doc, true) ;
+
+            doc.close_tab.connect (close) ;
         }
 
         public void close(Gtk.Widget tab) {
