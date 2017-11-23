@@ -33,7 +33,6 @@ namespace iZiCodeEditor{
             pack_end (insmode_label) ;
 
             terminal_switch () ;
-            zoom_popover () ;
             line_popover () ;
             tab_popover () ;
             language_popover () ;
@@ -320,39 +319,6 @@ namespace iZiCodeEditor{
 
             pack_end (line_button) ;
 
-        }
-
-        private void zoom_popover() {
-            Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom", Gtk.IconSize.SMALL_TOOLBAR) ;
-            zoomButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-
-            var minusButton = new Gtk.Button.from_icon_name ("list-remove-symbolic", Gtk.IconSize.BUTTON) ;
-            minusButton.set_can_focus (false) ;
-            minusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            minusButton.clicked.connect (() => { window.zooming (Gdk.ScrollDirection.DOWN) ; }) ;
-
-            var plusButton = new Gtk.Button.from_icon_name ("list-add-symbolic", Gtk.IconSize.BUTTON) ;
-            plusButton.set_can_focus (false) ;
-            plusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            plusButton.clicked.connect (() => { window.zooming (Gdk.ScrollDirection.UP) ; }) ;
-            var resetButton = new Gtk.Button.with_label ("Reset") ;
-            resetButton.set_can_focus (false) ;
-            resetButton.clicked.connect (() => { Application.settings_fonts_colors.set_string ("font", window.get_default_font () + " 14") ; }) ;
-
-            Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
-            box.pack_start (minusButton, false, false, 0) ;
-            box.pack_start (plusButton, false, false, 0) ;
-            box.pack_start (resetButton, false, false, 0) ;
-            box.valign = Gtk.Align.CENTER ;
-            box.set_border_width (3) ;
-
-            var zoomPopover = new Gtk.Popover (zoomButton) ;
-
-            zoomPopover.add (box) ;
-
-            zoomButton.clicked.connect (zoomPopover.show_all) ;
-
-            pack_end (zoomButton) ;
         }
 
     }
