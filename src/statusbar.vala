@@ -30,6 +30,7 @@ namespace iZiCodeEditor{
             set_center_widget (status_label) ;
 
             insmode_label = new Gtk.Label ("") ;
+            insmode_label.width_request = 60 ;
             pack_end (insmode_label) ;
 
             terminal_switch () ;
