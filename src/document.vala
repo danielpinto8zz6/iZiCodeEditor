@@ -70,8 +70,6 @@ namespace iZiCodeEditor{
         }
 
         public signal void close(Document doc) ;
-        public signal void cursor_position_changed(Document doc) ;
-        public signal void language_changed(Document doc) ;
         public signal void filename_changed(string title) ;
         public signal void fileparsename_changed(string subtitle) ;
 
@@ -145,10 +143,6 @@ namespace iZiCodeEditor{
                 }
             }) ;
 
-            sourceview.buffer.notify["cursor-position"].connect (() => {
-                cursor_position_changed (this) ;
-            }) ;
-
             attach (scroll, 0, 0, 1, 1) ;
             attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1) ;
 
@@ -190,8 +184,6 @@ namespace iZiCodeEditor{
             }
 
             sourceview.set_language_from_file (file) ;
-
-            language_changed (this) ;
 
             sourceview.buffer.set_modified (false) ;
 
@@ -272,8 +264,6 @@ namespace iZiCodeEditor{
 
                 if( is_saved ){
                     sourceview.set_language_from_file (file) ;
-
-                    language_changed (this) ;
 
                     _file_name = file.get_basename () ;
                     _file_parse_name = file.get_parse_name () ;

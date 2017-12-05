@@ -35,6 +35,7 @@ namespace iZiCodeEditor{
             var doc = (Document) tab ;
             docs.remove (doc) ;
             doc.sourceview.drag_data_received.disconnect (drag_received) ;
+            doc.sourceview.focus_in_event.disconnect (on_focus_in_event) ;
             on_tabs_changed () ;
             if( get_n_pages () == 0 ){
                 window.headerbar.set_title (NAME) ;
@@ -46,6 +47,7 @@ namespace iZiCodeEditor{
         private void on_doc_added(Gtk.Widget tab, uint page_num) {
             var doc = (Document) tab ;
             docs.append (doc) ;
+            doc.sourceview.focus_in_event.connect_after (on_focus_in_event) ;
             doc.sourceview.drag_data_received.connect (drag_received) ;
             on_tabs_changed () ;
         }
@@ -57,13 +59,21 @@ namespace iZiCodeEditor{
             docs.insert (doc, (int) new_pos) ;
         }
 
-        public void on_notebook_page_switched(Gtk.Widget page, uint page_num) {
+        public void on_notebook_page_switched(Gtk.Widget page, uint page_num = 0) {
             var doc = (Document) page ;
 
             window.headerbar.set_title (doc.file_name) ;
             window.headerbar.set_subtitle (doc.file_parse_name) ;
-
             window.status_bar.update_statusbar (doc) ;
+        }
+
+        private bool on_focus_in_event() {
+            var doc = current_doc ;
+            if( doc != null ){
+                on_notebook_page_switched (doc) ;
+            }
+
+            return false ;
         }
 
         public void on_tabs_changed() {
@@ -235,8 +245,6 @@ namespace iZiCodeEditor{
 
         private void set_doc_signals(Document doc) {
             doc.close.connect (close) ;
-            doc.cursor_position_changed.connect (window.status_bar.update_statusbar_line) ;
-            doc.language_changed.connect (window.status_bar.update_statusbar_language) ;
             doc.filename_changed.connect (window.headerbar.set_title) ;
             doc.fileparsename_changed.connect (window.headerbar.set_subtitle) ;
         }
