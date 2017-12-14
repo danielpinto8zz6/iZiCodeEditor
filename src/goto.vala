@@ -2,7 +2,7 @@ namespace iZiCodeEditor{
     public class GoToLine : Gtk.Popover {
         public unowned ApplicationWindow window { get ; construct set ; }
 
-        private Gtk.SpinButton entry ;
+        private Gtk.Entry entry ;
 
         public GoToLine (iZiCodeEditor.ApplicationWindow window) {
             Object (
@@ -13,9 +13,8 @@ namespace iZiCodeEditor{
         construct {
             var view = window.notebook.current_doc.sourceview ;
             var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            entry = new Gtk.SpinButton.with_range (1, buffer.get_line_count (), 1) ;
+            entry = new Gtk.Entry () ;
             entry.set_size_request (200, 30) ;
-            entry.digits = 0 ;
 
             var gotoBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
             gotoBox.pack_start (entry, false, true, 0) ;
@@ -32,26 +31,22 @@ namespace iZiCodeEditor{
                 return Gdk.EVENT_PROPAGATE ;
             }) ;
 
-            //// signals
-            entry.value_changed.connect (() => {
-                go_to (entry.get_value_as_int ()) ;
+            entry.activate.connect_after (() => {
+                int line, offset ;
+                entry.text.scanf ("%i.%i", out line, out offset) ;
+                if( line < buffer.get_line_count ()){
+                    view.go_to (line, offset) ;
+                    view.grab_focus () ;
+                } else {
+                    entry.get_style_context ().add_class (Gtk.STYLE_CLASS_ERROR) ;
+                }
             }) ;
+
             entry.grab_focus () ;
 
             hide.connect (on_popover_hide) ;
         }
 
-        // Search forward on entry changed
-        public void go_to(int line) {
-            Gtk.TextIter it ;
-            var view = window.notebook.current_doc.sourceview ;
-            var buffer = (Gtk.SourceBuffer)view.get_buffer () ;
-            buffer.get_iter_at_line (out it, line - 1) ;
-            view.scroll_to_iter (it, 0, false, 0, 0) ;
-            buffer.place_cursor (it) ;
-        }
-
-        // On popover hide
         private void on_popover_hide() {
             var view = window.notebook.current_doc.sourceview ;
             view.grab_focus () ;
