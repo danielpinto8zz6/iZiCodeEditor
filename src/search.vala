@@ -36,37 +36,13 @@ namespace iZiCodeEditor{
             }) ;
 
             // signals
-            entry.changed.connect (forward_on_changed) ;
-            entry.activate.connect (forward) ;
+            entry.changed.connect (forward) ;
             entry.grab_focus () ;
             entry.key_press_event.connect (on_search_entry_key_press) ;
             nextButton.clicked.connect (forward) ;
             prevButton.clicked.connect (backward) ;
 
             hide.connect (on_popover_hide) ;
-        }
-
-        // Search forward on entry changed
-        public void forward_on_changed() {
-            Gtk.TextIter sel_st ;
-            Gtk.TextIter sel_end ;
-            Gtk.TextIter match_st ;
-            Gtk.TextIter match_end ;
-            buffer.get_selection_bounds (out sel_st, out sel_end) ;
-            context.settings.set_search_text (entry.get_text ()) ;
-            context.set_highlight (true) ;
-            context.settings.set_wrap_around (true) ;
-            bool found = context.forward2 (sel_st, out match_st, out match_end, null) ;
-            if( found ){
-                buffer.select_range (match_st, match_end) ;
-                sourceview.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
-                entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
-            } else {
-                if( entry.text == "" )
-                    entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
-                else
-                    entry.get_style_context ().add_class (Gtk.STYLE_CLASS_ERROR) ;
-            }
         }
 
         // Search forward
@@ -77,6 +53,7 @@ namespace iZiCodeEditor{
             Gtk.TextIter match_end ;
             buffer.get_selection_bounds (out sel_st, out sel_end) ;
             context.settings.set_search_text (entry.get_text ()) ;
+            context.set_highlight (true) ;
             context.settings.set_wrap_around (true) ;
             bool found = context.forward2 (sel_end, out match_st, out match_end, null) ;
             if( found ){
