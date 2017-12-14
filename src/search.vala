@@ -4,6 +4,7 @@ namespace iZiCodeEditor{
         private Gtk.SourceSearchContext context = null ;
         private iZiCodeEditor.SourceView ? sourceview = null ;
         private Gtk.TextBuffer ? buffer = null ;
+        private Gtk.Button label_occurrences ;
 
         construct {
 
@@ -16,14 +17,20 @@ namespace iZiCodeEditor{
             nextButton.set_can_focus (false) ;
             prevButton.set_can_focus (false) ;
 
+            label_occurrences = new Gtk.Button () ;
+            label_occurrences.set_sensitive (false) ;
+
             var searchBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
-            searchBox.pack_start (entry, false, true, 0) ;
-            searchBox.pack_start (prevButton, false, false, 0) ;
-            searchBox.pack_start (nextButton, false, false, 0) ;
+            searchBox.add (entry) ;
+            searchBox.add (prevButton) ;
+            searchBox.add (nextButton) ;
+            searchBox.add (label_occurrences) ;
             searchBox.get_style_context ().add_class ("linked") ;
             searchBox.valign = Gtk.Align.CENTER ;
             searchBox.set_border_width (3) ;
             searchBox.show_all () ;
+
+            label_occurrences.hide () ;
 
             add (searchBox) ;
 
@@ -41,6 +48,13 @@ namespace iZiCodeEditor{
             entry.key_press_event.connect (on_search_entry_key_press) ;
             nextButton.clicked.connect (forward) ;
             prevButton.clicked.connect (backward) ;
+
+            show.connect (() => {
+                context.notify["occurrences-count"].connect (() =>
+                {
+                    update_info_label () ;
+                }) ;
+            }) ;
 
             hide.connect (on_popover_hide) ;
         }
@@ -61,11 +75,13 @@ namespace iZiCodeEditor{
                 sourceview.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
                 entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
             } else {
-                if( entry.text == "" )
+                if( entry.text == "" ){
+                    label_occurrences.hide () ;
                     entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
-                else
+                } else
                     entry.get_style_context ().add_class (Gtk.STYLE_CLASS_ERROR) ;
             }
+            update_info_label () ;
         }
 
         // Search backward
@@ -88,6 +104,7 @@ namespace iZiCodeEditor{
                 else
                     entry.get_style_context ().add_class (Gtk.STYLE_CLASS_ERROR) ;
             }
+            update_info_label () ;
         }
 
         // On popover hide
@@ -124,7 +141,39 @@ namespace iZiCodeEditor{
             }
             this.sourceview = sourceview ;
             buffer = sourceview.get_buffer () ;
-            this.context = new Gtk.SourceSearchContext (buffer as Gtk.SourceBuffer, null) ;
+            context = new Gtk.SourceSearchContext (buffer as Gtk.SourceBuffer, null) ;
+        }
+
+        private void update_info_label() {
+            if( context == null ||
+                context.settings.get_search_text () == null ){
+                label_occurrences.set_label ("") ;
+                return ;
+            }
+
+            int count = context.occurrences_count ;
+
+            if( count == -1 ){
+                label_occurrences.hide () ;
+                return ;
+            }
+
+            if( count == 0 ){
+                label_occurrences.hide () ;
+                return ;
+            }
+
+            Gtk.TextBuffer buffer = context.get_buffer () ;
+            Gtk.TextIter start ;
+            Gtk.TextIter end ;
+
+            buffer.get_selection_bounds (out start, out end) ;
+
+            int pos = context.get_occurrence_position (start, end) ;
+
+            label_occurrences.set_label ("%d of %d".printf (pos, count)) ;
+            label_occurrences.show () ;
+
         }
 
     }

@@ -291,13 +291,13 @@ namespace iZiCodeEditor{
 
         public void action_search() {
             if( notebook.get_n_pages () > 0 ){
-                headerbar.search.show_all () ;
+                headerbar.search.show () ;
             }
         }
 
         public void action_gotoline() {
             if( notebook.get_n_pages () > 0 ){
-                headerbar.gotoline.show_all () ;
+                headerbar.gotoline.show () ;
             }
         }
 
