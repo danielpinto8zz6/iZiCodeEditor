@@ -6,8 +6,6 @@ namespace iZiCodeEditor{
         private iZiCodeEditor.Terminal terminal ;
         public iZiCodeEditor.HeaderBar headerbar ;
         public iZiCodeEditor.StatusBar status_bar ;
-        public iZiCodeEditor.Search search ;
-        public iZiCodeEditor.GoToLine gotoline ;
         public iZiCodeEditor.Replace replace ;
         public iZiCodeEditor.Preferences preferences ;
         public GLib.List<string> files ;
@@ -293,15 +291,13 @@ namespace iZiCodeEditor{
 
         public void action_search() {
             if( notebook.get_n_pages () > 0 ){
-                search = new iZiCodeEditor.Search (this) ;
-                search.show_all () ;
+                headerbar.search.show_all () ;
             }
         }
 
         public void action_gotoline() {
             if( notebook.get_n_pages () > 0 ){
-                gotoline = new iZiCodeEditor.GoToLine (this) ;
-                gotoline.show_all () ;
+                headerbar.gotoline.show_all () ;
             }
         }
 

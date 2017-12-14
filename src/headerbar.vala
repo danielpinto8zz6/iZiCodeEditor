@@ -2,6 +2,10 @@ namespace iZiCodeEditor{
 
     public class HeaderBar : Gtk.HeaderBar {
         public Gtk.Button searchButton ;
+        public iZiCodeEditor.Search search ;
+        public iZiCodeEditor.GoToLine gotoline ;
+
+        public unowned Document ? doc = null ;
 
         public HeaderBar () {
             Object (
@@ -39,16 +43,19 @@ namespace iZiCodeEditor{
             var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
 
             var openButton = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.BUTTON) ;
-            openButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_OPEN;
+            openButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_OPEN ;
 
             var newButton = new Gtk.Button.from_icon_name ("tab-new-symbolic", Gtk.IconSize.BUTTON) ;
-            newButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_NEW;
+            newButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_NEW ;
 
             var saveButton = new Gtk.Button.from_icon_name ("document-save-symbolic", Gtk.IconSize.BUTTON) ;
-            saveButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SAVE;
+            saveButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SAVE ;
 
             searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON) ;
-            searchButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SEARCH;
+            searchButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SEARCH ;
+
+            search = new iZiCodeEditor.Search () ;
+            search.set_relative_to (searchButton) ;
 
             var menuButton = new Gtk.MenuButton () ;
             menuButton.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON) ;
@@ -67,6 +74,16 @@ namespace iZiCodeEditor{
             pack_start (leftIcons) ;
             pack_end (rightIcons) ;
 
+            gotoline = new iZiCodeEditor.GoToLine () ;
+            gotoline.set_relative_to (searchButton) ;
+        }
+
+        public void set_doc(Document doc) {
+            this.doc = doc ;
+            set_title (doc.file_name) ;
+            set_subtitle (doc.file_parse_name) ;
+            search.set_sourceview (doc.sourceview) ;
+            gotoline.set_sourceview (doc.sourceview) ;
         }
 
     }

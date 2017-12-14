@@ -1,22 +1,11 @@
 namespace iZiCodeEditor{
     public class Search : Gtk.Popover {
-        public unowned ApplicationWindow window { get ; construct set ; }
-
         private Gtk.Entry entry ;
         private Gtk.SourceSearchContext context = null ;
-        private Gtk.SourceView ? view = null ;
-
-        public Search (iZiCodeEditor.ApplicationWindow window) {
-            Object (
-                window: window,
-                relative_to: window.headerbar.searchButton
-                ) ;
-        }
+        private iZiCodeEditor.SourceView ? sourceview = null ;
+        private Gtk.TextBuffer ? buffer = null ;
 
         construct {
-
-            view = window.notebook.current_doc.sourceview ;
-            context = new Gtk.SourceSearchContext (view.buffer as Gtk.SourceBuffer, null) ;
 
             entry = new Gtk.SearchEntry () ;
             entry.set_size_request (200, 30) ;
@@ -39,6 +28,7 @@ namespace iZiCodeEditor{
             add (searchBox) ;
 
             scroll_event.connect ((evt) => {
+                var window = Application.instance.get_last_window () ;
                 var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ()) ;
                 var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0) ;
                 scrolled.scroll_event (evt) ;
@@ -62,14 +52,14 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            view.buffer.get_selection_bounds (out sel_st, out sel_end) ;
+            buffer.get_selection_bounds (out sel_st, out sel_end) ;
             context.settings.set_search_text (entry.get_text ()) ;
             context.set_highlight (true) ;
             context.settings.set_wrap_around (true) ;
             bool found = context.forward2 (sel_st, out match_st, out match_end, null) ;
             if( found ){
-                view.buffer.select_range (match_st, match_end) ;
-                view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
+                buffer.select_range (match_st, match_end) ;
+                sourceview.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
                 entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
             } else {
                 if( entry.text == "" )
@@ -85,13 +75,13 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            view.buffer.get_selection_bounds (out sel_st, out sel_end) ;
+            buffer.get_selection_bounds (out sel_st, out sel_end) ;
             context.settings.set_search_text (entry.get_text ()) ;
             context.settings.set_wrap_around (true) ;
             bool found = context.forward2 (sel_end, out match_st, out match_end, null) ;
             if( found ){
-                view.buffer.select_range (match_st, match_end) ;
-                view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
+                buffer.select_range (match_st, match_end) ;
+                sourceview.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
                 entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
             } else {
                 if( entry.text == "" )
@@ -107,13 +97,13 @@ namespace iZiCodeEditor{
             Gtk.TextIter sel_end ;
             Gtk.TextIter match_st ;
             Gtk.TextIter match_end ;
-            view.buffer.get_selection_bounds (out sel_st, out sel_end) ;
+            buffer.get_selection_bounds (out sel_st, out sel_end) ;
             context.settings.set_search_text (entry.get_text ()) ;
             context.settings.set_wrap_around (true) ;
             bool found = context.backward2 (sel_st, out match_st, out match_end, null) ;
             if( found == true ){
-                view.buffer.select_range (match_st, match_end) ;
-                view.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
+                buffer.select_range (match_st, match_end) ;
+                sourceview.scroll_to_iter (match_st, 0.10, false, 0, 0) ;
                 entry.get_style_context ().remove_class (Gtk.STYLE_CLASS_ERROR) ;
             } else {
                 if( entry.text == "" )
@@ -125,7 +115,7 @@ namespace iZiCodeEditor{
 
         // On popover hide
         private void on_popover_hide() {
-            view.grab_focus () ;
+            sourceview.grab_focus () ;
             if( entry.get_text_length () > 0 )
                 context.set_highlight (false) ;
         }
@@ -149,6 +139,15 @@ namespace iZiCodeEditor{
             }
 
             return false ;
+        }
+
+        public void set_sourceview(iZiCodeEditor.SourceView sourceview) {
+            if( sourceview == null ){
+                return ;
+            }
+            this.sourceview = sourceview ;
+            buffer = sourceview.get_buffer () ;
+            this.context = new Gtk.SourceSearchContext (buffer as Gtk.SourceBuffer, null) ;
         }
 
     }

@@ -62,8 +62,7 @@ namespace iZiCodeEditor{
         public void on_notebook_page_switched(Gtk.Widget page, uint page_num = 0) {
             var doc = (Document) page ;
 
-            window.headerbar.set_title (doc.file_name) ;
-            window.headerbar.set_subtitle (doc.file_parse_name) ;
+            window.headerbar.set_doc (doc) ;
             window.status_bar.update_statusbar (doc) ;
         }
 
