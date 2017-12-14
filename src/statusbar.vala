@@ -18,6 +18,8 @@ namespace iZiCodeEditor{
 
         public Gtk.Label insmode_label ;
 
+        private unowned Document? doc = null;
+
         public StatusBar (iZiCodeEditor.ApplicationWindow window) {
             Object (
                 window: window) ;
@@ -30,10 +32,10 @@ namespace iZiCodeEditor{
             set_center_widget (status_label) ;
 
             insmode_label = new Gtk.Label ("") ;
+            insmode_label.width_request = 60 ;
             pack_end (insmode_label) ;
 
             terminal_switch () ;
-            zoom_popover () ;
             line_popover () ;
             tab_popover () ;
             language_popover () ;
@@ -50,24 +52,30 @@ namespace iZiCodeEditor{
             return false ;
         }
 
-        public void update_statusbar(Document doc) {
-            update_statusbar_language (doc) ;
-            update_statusbar_line (doc) ;
-            update_statusbar_insmode (doc) ;
+        public void update_statusbar (Document doc) {
+            if (this.doc != null) {
+                this.doc.sourceview.buffer.notify["cursor-position"].disconnect (update_statusbar_line);
+            }
+            this.doc = doc;
+            update_statusbar_language () ;
+            update_statusbar_line () ;
+            update_statusbar_insmode () ;
+            this.doc.sourceview.buffer.notify["cursor-position"].connect (update_statusbar_line);
         }
 
-        private void update_statusbar_insmode(Document doc) {
+        private void update_statusbar_insmode() {
             insmode_label.set_label (doc.sourceview.overwrite ? "OVR" : "INS") ;
         }
 
-        public void update_statusbar_line(Document doc) {
+        public void update_statusbar_line() {
+            var buffer = doc.sourceview.buffer;
             var position = doc.sourceview.buffer.cursor_position ;
             Gtk.TextIter iter ;
-            doc.sourceview.buffer.get_iter_at_offset (out iter, position) ;
+            buffer.get_iter_at_offset (out iter, position) ;
             line_button.set_label ("Ln %d, Col %d".printf (iter.get_line () + 1, iter.get_line_offset () + 1)) ;
         }
 
-        public void update_statusbar_language(Document doc) {
+        public void update_statusbar_language() {
             var language = doc.sourceview.language ;
             if( language != null ){
                 lang_button.set_label (language.name) ;
@@ -145,9 +153,8 @@ namespace iZiCodeEditor{
             lang_listbox.row_activated.connect (row => {
                 string language = ((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label ;
 
-                var sourceview = window.notebook.current_doc.sourceview ;
-                if( language != sourceview.language.name ){
-                    sourceview.language = language != null ? get_selected_language (language) : null ;
+                if( language != doc.sourceview.language.name ){
+                    doc.sourceview.language = language != null ? get_selected_language (language) : null ;
                     lang_button.set_label (language) ;
                 }
                 lang_popover.hide () ;
@@ -320,39 +327,6 @@ namespace iZiCodeEditor{
 
             pack_end (line_button) ;
 
-        }
-
-        private void zoom_popover() {
-            Gtk.Button zoomButton = new Gtk.Button.from_icon_name ("zoom", Gtk.IconSize.SMALL_TOOLBAR) ;
-            zoomButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-
-            var minusButton = new Gtk.Button.from_icon_name ("list-remove-symbolic", Gtk.IconSize.BUTTON) ;
-            minusButton.set_can_focus (false) ;
-            minusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            minusButton.clicked.connect (() => { window.zooming (Gdk.ScrollDirection.DOWN) ; }) ;
-
-            var plusButton = new Gtk.Button.from_icon_name ("list-add-symbolic", Gtk.IconSize.BUTTON) ;
-            plusButton.set_can_focus (false) ;
-            plusButton.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT) ;
-            plusButton.clicked.connect (() => { window.zooming (Gdk.ScrollDirection.UP) ; }) ;
-            var resetButton = new Gtk.Button.with_label ("Reset") ;
-            resetButton.set_can_focus (false) ;
-            resetButton.clicked.connect (() => { Application.settings_fonts_colors.set_string ("font", window.get_default_font () + " 14") ; }) ;
-
-            Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0) ;
-            box.pack_start (minusButton, false, false, 0) ;
-            box.pack_start (plusButton, false, false, 0) ;
-            box.pack_start (resetButton, false, false, 0) ;
-            box.valign = Gtk.Align.CENTER ;
-            box.set_border_width (3) ;
-
-            var zoomPopover = new Gtk.Popover (zoomButton) ;
-
-            zoomPopover.add (box) ;
-
-            zoomButton.clicked.connect (zoomPopover.show_all) ;
-
-            pack_end (zoomButton) ;
         }
 
     }
