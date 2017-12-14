@@ -18,7 +18,7 @@ namespace iZiCodeEditor{
 
         public Gtk.Label insmode_label ;
 
-        private unowned Document? doc = null;
+        private unowned Document ? doc = null ;
 
         public StatusBar (iZiCodeEditor.ApplicationWindow window) {
             Object (
@@ -52,15 +52,15 @@ namespace iZiCodeEditor{
             return false ;
         }
 
-        public void update_statusbar (Document doc) {
-            if (this.doc != null) {
-                this.doc.sourceview.buffer.notify["cursor-position"].disconnect (update_statusbar_line);
+        public void update_statusbar(Document doc) {
+            if( this.doc != null ){
+                this.doc.sourceview.buffer.notify["cursor-position"].disconnect (update_statusbar_line) ;
             }
-            this.doc = doc;
+            this.doc = doc ;
             update_statusbar_language () ;
             update_statusbar_line () ;
             update_statusbar_insmode () ;
-            this.doc.sourceview.buffer.notify["cursor-position"].connect (update_statusbar_line);
+            this.doc.sourceview.buffer.notify["cursor-position"].connect (update_statusbar_line) ;
         }
 
         private void update_statusbar_insmode() {
@@ -68,7 +68,7 @@ namespace iZiCodeEditor{
         }
 
         public void update_statusbar_line() {
-            var buffer = doc.sourceview.buffer;
+            var buffer = doc.sourceview.buffer ;
             var position = doc.sourceview.buffer.cursor_position ;
             Gtk.TextIter iter ;
             buffer.get_iter_at_offset (out iter, position) ;
@@ -138,8 +138,14 @@ namespace iZiCodeEditor{
             box.width_request = 250 ;
 
             var searchentry = new Gtk.SearchEntry () ;
-            searchentry.activate.connect (on_searchentry_activated) ;
-            searchentry.search_changed.connect (on_searchentry_activated) ;
+
+            lang_listbox.set_filter_func ((row) => {
+                return (((row as Gtk.ListBoxRow).get_child () as Gtk.Label).label.down ().contains (searchentry.text.down ().strip ())) ;
+            }) ;
+
+            searchentry.search_changed.connect (() => {
+                lang_listbox.invalidate_filter () ;
+            }) ;
 
             box.pack_start (searchentry, false, false, 0) ;
             box.pack_start (lang_scrolled, false, false, 0) ;
@@ -171,24 +177,6 @@ namespace iZiCodeEditor{
                 }
             }
             return selected ;
-        }
-
-        public void on_searchentry_activated(Gtk.Entry searchentry) {
-
-            lang_listbox.show_all () ;
-
-            var text = searchentry.get_text () ;
-
-            if( text == "" ){
-                lang_listbox.show_all () ;
-            } else {
-                listbox_get_row (lang_fallback).hide () ;
-                foreach( var lang_id in manager.get_language_ids ()){
-                    if( !manager.get_language (lang_id).name.down ().contains (text.down ())){
-                        listbox_get_row (manager.get_language (lang_id).name).hide () ;
-                    }
-                }
-            }
         }
 
         private void terminal_switch() {
