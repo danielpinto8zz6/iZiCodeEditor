@@ -38,8 +38,7 @@ namespace iZiCodeEditor {
       doc.sourceview.focus_in_event.disconnect (on_focus_in_event);
       on_tabs_changed ();
       if (get_n_pages () == 0) {
-        window.headerbar.set_title (NAME);
-        window.headerbar.set_subtitle (null);
+        new_tab ();
       }
     }
 
@@ -97,8 +96,6 @@ namespace iZiCodeEditor {
       append_page (doc, doc.tab_label);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
-
-      set_doc_signals (doc);
     }
 
     public void save_opened (Document doc) {
@@ -238,12 +235,6 @@ namespace iZiCodeEditor {
           sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.WORD);
         }
       }
-    }
-
-    private void set_doc_signals (Document doc) {
-      doc.close.connect (close);
-      doc.filename_changed.connect (window.headerbar.set_title);
-      doc.fileparsename_changed.connect (window.headerbar.set_subtitle);
     }
   }
 }

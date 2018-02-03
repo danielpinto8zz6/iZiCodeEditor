@@ -18,7 +18,8 @@ vala_args = [
     '--pkg=gtksourceview-3.0',
     '--pkg=gee-0.8',
     '--pkg=vte-2.91',
-    '--enable-checking'
+    '--enable-checking',
+    '--thread'
 ]
 
 iZiCodeEditor = executable('iZiCodeEditor',

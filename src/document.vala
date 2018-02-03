@@ -69,7 +69,6 @@ namespace iZiCodeEditor {
       }
     }
 
-    public signal void close (Document doc);
     public signal void filename_changed (string title);
     public signal void fileparsename_changed (string subtitle);
 
@@ -92,7 +91,7 @@ namespace iZiCodeEditor {
       eventbox.add (label);
       eventbox.button_press_event.connect ((event) => {
         if (event.button == 2) {
-          close (this);
+          Application.instance.get_last_window ().notebook.close (this);
         }
         return false;
       });
@@ -102,14 +101,14 @@ namespace iZiCodeEditor {
       tab_button.set_hexpand (false);
       tab_button.get_style_context ().add_class ("close-tab-button");
       tab_button.clicked.connect (() => {
-        close (this);
+        Application.instance.get_last_window ().notebook.close (this);
       });
       _tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       _tab_label.pack_start (eventbox);
       _tab_label.pack_end (tab_button);
       _tab_label.show_all ();
 
-      sourceview = new iZiCodeEditor.SourceView ();
+      sourceview = new iZiCodeEditor.SourceView (this);
       source_map = new Gtk.SourceMap ();
       sourcefile = new Gtk.SourceFile ();
 
@@ -146,15 +145,13 @@ namespace iZiCodeEditor {
       attach (scroll, 0, 0, 1, 1);
       attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
 
+      filename_changed.connect (Application.instance.get_last_window ().headerbar.set_title);
+      fileparsename_changed.connect (Application.instance.get_last_window ().headerbar.set_subtitle);
+
       show_all ();
     }
 
     public void new_doc () {
-
-      sourceview.buffer.modified_changed.connect (() => {
-        set_status ();
-      });
-
       label.label = file_name;
       label.tooltip_text = file_parse_name;
 
@@ -164,31 +161,29 @@ namespace iZiCodeEditor {
       sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
 
       sourceview.grab_focus ();
+
+      sourceview.buffer.set_modified (false);
     }
 
     public async bool open () {
       sourceview.sensitive = false;
 
-      while (Gtk.events_pending ()) {
-        Gtk.main_iteration ();
-      }
+      var buffer = new Gtk.SourceBuffer (null);
 
       try {
-        var source_file_loader = new Gtk.SourceFileLoader ((Gtk.SourceBuffer)sourceview.buffer, sourcefile);
-
+        var source_file_loader = new Gtk.SourceFileLoader (buffer, sourcefile);
         yield source_file_loader.load_async (GLib.Priority.DEFAULT, null, null);
+
+        sourceview.buffer.text = buffer.text;
       } catch (Error e) {
-        stderr.printf ("error: %s\n", e.message);
+        sourceview.buffer.text = "";
+        critical (e.message);
         return false;
       }
 
       sourceview.set_language_from_file (file);
 
       sourceview.buffer.set_modified (false);
-
-      sourceview.buffer.modified_changed.connect (() => {
-        set_status ();
-      });
 
       label.label = file_name;
       label.tooltip_text = file_parse_name;
@@ -206,9 +201,12 @@ namespace iZiCodeEditor {
     }
 
     public async bool save () {
-      if (file == null) {
+      if (!sourceview.buffer.get_modified ()) {
+        return false;
+      } else if (file == null) {
         save_as.begin ();
       }
+
       try {
         var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile);
 
@@ -228,7 +226,7 @@ namespace iZiCodeEditor {
 
       var dialog = new Gtk.MessageDialog (parent_window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE,
-                                          "Error saving file %s.\nThe file on disk may now be truncated!", file.get_parse_name ());
+                                          "Error saving file %s.\n", file.get_parse_name ());
       dialog.add_button ("Don't save", Gtk.ResponseType.NO);
       dialog.add_button ("Select New Location", Gtk.ResponseType.YES);
       dialog.set_resizable (false);
@@ -281,7 +279,7 @@ namespace iZiCodeEditor {
     public void set_status () {
       string unsaved_identifier = "* ";
 
-      if (sourceview.buffer.get_modified () == true) {
+      if (sourceview.buffer.get_modified ()) {
 
         if (!(unsaved_identifier in name)) {
           label.label = unsaved_identifier + label.label;

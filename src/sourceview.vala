@@ -9,6 +9,8 @@ namespace iZiCodeEditor {
     };
     public Gtk.SourceLanguageManager manager;
 
+    public unowned Document doc { get; construct set; }
+
     public Gtk.SourceLanguage ? language {
       set {
         ((Gtk.SourceBuffer)buffer).language = value;
@@ -18,11 +20,12 @@ namespace iZiCodeEditor {
       }
     }
 
-    public SourceView () {
+    public SourceView (Document doc) {
       Object (
         cursor_visible: true,
         left_margin: 10,
-        smart_backspace: true);
+        smart_backspace: true,
+        doc: doc);
     }
 
     construct {
@@ -133,6 +136,10 @@ namespace iZiCodeEditor {
 
       notify["overwrite"].connect (() => {
         Application.instance.get_last_window ().status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
+      });
+
+      buffer.modified_changed.connect (() => {
+        doc.set_status ();
       });
 
       show_all ();
