@@ -6,6 +6,8 @@ namespace iZiCodeEditor {
 
     private Gtk.SourceFile sourcefile;
 
+    public FileMonitor monitor;
+
     public File file {
       get {
         return sourcefile.location;
@@ -197,6 +199,8 @@ namespace iZiCodeEditor {
 
       sourceview.grab_focus ();
 
+      monitor_file ();
+
       return true;
     }
 
@@ -287,6 +291,29 @@ namespace iZiCodeEditor {
       } else {
         label.label = label.label.replace (unsaved_identifier, "");
       }
+    }
+
+    public void monitor_file () {
+      if (file != null) {
+        try {
+          monitor = file.monitor_file (FileMonitorFlags.NONE, null);
+          stdout.printf ("Monitoring: %s\n", file.get_path ());
+
+          monitor.changed.connect ((src, dest, event) => {
+            if (event == FileMonitorEvent.CHANGES_DONE_HINT) {
+              if (dest != null) {
+                stdout.printf ("%s: %s, %s\n", event.to_string (), src.get_path (), dest.get_path ());
+              } else {
+                stdout.printf ("%s: %s\n", event.to_string (), src.get_path ());
+              }
+            }
+          });
+        } catch (Error err) {
+          stdout.printf ("Error: %s\n", err.message);
+          return;
+        }
+      }
+      return;
     }
   }
 }

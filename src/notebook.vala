@@ -173,6 +173,10 @@ namespace iZiCodeEditor {
       } else {
         remove_page (page_num (doc));
       }
+      if (doc.file != null) {
+        doc.monitor.cancel ();
+        stdout.printf ("Stop monitoring: %s\n", doc.file.get_path ());
+      }
     }
 
     public void close_all () {
