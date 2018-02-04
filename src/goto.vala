@@ -4,6 +4,12 @@ namespace iZiCodeEditor {
     private iZiCodeEditor.SourceView ? sourceview = null;
     private Gtk.TextBuffer ? buffer = null;
 
+    public unowned ApplicationWindow window { get; construct set; }
+
+    public GoToLine (iZiCodeEditor.ApplicationWindow window) {
+      Object (window: window);
+    }
+
     construct {
       entry = new Gtk.Entry ();
       entry.set_size_request (200, 30);
@@ -17,7 +23,6 @@ namespace iZiCodeEditor {
       add (gotoBox);
 
       scroll_event.connect ((evt) => {
-        var window = Application.instance.get_last_window ();
         var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ());
         var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0);
         scrolled.scroll_event (evt);

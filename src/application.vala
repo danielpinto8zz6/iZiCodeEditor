@@ -9,17 +9,6 @@ namespace iZiCodeEditor {
 
     private ApplicationWindow window;
 
-    public static Application _instance = null;
-
-    public static Application instance {
-      get {
-        if (_instance == null) {
-          _instance = new Application ();
-        }
-        return _instance;
-      }
-    }
-
     private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor");
     public static GLib.Settings settings_editor {
       get {
@@ -54,35 +43,13 @@ namespace iZiCodeEditor {
       Object (application_id: "com.github.danielpinto8zz6.iZiCodeEditor");
     }
 
-    public override void startup () {
-      base.startup ();
-      window = new ApplicationWindow (this);
-      window.present ();
-      // window.notebook.add_recent_files () ;
-
-      try {
-        var provider = new Gtk.CssProvider ();
-        var css_stuff = """ .close-tab-button { padding :0; } """;
-        provider.load_from_data (css_stuff, css_stuff.length);
-      } catch (Error e) {
-        stderr.printf ("Error: %s\n", e.message);
-      }
-    }
-
     public override void activate () {
-      if (window.notebook.get_n_pages () == 0) {
-        window.notebook.new_tab ();
-      }
-      get_last_window ().present ();
-    }
-
-    public ApplicationWindow ? get_last_window () {
-      unowned List<weak Gtk.Window> window = get_windows ();
-      return window.length () > 0 ? window.last ().data as ApplicationWindow : null;
+      window = new ApplicationWindow (this);
+      window.notebook.new_tab ();
     }
 
     private static int main (string[] args) {
-      Application app = Application.instance;
+      Application app = new Application ();
       return app.run (args);
     }
   }

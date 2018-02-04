@@ -6,6 +6,12 @@ namespace iZiCodeEditor {
     private Gtk.TextBuffer ? buffer = null;
     private Gtk.Button label_occurrences;
 
+    public unowned ApplicationWindow window { get; construct set; }
+
+    public Search (iZiCodeEditor.ApplicationWindow window) {
+      Object (window: window);
+    }
+
     construct {
 
       entry = new Gtk.SearchEntry ();
@@ -35,7 +41,6 @@ namespace iZiCodeEditor {
       add (searchBox);
 
       scroll_event.connect ((evt) => {
-        var window = Application.instance.get_last_window ();
         var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ());
         var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0);
         scrolled.scroll_event (evt);

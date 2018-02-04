@@ -114,7 +114,7 @@ namespace iZiCodeEditor {
         maximize ();
       }
 
-      headerbar = new iZiCodeEditor.HeaderBar ();
+      headerbar = new iZiCodeEditor.HeaderBar (this);
       set_titlebar (headerbar);
       headerbar.show_all ();
 
@@ -188,7 +188,7 @@ namespace iZiCodeEditor {
         }
       });
 
-      delete_event.connect (() => {
+      this.delete_event.connect (() => {
         action_quit ();
         return true;
       });
@@ -330,7 +330,7 @@ namespace iZiCodeEditor {
     }
 
     public void action_preferences () {
-      preferences = new iZiCodeEditor.Preferences ();
+      preferences = new iZiCodeEditor.Preferences (this);
       preferences.show_all ();
     }
 
@@ -348,7 +348,9 @@ namespace iZiCodeEditor {
 
       // notebook.set_recent_files () ;
 
-      get_application ().quit ();
+      notebook.close_all ();
+
+      destroy ();
     }
 
     public void show_about () {

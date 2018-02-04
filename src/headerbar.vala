@@ -7,8 +7,11 @@ namespace iZiCodeEditor {
 
     public unowned Document ? doc = null;
 
-    public HeaderBar () {
+    public unowned ApplicationWindow window { get; construct set; }
+
+    public HeaderBar (ApplicationWindow window) {
       Object (
+        window: window,
         show_close_button: true);
     }
 
@@ -128,7 +131,7 @@ namespace iZiCodeEditor {
       searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON);
       searchButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SEARCH;
 
-      search = new iZiCodeEditor.Search ();
+      search = new iZiCodeEditor.Search (window);
       search.set_relative_to (searchButton);
 
       var menuButton = new Gtk.MenuButton ();
@@ -147,12 +150,12 @@ namespace iZiCodeEditor {
       pack_start (leftIcons);
       pack_end (rightIcons);
 
-      gotoline = new iZiCodeEditor.GoToLine ();
+      gotoline = new iZiCodeEditor.GoToLine (window);
       gotoline.set_relative_to (searchButton);
 
       Application.settings_fonts_colors.changed.connect (() => {
         // Default font size = 14, so, (14-4) * 10 = 100% zoom
-        zoom_default_button.label = "%.0f%%".printf ((Application.instance.get_last_window ().get_current_font_size () - 4) * 10);
+        zoom_default_button.label = "%.0f%%".printf ((window.get_current_font_size () - 4) * 10);
       });
     }
 

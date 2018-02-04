@@ -91,7 +91,7 @@ namespace iZiCodeEditor {
     }
 
     public void new_tab () {
-      var doc = new Document (null);
+      var doc = new Document (null, this);
       doc.new_doc ();
       append_page (doc, doc.tab_label);
       set_current_page (page_num (doc));
@@ -157,7 +157,7 @@ namespace iZiCodeEditor {
           return;
         }
       }
-      var doc = new Document (file);
+      var doc = new Document (file, this);
       doc.open.begin ();
       append_page (doc, doc.tab_label);
       set_current_page (page_num (doc));

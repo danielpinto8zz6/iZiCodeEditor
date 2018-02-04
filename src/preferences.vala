@@ -26,9 +26,9 @@ namespace iZiCodeEditor {
 
     private Gtk.HeaderBar header;
 
-    public Preferences () {
+    public Preferences (ApplicationWindow window) {
       Object (
-        transient_for: Application.instance.get_last_window (),
+        transient_for: window,
         resizable: true
         );
       header = new Gtk.HeaderBar ();
@@ -385,7 +385,7 @@ namespace iZiCodeEditor {
     }
 
     public void reset_all () {
-      var dialog = new Gtk.MessageDialog (Application.instance.get_last_window (),
+      var dialog = new Gtk.MessageDialog (get_toplevel () as Gtk.Window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
                                           "Are you sure you want to reset all preferences?");
       dialog.add_button ("Yes", Gtk.ResponseType.YES);

@@ -8,6 +8,12 @@ namespace iZiCodeEditor {
 
     public FileMonitor monitor;
 
+    public unowned ApplicationWindow window {
+      get {
+        return notebook.window;
+      }
+    }
+
     public File file {
       get {
         return sourcefile.location;
@@ -74,7 +80,12 @@ namespace iZiCodeEditor {
     public signal void filename_changed (string title);
     public signal void fileparsename_changed (string subtitle);
 
-    public Document (File ? file = null) {
+    public unowned Notebook notebook { get; construct set; }
+
+    public Document (File ? file = null, Notebook notebook) {
+      Object (
+        notebook: notebook);
+
       this.file = file;
       if (file != null) {
         _file_name = file.get_basename ();
@@ -93,7 +104,7 @@ namespace iZiCodeEditor {
       eventbox.add (label);
       eventbox.button_press_event.connect ((event) => {
         if (event.button == 2) {
-          Application.instance.get_last_window ().notebook.close (this);
+          notebook.close (this);
         }
         return false;
       });
@@ -101,9 +112,18 @@ namespace iZiCodeEditor {
                                                       Gtk.IconSize.MENU);
       tab_button.set_relief (Gtk.ReliefStyle.NONE);
       tab_button.set_hexpand (false);
+
+      try {
+        var provider = new Gtk.CssProvider ();
+        var css_stuff = """ .close-tab-button { padding :0; } """;
+        provider.load_from_data (css_stuff, css_stuff.length);
+      } catch (Error e) {
+        stderr.printf ("Error: %s\n", e.message);
+      }
+
       tab_button.get_style_context ().add_class ("close-tab-button");
       tab_button.clicked.connect (() => {
-        Application.instance.get_last_window ().notebook.close (this);
+        notebook.close (this);
       });
       _tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       _tab_label.pack_start (eventbox);
@@ -147,8 +167,8 @@ namespace iZiCodeEditor {
       attach (scroll, 0, 0, 1, 1);
       attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
 
-      filename_changed.connect (Application.instance.get_last_window ().headerbar.set_title);
-      fileparsename_changed.connect (Application.instance.get_last_window ().headerbar.set_subtitle);
+      filename_changed.connect (window.headerbar.set_title);
+      fileparsename_changed.connect (window.headerbar.set_subtitle);
 
       show_all ();
     }

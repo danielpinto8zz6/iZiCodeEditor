@@ -20,6 +20,12 @@ namespace iZiCodeEditor {
       }
     }
 
+    public unowned ApplicationWindow window {
+      get {
+        return doc.window;
+      }
+    }
+
     public SourceView (Document doc) {
       Object (
         cursor_visible: true,
@@ -123,19 +129,19 @@ namespace iZiCodeEditor {
 
       scroll_event.connect ((event) => {
         if ((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y < 0) {
-          Application.instance.get_last_window ().action_zoom_in ();
+          window.action_zoom_in ();
           return true;
         } else if ((Gdk.ModifierType.CONTROL_MASK in event.state) && event.delta_y > 0) {
-          Application.instance.get_last_window ().action_zoom_out ();
+          window.action_zoom_out ();
           return true;
         }
         return false;
       });
 
-      Application.instance.get_last_window ().status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
+      window.status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
 
       notify["overwrite"].connect (() => {
-        Application.instance.get_last_window ().status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
+        window.status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
       });
 
       buffer.modified_changed.connect (() => {
