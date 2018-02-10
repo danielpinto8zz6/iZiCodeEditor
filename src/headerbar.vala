@@ -91,31 +91,6 @@ namespace iZiCodeEditor {
       var menu = new Gtk.Popover (null);
       menu.add (menu_grid);
 
-      // var menu = new GLib.Menu ();
-      // var section = new GLib.Menu ();
-      // section.append ("Save As...", "win.save-as");
-      // section.append ("Save All", "win.save-all");
-      // menu.append_section (null, section);
-      // section = new GLib.Menu ();
-      // section.append ("Search...", "win.search");
-      // section.append ("Replace...", "win.replace");
-      // menu.append_section (null, section);
-      // section = new GLib.Menu ();
-      // section.append ("Go to line...", "win.gotoline");
-      // menu.append_section (null, section);
-      // section = new GLib.Menu ();
-      // section.append ("Close", "win.close");
-      // section.append ("Close All", "win.close-all");
-      // menu.append_section (null, section);
-      // section = new GLib.Menu ();
-      // section.append ("Preferences", "win.pref");
-      // menu.append_section (null, section);
-      // section = new GLib.Menu ();
-      // section.append ("About", "win.about");
-      // section.append ("Quit", "win.quit");
-      // menu.append_section (null, section);
-      // menu.add (zoom_grid);
-
       var leftIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
@@ -161,8 +136,8 @@ namespace iZiCodeEditor {
 
     public void set_doc (Document doc) {
       this.doc = doc;
-      set_title (doc.file_name);
-      set_subtitle (doc.file_parse_name);
+      set_title (doc.get_file_name ());
+      set_subtitle (doc.get_file_path ());
       search.set_sourceview (doc.sourceview);
       gotoline.set_sourceview (doc.sourceview);
     }

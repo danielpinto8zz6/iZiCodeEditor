@@ -263,7 +263,7 @@ namespace iZiCodeEditor {
       return css;
     }
 
-    public void set_language_from_file (File file) {
+    public void change_syntax_highlight_from_file (File file) {
       try {
         var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null);
         var mime_type = ContentType.get_mime_type (info.get_attribute_as_string (FileAttribute.STANDARD_CONTENT_TYPE));

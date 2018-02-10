@@ -4,9 +4,7 @@ namespace iZiCodeEditor {
 
     private Gtk.SourceMap source_map;
 
-    private Gtk.SourceFile sourcefile;
-
-    public FileMonitor monitor;
+    private Gtk.SourceFile sourcefile = null;
 
     public unowned ApplicationWindow window {
       get {
@@ -23,80 +21,45 @@ namespace iZiCodeEditor {
       }
     }
 
-    public Gtk.Label label;
+    public Gtk.Box tab_label;
 
-    public Gtk.Box _tab_label;
-
-    public Gtk.Box tab_label {
-      get {
-        return (Gtk.Box)_tab_label;
-      }
-    }
-
-    public string ? _file_name = null;
-
-    public string ? file_name {
-      get {
-        return _file_name;
-      }
-      set {
-        _file_name = value;
-      }
-    }
-
-    public string ? _file_parse_name = null;
-
-    public string ? file_parse_name {
-      get {
-        return _file_parse_name;
-      }
-      set {
-        _file_parse_name = value;
-      }
-    }
-
-    private string ? _mime_type = null;
-    public string ? mime_type {
-      get {
-        if (_mime_type == null) {
-          try {
-            var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null);
-            var content_type = info.get_attribute_as_string (FileAttribute.STANDARD_CONTENT_TYPE);
-            _mime_type = ContentType.get_mime_type (content_type);
-            return _mime_type;
-          } catch (Error e) {
-            debug (e.message);
-          }
-        }
-
-        if (_mime_type == null) {
-          _mime_type = "undefined";
-        }
-
-        return _mime_type;
-      }
-    }
-
-    public signal void filename_changed (string title);
-    public signal void fileparsename_changed (string subtitle);
+    private Gtk.Label label;
 
     public unowned Notebook notebook { get; construct set; }
 
-    public Document (File ? file = null, Notebook notebook) {
-      Object (
-        notebook: notebook);
+    public Document (File file, Notebook notebook) {
+      Object (notebook: notebook,
+              file: file);
 
-      this.file = file;
-      if (file != null) {
-        _file_name = file.get_basename ();
-        _file_parse_name = file.get_parse_name ();
-      } else {
-        _file_name = "New Document";
-        _file_parse_name = null;
-      }
+      open.begin ();
+
+      sourceview.change_syntax_highlight_from_file (file);
+
+      label.label = get_file_name ();
+      label.tooltip_text = get_file_path ();
+
+      sourceview.buffer.set_modified (false);
+
+      Gtk.TextIter iter_st;
+      sourceview.buffer.get_start_iter (out iter_st);
+      sourceview.buffer.place_cursor (iter_st);
+      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
+    }
+
+    public Document.new_doc (Notebook notebook) {
+      Object (notebook: notebook);
+
+      label.label = get_file_name ();
+      label.tooltip_text = get_file_path ();
+
+      Gtk.TextIter iter_st;
+      sourceview.buffer.get_start_iter (out iter_st);
+      sourceview.buffer.place_cursor (iter_st);
+      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
     }
 
     construct {
+
       label = new Gtk.Label ("");
       label.set_size_request (100, -1);
 
@@ -125,10 +88,10 @@ namespace iZiCodeEditor {
       tab_button.clicked.connect (() => {
         notebook.close (this);
       });
-      _tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-      _tab_label.pack_start (eventbox);
-      _tab_label.pack_end (tab_button);
-      _tab_label.show_all ();
+      tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+      tab_label.pack_start (eventbox);
+      tab_label.pack_end (tab_button);
+      tab_label.show_all ();
 
       sourceview = new iZiCodeEditor.SourceView (this);
       source_map = new Gtk.SourceMap ();
@@ -167,24 +130,7 @@ namespace iZiCodeEditor {
       attach (scroll, 0, 0, 1, 1);
       attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
 
-      filename_changed.connect (window.headerbar.set_title);
-      fileparsename_changed.connect (window.headerbar.set_subtitle);
-
       show_all ();
-    }
-
-    public void new_doc () {
-      label.label = file_name;
-      label.tooltip_text = file_parse_name;
-
-      Gtk.TextIter iter_st;
-      sourceview.buffer.get_start_iter (out iter_st);
-      sourceview.buffer.place_cursor (iter_st);
-      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
-
-      sourceview.grab_focus ();
-
-      sourceview.buffer.set_modified (false);
     }
 
     public async bool open () {
@@ -203,23 +149,9 @@ namespace iZiCodeEditor {
         return false;
       }
 
-      sourceview.set_language_from_file (file);
-
       sourceview.buffer.set_modified (false);
 
-      label.label = file_name;
-      label.tooltip_text = file_parse_name;
-
       sourceview.sensitive = true;
-
-      Gtk.TextIter iter_st;
-      sourceview.buffer.get_start_iter (out iter_st);
-      sourceview.buffer.place_cursor (iter_st);
-      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
-
-      sourceview.grab_focus ();
-
-      monitor_file ();
 
       return true;
     }
@@ -283,16 +215,10 @@ namespace iZiCodeEditor {
         var is_saved = yield save ();
 
         if (is_saved) {
-          sourceview.set_language_from_file (file);
+          sourceview.change_syntax_highlight_from_file (file);
 
-          _file_name = file.get_basename ();
-          _file_parse_name = file.get_parse_name ();
-
-          filename_changed (file_name);
-          fileparsename_changed (file_parse_name);
-
-          label.label = file_name;
-          label.tooltip_text = file_parse_name;
+          label.label = get_file_name ();
+          label.tooltip_text = get_file_path ();
         }
 
         dialog.destroy ();
@@ -304,7 +230,6 @@ namespace iZiCodeEditor {
       string unsaved_identifier = "* ";
 
       if (sourceview.buffer.get_modified ()) {
-
         if (!(unsaved_identifier in name)) {
           label.label = unsaved_identifier + label.label;
         }
@@ -313,27 +238,16 @@ namespace iZiCodeEditor {
       }
     }
 
-    public void monitor_file () {
-      if (file != null) {
-        try {
-          monitor = file.monitor_file (FileMonitorFlags.NONE, null);
-          stdout.printf ("Monitoring: %s\n", file.get_path ());
+    public Gtk.Box get_tab_label () {
+      return (Gtk.Box)tab_label;
+    }
 
-          monitor.changed.connect ((src, dest, event) => {
-            if (event == FileMonitorEvent.CHANGES_DONE_HINT) {
-              if (dest != null) {
-                stdout.printf ("%s: %s, %s\n", event.to_string (), src.get_path (), dest.get_path ());
-              } else {
-                stdout.printf ("%s: %s\n", event.to_string (), src.get_path ());
-              }
-            }
-          });
-        } catch (Error err) {
-          stdout.printf ("Error: %s\n", err.message);
-          return;
-        }
-      }
-      return;
+    public string get_file_name () {
+      return file != null ? file.get_basename () : "New document";
+    }
+
+    public string get_file_path () {
+      return file != null ? file.get_parse_name () : null;
     }
   }
 }

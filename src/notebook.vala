@@ -91,18 +91,18 @@ namespace iZiCodeEditor {
     }
 
     public void new_tab () {
-      var doc = new Document (null, this);
-      doc.new_doc ();
-      append_page (doc, doc.tab_label);
+      var doc = new Document.new_doc (this);
+      add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
+      doc.sourceview.grab_focus ();
     }
 
     public void save_opened (Document doc) {
       set_current_page (page_num (doc));
       var dialog = new Gtk.MessageDialog (window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
-                                          "The file '%s' is not saved.\nDo you want to save it?", doc.file_name);
+                                          "The file '%s' is not saved.\nDo you want to save it?", doc.get_file_name ());
       dialog.add_button ("Don't save", Gtk.ResponseType.NO);
       dialog.add_button ("Cancel", Gtk.ResponseType.CANCEL);
       dialog.add_button ("Save", Gtk.ResponseType.YES);
@@ -158,10 +158,10 @@ namespace iZiCodeEditor {
         }
       }
       var doc = new Document (file, this);
-      doc.open.begin ();
-      append_page (doc, doc.tab_label);
+      add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
+      doc.sourceview.grab_focus ();
     }
 
     public void close (Gtk.Widget tab) {
@@ -172,10 +172,6 @@ namespace iZiCodeEditor {
         remove_page (page_num (doc));
       } else {
         remove_page (page_num (doc));
-      }
-      if (doc.file != null) {
-        doc.monitor.cancel ();
-        stdout.printf ("Stop monitoring: %s\n", doc.file.get_path ());
       }
     }
 
@@ -239,6 +235,10 @@ namespace iZiCodeEditor {
           sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.WORD);
         }
       }
+    }
+
+    public void add_doc (Document doc) {
+      append_page (doc, doc.get_tab_label ());
     }
   }
 }
