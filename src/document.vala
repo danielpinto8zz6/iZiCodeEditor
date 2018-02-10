@@ -104,10 +104,6 @@ namespace iZiCodeEditor {
 
       source_map.set_view (sourceview);
 
-      Gtk.TargetEntry uris = { "text/uri-list", 0, 0 };
-      Gtk.TargetEntry text = { "text/plain", 0, 0 };
-      Gtk.drag_dest_set (sourceview, Gtk.DestDefaults.ALL, { uris, text }, Gdk.DragAction.COPY);
-
       if (Application.settings_view.get_boolean ("source-map")) {
         source_map.show ();
         scroll.vscrollbar_policy = Gtk.PolicyType.EXTERNAL;

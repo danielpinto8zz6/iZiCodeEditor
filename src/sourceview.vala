@@ -117,8 +117,6 @@ namespace iZiCodeEditor {
 
       Application.settings_editor.bind ("highlight-matching-brackets", buffer, "highlight_matching_brackets", SettingsBindFlags.DEFAULT);
 
-      Gtk.drag_dest_add_uri_targets (this);
-
       if (this != null) {
         key_press_event.disconnect (on_key_press);
         backspace.disconnect (on_backspace);

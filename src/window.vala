@@ -188,12 +188,32 @@ namespace iZiCodeEditor {
         }
       });
 
+      support_drag_and_drop ();
+
       this.delete_event.connect (() => {
         action_quit ();
         return true;
       });
 
       show ();
+    }
+
+    private void support_drag_and_drop () {
+      Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, {}, Gdk.DragAction.COPY);
+      Gtk.drag_dest_add_uri_targets (this);
+      drag_data_received.connect ((dc, x, y, selection_data, info, time) =>
+      {
+        File[] files = {};
+        foreach (string uri in selection_data.get_uris ()) {
+          if (0 < uri.length)
+            files += File.new_for_uri (uri);
+        }
+
+        foreach (File file in files)
+          notebook.open (file);
+
+        Gtk.drag_finish (dc, true, true, time);
+      });
     }
 
     public void action_zoom_in () {

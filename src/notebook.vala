@@ -34,7 +34,6 @@ namespace iZiCodeEditor {
     private void on_doc_removed (Gtk.Widget tab, uint page_num) {
       var doc = (Document) tab;
       docs.remove (doc);
-      doc.sourceview.drag_data_received.disconnect (drag_received);
       doc.sourceview.focus_in_event.disconnect (on_focus_in_event);
       on_tabs_changed ();
       if (get_n_pages () == 0) {
@@ -46,7 +45,6 @@ namespace iZiCodeEditor {
       var doc = (Document) tab;
       docs.append (doc);
       doc.sourceview.focus_in_event.connect_after (on_focus_in_event);
-      doc.sourceview.drag_data_received.connect (drag_received);
       on_tabs_changed ();
     }
 
@@ -78,16 +76,6 @@ namespace iZiCodeEditor {
       set_show_tabs (pages > 1);
       no_show_all = (pages == 0);
       visible = (pages > 0);
-    }
-
-    private void drag_received (Gtk.Widget w, Gdk.DragContext ctx, int x, int y, Gtk.SelectionData sel, uint info, uint time) {
-      var uris = sel.get_uris ();
-      foreach (var filename in uris) {
-        var file = File.new_for_uri (filename);
-        open (file);
-      }
-
-      Gtk.drag_finish (ctx, true, false, time);
     }
 
     public void new_tab () {
