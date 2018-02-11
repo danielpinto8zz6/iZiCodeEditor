@@ -149,7 +149,6 @@ namespace iZiCodeEditor {
       add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
-      doc.sourceview.grab_focus ();
     }
 
     public void close (Gtk.Widget tab) {

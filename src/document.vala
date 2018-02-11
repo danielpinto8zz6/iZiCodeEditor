@@ -46,11 +46,6 @@ namespace iZiCodeEditor {
 
       label.label = get_file_name ();
       label.tooltip_text = get_file_path ();
-
-      Gtk.TextIter iter_st;
-      sourceview.buffer.get_start_iter (out iter_st);
-      sourceview.buffer.place_cursor (iter_st);
-      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
     }
 
     construct {
@@ -128,6 +123,9 @@ namespace iZiCodeEditor {
 
     private bool view_focused_in () {
       if (ask_if_externally_modified)
+        return false;
+
+      if (!sourcefile.is_local ())
         return false;
 
       sourcefile.check_file_on_disk ();
@@ -219,9 +217,7 @@ namespace iZiCodeEditor {
     }
 
     public void save_fallback () {
-      var parent_window = sourceview.get_toplevel () as Gtk.Window;
-
-      var dialog = new Gtk.MessageDialog (parent_window,
+      var dialog = new Gtk.MessageDialog (window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE,
                                           "Error saving file %s.\n", file.get_parse_name ());
       dialog.add_button ("Don't save", Gtk.ResponseType.NO);
@@ -240,9 +236,7 @@ namespace iZiCodeEditor {
     }
 
     public async bool save_as () {
-      var parent_window = sourceview.get_toplevel () as Gtk.Window;
-
-      var dialog = new Gtk.FileChooserDialog ("Save As...", parent_window,
+      var dialog = new Gtk.FileChooserDialog ("Save As...", window,
                                               Gtk.FileChooserAction.SAVE,
                                               "Cancel", Gtk.ResponseType.CANCEL,
                                               "Save", Gtk.ResponseType.ACCEPT);
