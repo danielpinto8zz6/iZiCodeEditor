@@ -33,6 +33,7 @@ namespace iZiCodeEditor {
     public const string ACTION_ZOOM_DEFAULT = "zoom-default";
     public const string ACTION_ZOOM_IN = "zoom-in";
     public const string ACTION_ZOOM_OUT = "zoom-out";
+    public const string ACTION_COMMENT = "comment";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -55,7 +56,8 @@ namespace iZiCodeEditor {
       { ACTION_QUIT, action_quit },
       { ACTION_ZOOM_DEFAULT, action_set_default_zoom },
       { ACTION_ZOOM_IN, action_zoom_in },
-      { ACTION_ZOOM_OUT, action_zoom_out }
+      { ACTION_ZOOM_OUT, action_zoom_out },
+      { ACTION_COMMENT, action_comment }
     };
 
     public ApplicationWindow (Gtk.Application app) {
@@ -86,6 +88,7 @@ namespace iZiCodeEditor {
       action_accelerators.set (ACTION_ZOOM_IN, "<Control>KP_Add");
       action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
       action_accelerators.set (ACTION_ZOOM_OUT, "<Control>KP_Subtract");
+      action_accelerators.set (ACTION_COMMENT, "<Control>M");
 
       var actions = new SimpleActionGroup ();
       actions.add_action_entries (action_entries, this);
@@ -214,6 +217,10 @@ namespace iZiCodeEditor {
 
         Gtk.drag_finish (dc, true, true, time);
       });
+    }
+
+    public void action_comment () {
+      notebook.current_doc.sourceview.on_toggle_comment ();
     }
 
     public void action_zoom_in () {
