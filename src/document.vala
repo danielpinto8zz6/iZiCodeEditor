@@ -25,6 +25,8 @@ namespace iZiCodeEditor {
 
     private Gtk.Label label;
 
+    private bool ask_if_externally_modified = false;
+
     public unowned Notebook notebook { get; construct set; }
 
     public Document (File file, Notebook notebook) {
@@ -123,10 +125,53 @@ namespace iZiCodeEditor {
         }
       });
 
-      attach (scroll, 0, 0, 1, 1);
+      sourceview.focus_in_event.connect (view_focused_in);
+
+      attach (scroll, 0, 1, 1, 1);
       attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
 
       show_all ();
+    }
+
+    private bool view_focused_in () {
+      if (ask_if_externally_modified)
+        return false;
+
+      sourcefile.check_file_on_disk ();
+
+      if (sourcefile.is_externally_modified ()) {
+        ask_if_externally_modified = true;
+
+        Gtk.InfoBar infobar = new Gtk.InfoBar ();
+
+        infobar.add_button ("Reload", Gtk.ResponseType.OK);
+        infobar.add_button ("Ignore", Gtk.ResponseType.REJECT);
+
+        string msg = "The file %s changed on disk. Reload it?"
+                      .printf (file.get_parse_name ());
+
+        Gtk.Container content = infobar.get_content_area ();
+        var info = new Gtk.Label (msg);
+        content.add (info);
+
+        infobar.set_message_type (Gtk.MessageType.WARNING);
+
+        attach (infobar, 0, 0, 2, 1);
+
+        infobar.show_all ();
+
+        infobar.response.connect ((response_id) =>
+        {
+          if (response_id == Gtk.ResponseType.OK) {
+            open.begin ();
+            ask_if_externally_modified = false;
+          }
+
+          infobar.destroy ();
+          sourceview.grab_focus ();
+        });
+      }
+      return false;
     }
 
     public async bool open () {
