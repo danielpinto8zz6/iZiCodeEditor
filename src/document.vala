@@ -35,7 +35,7 @@ namespace iZiCodeEditor {
 
       open.begin ();
 
-      sourceview.change_syntax_highlight_from_file (file);
+      sourceview.update_syntax_highlighting ();
 
       label.label = get_file_name ();
       label.tooltip_text = get_file_path ();
@@ -250,7 +250,7 @@ namespace iZiCodeEditor {
         var is_saved = yield save ();
 
         if (is_saved) {
-          sourceview.change_syntax_highlight_from_file (file);
+          sourceview.update_syntax_highlighting ();
 
           label.label = get_file_name ();
           label.tooltip_text = get_file_path ();

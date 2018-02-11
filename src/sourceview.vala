@@ -261,14 +261,16 @@ namespace iZiCodeEditor {
       return css;
     }
 
-    public void change_syntax_highlight_from_file (File file) {
+    public void update_syntax_highlighting () {
+      string content_type = null;
       try {
-        var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null);
-        var mime_type = ContentType.get_mime_type (info.get_attribute_as_string (FileAttribute.STANDARD_CONTENT_TYPE));
-        language = manager.guess_language (file.get_path (), mime_type);
+        FileInfo info = doc.file.query_info (FileAttribute.STANDARD_CONTENT_TYPE,
+                                             FileQueryInfoFlags.NONE, null);
+        content_type = info.get_content_type ();
       } catch (Error e) {
         critical (e.message);
       }
+      language = manager.guess_language (doc.file.get_parse_name (), content_type);
     }
 
     public void go_to (int line, int offset = 0) {
