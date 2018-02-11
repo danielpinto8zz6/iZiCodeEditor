@@ -39,13 +39,6 @@ namespace iZiCodeEditor {
 
       label.label = get_file_name ();
       label.tooltip_text = get_file_path ();
-
-      sourceview.buffer.set_modified (false);
-
-      Gtk.TextIter iter_st;
-      sourceview.buffer.get_start_iter (out iter_st);
-      sourceview.buffer.place_cursor (iter_st);
-      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
     }
 
     public Document.new_doc (Notebook notebook) {
@@ -193,6 +186,13 @@ namespace iZiCodeEditor {
       sourceview.buffer.set_modified (false);
 
       sourceview.sensitive = true;
+
+      Gtk.TextIter iter_st;
+      sourceview.buffer.get_start_iter (out iter_st);
+      sourceview.buffer.place_cursor (iter_st);
+      sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
+
+      sourceview.grab_focus ();
 
       return true;
     }
