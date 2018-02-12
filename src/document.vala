@@ -52,6 +52,7 @@ namespace iZiCodeEditor {
 
       label = new Gtk.Label ("");
       label.set_size_request (100, -1);
+      label.ellipsize = Pango.EllipsizeMode.END;
 
       var eventbox = new Gtk.EventBox ();
       eventbox.add (label);
