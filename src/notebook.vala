@@ -24,6 +24,8 @@ namespace iZiCodeEditor {
         text_wrap_mode ();
       });
 
+      scrollable = true;
+
       on_tabs_changed ();
       page_added.connect (on_doc_added);
       page_removed.connect (on_doc_removed);
