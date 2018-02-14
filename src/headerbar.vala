@@ -27,7 +27,9 @@ namespace iZiCodeEditor {
 
       var zoom_grid = new Gtk.Grid ();
       zoom_grid.get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+      zoom_grid.column_homogeneous = true;
       zoom_grid.margin_bottom = 6;
+      zoom_grid.hexpand = true;
       zoom_grid.add (zoom_out_button);
       zoom_grid.add (zoom_default_button);
       zoom_grid.add (zoom_in_button);

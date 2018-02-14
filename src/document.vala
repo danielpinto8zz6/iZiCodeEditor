@@ -26,6 +26,7 @@ namespace iZiCodeEditor {
     private Gtk.Label label;
 
     private bool ask_if_externally_modified = false;
+    private bool ask_if_deleted = false;
 
     public unowned Notebook notebook { get; construct set; }
 
@@ -123,15 +124,40 @@ namespace iZiCodeEditor {
     }
 
     private bool view_focused_in () {
-      if (ask_if_externally_modified)
-        return false;
-
-      if (!sourcefile.is_local ())
-        return false;
-
       sourcefile.check_file_on_disk ();
 
-      if (sourcefile.is_externally_modified ()) {
+      if (!ask_if_deleted && sourcefile.is_deleted ()) {
+        ask_if_deleted = true;
+
+        Gtk.InfoBar infobar = new Gtk.InfoBar ();
+
+        infobar.add_button ("Save", Gtk.ResponseType.OK);
+        infobar.add_button ("Ignore", Gtk.ResponseType.REJECT);
+
+        string msg = "The file %s was deleted. Do you want to save it?"
+                      .printf (file.get_parse_name ());
+
+        Gtk.Container content = infobar.get_content_area ();
+        var info = new Gtk.Label (msg);
+        content.add (info);
+
+        infobar.set_message_type (Gtk.MessageType.WARNING);
+
+        attach (infobar, 0, 0, 2, 1);
+
+        infobar.show_all ();
+
+        infobar.response.connect ((response_id) =>
+        {
+          if (response_id == Gtk.ResponseType.OK) {
+            save_as.begin ();
+            ask_if_deleted = false;
+          }
+          sourceview.grab_focus ();
+          infobar.destroy ();
+        });
+      } else if (!ask_if_externally_modified && sourcefile.is_local ()
+                 && sourcefile.is_externally_modified ()) {
         ask_if_externally_modified = true;
 
         Gtk.InfoBar infobar = new Gtk.InfoBar ();
@@ -158,7 +184,6 @@ namespace iZiCodeEditor {
             open.begin ();
             ask_if_externally_modified = false;
           }
-
           infobar.destroy ();
           sourceview.grab_focus ();
         });
