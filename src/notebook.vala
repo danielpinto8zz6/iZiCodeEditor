@@ -147,10 +147,14 @@ namespace iZiCodeEditor {
           return;
         }
       }
+      var current = current_doc;
       var doc = new Document (file, this);
       add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
+      if (current.file == null && !current.sourceview.buffer.get_modified ()) {
+        close (current);
+      }
     }
 
     public void close (Gtk.Widget tab) {
