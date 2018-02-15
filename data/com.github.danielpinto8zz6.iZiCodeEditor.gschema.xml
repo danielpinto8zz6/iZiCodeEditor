@@ -33,12 +33,12 @@
       <description>Show line numbers</description>
     </key>
     <key name="pattern-show" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>pattern-show</summary>
       <description>Show grid pattern</description>
     </key>
     <key name="margin-show" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>margin-show</summary>
       <description>Show margin on right</description>
     </key>
@@ -58,7 +58,7 @@
       <description>Dark mode theme variant</description>
     </key>
     <key name="source-map" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>source-map</summary>
       <description>Source map</description>
     </key>
