@@ -9,6 +9,9 @@ namespace iZiCodeEditor {
     public iZiCodeEditor.Replace replace;
     public iZiCodeEditor.Preferences preferences;
     public GLib.List<string> files;
+    private Gtk.Paned leftPaned;
+    private Gtk.Paned rightPaned;
+    private Gtk.Paned mainPaned;
 
     private int FONT_SIZE_MAX = 72;
     private int FONT_SIZE_MIN = 7;
@@ -111,17 +114,12 @@ namespace iZiCodeEditor {
 
       // window
       window_position = Gtk.WindowPosition.CENTER;
-      set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height"));
 
       Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode"));
 
       Application.settings_view.changed["dark-mode"].connect (() => {
         Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode"));
       });
-
-      if (Application.saved_state.get_boolean ("maximized")) {
-        maximize ();
-      }
 
       headerbar = new iZiCodeEditor.HeaderBar (this);
       set_titlebar (headerbar);
@@ -139,20 +137,18 @@ namespace iZiCodeEditor {
       bottomBar.page_added.connect (() => { on_bars_changed (bottomBar); });
       bottomBar.page_removed.connect (() => { on_bars_changed (bottomBar); });
 
-      var leftPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-      leftPane.position = 180;
-      // leftPane.pack1 (leftBar, false, false) ;
-      leftPane.pack2 (content, true, false);
+      leftPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+      leftPaned.position = 180;
+      // leftPaned.pack1 (leftBar, false, false) ;
+      leftPaned.pack2 (content, true, false);
 
-      var rightPane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-      rightPane.position = (Application.saved_state.get_int ("width") - 180);
-      rightPane.pack1 (leftPane, true, false);
-      // rightPane.pack2 (rightBar, false, false) ;
+      rightPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+      rightPaned.pack1 (leftPaned, true, false);
+      // rightPaned.pack2 (rightBar, false, false) ;
 
-      var mainPane = new Gtk.Paned (Gtk.Orientation.VERTICAL);
-      mainPane.position = (Application.saved_state.get_int ("height") - 150);
-      mainPane.pack1 (rightPane, true, false);
-      mainPane.pack2 (bottomBar, false, false);
+      mainPaned = new Gtk.Paned (Gtk.Orientation.VERTICAL);
+      mainPaned.pack1 (rightPaned, true, false);
+      mainPaned.pack2 (bottomBar, false, false);
 
       terminal = new iZiCodeEditor.Terminal ();
 
@@ -176,7 +172,7 @@ namespace iZiCodeEditor {
 
       var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-      mainBox.pack_start (mainPane, false, true, 0);
+      mainBox.pack_start (mainPaned, false, true, 0);
 
       mainBox.pack_end (status_bar, false, false, 0);
 
@@ -204,7 +200,40 @@ namespace iZiCodeEditor {
         return true;
       });
 
+      restore_saved_state ();
+
+      if (notebook.get_n_pages () == 0)
+        action_new ();
+
       show ();
+    }
+
+    private void restore_saved_state () {
+      if (Application.saved_state.get_boolean ("maximized")) {
+        maximize ();
+      }
+
+      set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height"));
+
+      rightPaned.position = (Application.saved_state.get_int ("width") - 180);
+
+      mainPaned.position = (Application.saved_state.get_int ("height") - 150);
+
+      restore_recent_files ();
+    }
+
+    private void restore_recent_files () {
+      string[] recent_files = Application.saved_state.get_strv ("recent-files");
+      if (recent_files.length > 0) {
+        foreach (string uri in recent_files) {
+          if (uri != "") {
+            var file = File.new_for_uri (uri);
+            if (file.query_exists ())
+              notebook.open (file);
+          }
+        }
+        notebook.set_current_page ((int) Application.saved_state.get_uint ("active-tab"));
+      }
     }
 
     private void support_drag_and_drop () {
@@ -371,19 +400,32 @@ namespace iZiCodeEditor {
       show_about ();
     }
 
-    public void action_quit () {
+    private void action_quit () {
+      set_saved_state ();
+      notebook.close_all ();
+      destroy ();
+    }
+
+    private void set_saved_state () {
       int width, height;
       get_size (out width, out height);
       Application.saved_state.set_boolean ("maximized", is_maximized);
       Application.saved_state.set_int ("width", width);
       Application.saved_state.set_int ("height", height);
-      // Application.saved_state.set_uint ("active-tab", notebook.get_current_page ()) ;
+      set_recent_files ();
+      Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+    }
 
-      // notebook.set_recent_files () ;
-
-      notebook.close_all ();
-
-      destroy ();
+    public void set_recent_files () {
+      string[] recent_files = {};
+      for (int i = 0; i < notebook.docs.length (); i++) {
+        var sel_doc = notebook.docs.nth_data (i);
+        if (sel_doc == null || sel_doc.file == null) {
+          continue;
+        }
+        recent_files += sel_doc.file.get_uri ();
+      }
+      Application.saved_state.set_strv ("recent-files", recent_files);
     }
 
     public void show_about () {

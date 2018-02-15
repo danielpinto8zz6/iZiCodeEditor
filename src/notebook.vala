@@ -152,7 +152,7 @@ namespace iZiCodeEditor {
       add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
-      if (current.file == null && !current.sourceview.buffer.get_modified ()) {
+      if (current != null && current.file == null && !current.sourceview.buffer.get_modified ()) {
         close (current);
       }
     }
@@ -171,32 +171,6 @@ namespace iZiCodeEditor {
     public void close_all () {
       for (uint i = docs.length (); i > 0; i--) {
         close (current_doc);
-      }
-    }
-
-    public void set_recent_files () {
-      string[] recent_files = {};
-      for (int i = 0; i < docs.length (); i++) {
-        var sel_doc = docs.nth_data (i);
-        if (sel_doc == null) {
-          continue;
-        }
-        close (sel_doc);
-        recent_files += sel_doc.file.get_uri ();
-      }
-      Application.saved_state.set_strv ("recent-files", recent_files);
-    }
-
-    public void add_recent_files () {
-      string[] recent_files = Application.saved_state.get_strv ("recent-files");
-      if (recent_files.length > 0) {
-        for (int i = 0; i < recent_files.length; i++) {
-          var one = GLib.File.new_for_uri (recent_files[i]);
-          if (one.query_exists () == true) {
-            window.notebook.open (one);
-          }
-        }
-        set_current_page ((int) Application.saved_state.get_uint ("active-tab"));
       }
     }
 

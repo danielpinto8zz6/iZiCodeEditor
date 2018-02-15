@@ -45,7 +45,6 @@ namespace iZiCodeEditor {
 
     public override void activate () {
       window = new ApplicationWindow (this);
-      window.notebook.new_tab ();
     }
 
     private static int main (string[] args) {
