@@ -19,7 +19,7 @@ namespace iZiCodeEditor {
       var zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
       zoom_out_button.action_name = "win.zoom-out";
 
-      var zoom_default_button = new Gtk.Button.with_label ("100%");
+      var zoom_default_button = new Gtk.Button.with_label ("%.0f%%".printf ((window.get_current_font_size () - 4) * 10));
       zoom_default_button.action_name = "win.zoom-default";
 
       var zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
