@@ -40,14 +40,6 @@ namespace iZiCodeEditor {
 
       add (searchBox);
 
-      scroll_event.connect ((evt) => {
-        var tab_page = (Gtk.Grid)window.notebook.get_nth_page (window.notebook.get_current_page ());
-        var scrolled = (Gtk.ScrolledWindow)tab_page.get_child_at (0, 0);
-        scrolled.scroll_event (evt);
-        return Gdk.EVENT_PROPAGATE;
-      });
-
-      // signals
       entry.changed.connect (forward);
       entry.grab_focus ();
       entry.key_press_event.connect (on_search_entry_key_press);
@@ -59,6 +51,14 @@ namespace iZiCodeEditor {
         {
           update_info_label ();
         });
+      });
+
+      scroll_event.connect ((evt) => {
+        if (evt.direction == Gdk.ScrollDirection.UP)
+          window.current_doc.scroll.scroll_event (evt);
+        else if (evt.direction == Gdk.ScrollDirection.DOWN)
+          window.current_doc.scroll.scroll_event (evt);
+        return Gdk.EVENT_PROPAGATE;
       });
 
       hide.connect (on_popover_hide);

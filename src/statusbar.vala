@@ -86,18 +86,6 @@ namespace iZiCodeEditor {
       }
     }
 
-    public string mime_type (File file) {
-      string mime_type = "";
-      try {
-        var info = file.query_info ("standard::*", FileQueryInfoFlags.NONE, null);
-        var content_type = info.get_content_type ();
-        mime_type = ContentType.get_mime_type (content_type);
-      } catch (Error e) {
-        debug (e.message);
-      }
-      return mime_type;
-    }
-
     private Gtk.ListBoxRow listbox_get_row (string lang) {
       var selected_row = new Gtk.ListBoxRow ();
       lang_listbox.foreach (widget => {

@@ -25,6 +25,8 @@ namespace iZiCodeEditor {
 
     private Gtk.Label label;
 
+    public Gtk.ScrolledWindow scroll;
+
     private bool ask_if_externally_modified = false;
     private bool ask_if_deleted = false;
 
@@ -89,7 +91,7 @@ namespace iZiCodeEditor {
       source_map = new Gtk.SourceMap ();
       sourcefile = new Gtk.SourceFile ();
 
-      var scroll = new Gtk.ScrolledWindow (null, null);
+      scroll = new Gtk.ScrolledWindow (null, null);
       scroll.add (sourceview);
       scroll.set_hexpand (true);
       scroll.set_vexpand (true);

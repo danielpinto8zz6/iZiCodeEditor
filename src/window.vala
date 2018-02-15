@@ -60,6 +60,12 @@ namespace iZiCodeEditor {
       { ACTION_COMMENT, action_comment }
     };
 
+    public Document current_doc {
+      get {
+        return notebook.current_doc;
+      }
+    }
+
     public ApplicationWindow (Gtk.Application app) {
 
       Object (
