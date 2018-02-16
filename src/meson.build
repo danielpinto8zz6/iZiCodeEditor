@@ -19,7 +19,6 @@ vala_args = [
     '--pkg=gee-0.8',
     '--pkg=vte-2.91',
     '--enable-checking',
-    '--thread'
 ]
 
 iZiCodeEditor = executable('iZiCodeEditor',

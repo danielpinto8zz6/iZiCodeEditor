@@ -2,9 +2,9 @@
 Type=Application
 Name=iZiCodeEditor
 Comment=Simple text editor
-Exec=iZiCodeEditor %F
+Exec=iZiCodeEditor %U
 Icon=accessories-text-editor
 Terminal=false
-Categories=GTK;Development;
+Categories=GNOME;GTK;Utility;TextEditor;WebDevelopment;
 MimeType=text/plain;application/x-desktop;application/xml;application/x-shellscript
 StartupNotify=true
