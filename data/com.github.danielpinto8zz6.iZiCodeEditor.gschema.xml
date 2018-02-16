@@ -119,6 +119,11 @@
       <summary>brackets-completion</summary>
       <description>Complete brackets while typing</description>
     </key>
+    <key name="restore-recent-files" type="b">
+      <default>true</default>
+      <summary>restore-recent-files</summary>
+      <description>Restore recent opened files when open program</description>
+    </key>
   </schema>
   <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.fonts-colors" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/fonts-colors/">
     <key name="font" type="s">

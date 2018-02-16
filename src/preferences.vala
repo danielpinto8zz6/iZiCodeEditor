@@ -20,6 +20,7 @@ namespace iZiCodeEditor {
     private Gtk.Switch button_status_bar;
     private Gtk.Switch button_terminal;
     private Gtk.Switch button_brackets_completion;
+    private Gtk.Switch button_restore_recents;
 
     private Gtk.ColorButton button_terminal_fg;
     private Gtk.ColorButton button_terminal_bg;
@@ -81,6 +82,8 @@ namespace iZiCodeEditor {
       var label_terminal_color_header = new Gtk.Label ("<b>Color</b>");
       var label_terminal_color_bg = new Gtk.Label ("Background Color");
       var label_terminal_color_fg = new Gtk.Label ("Foreground Color");
+      var label_recents_header = new Gtk.Label ("<b>Recents</b>");
+      var label_restore_recents = new Gtk.Label ("Restore recent files when open programm");
 
       label_font.set_halign (Gtk.Align.START);
       label_margin_pos.set_halign (Gtk.Align.START);
@@ -117,6 +120,8 @@ namespace iZiCodeEditor {
       label_terminal_color_header.set_halign (Gtk.Align.START);
       label_terminal_color_bg.set_halign (Gtk.Align.START);
       label_terminal_color_fg.set_halign (Gtk.Align.START);
+      label_restore_recents.set_halign (Gtk.Align.START);
+      label_recents_header.set_halign (Gtk.Align.START);
 
       label_font.set_hexpand (true);
       label_margin_pos.set_hexpand (true);
@@ -153,6 +158,8 @@ namespace iZiCodeEditor {
       label_terminal_color_header.set_hexpand (true);
       label_terminal_color_bg.set_hexpand (true);
       label_terminal_color_fg.set_hexpand (true);
+      label_recents_header.set_hexpand (true);
+      label_restore_recents.set_hexpand (true);
 
       label_font_header.set_use_markup (true);
       label_color_header.set_use_markup (true);
@@ -169,6 +176,7 @@ namespace iZiCodeEditor {
       label_brackets_completion_header.set_use_markup (true);
       label_terminal_font_header.set_use_markup (true);
       label_terminal_color_header.set_use_markup (true);
+      label_recents_header.set_use_markup (true);
 
       label_font_header.set_line_wrap (true);
       label_color_header.set_line_wrap (true);
@@ -185,6 +193,7 @@ namespace iZiCodeEditor {
       label_brackets_completion.set_line_wrap (true);
       label_terminal_font_header.set_line_wrap (true);
       label_terminal_color_header.set_line_wrap (true);
+      label_recents_header.set_line_wrap (true);
 
       // Buttons
       button_font = new Gtk.FontButton ();
@@ -208,6 +217,7 @@ namespace iZiCodeEditor {
       button_terminal_font = new Gtk.FontButton ();
       button_terminal_bg = new Gtk.ColorButton ();
       button_terminal_fg = new Gtk.ColorButton ();
+      button_restore_recents = new Gtk.Switch ();
 
       button_font.set_halign (Gtk.Align.END);
       button_margin_pos.set_halign (Gtk.Align.END);
@@ -229,6 +239,7 @@ namespace iZiCodeEditor {
       button_terminal_font.set_halign (Gtk.Align.END);
       button_terminal_bg.set_halign (Gtk.Align.END);
       button_terminal_fg.set_halign (Gtk.Align.END);
+      button_restore_recents.set_halign (Gtk.Align.END);
 
       var scroll_scheme = new Gtk.ScrolledWindow (null, null);
       scroll_scheme.add (widget_scheme);
@@ -259,6 +270,7 @@ namespace iZiCodeEditor {
       Application.settings_editor.bind ("highlight-matching-brackets", button_highlight_matching_brackets, "active", SettingsBindFlags.DEFAULT);
       Application.settings_terminal.bind ("terminal", button_terminal, "active", SettingsBindFlags.DEFAULT);
       Application.settings_editor.bind ("brackets-completion", button_brackets_completion, "active", SettingsBindFlags.DEFAULT);
+      Application.settings_editor.bind ("restore-recent-files", button_restore_recents, "active", SettingsBindFlags.DEFAULT);
       button_terminal_font.set_font_name (Application.settings_terminal.get_string ("font"));
       button_terminal_font.notify["font"].connect (() => {
         Application.settings_terminal.set_string ("font", button_terminal_font.get_font ().to_string ());
@@ -331,6 +343,9 @@ namespace iZiCodeEditor {
       grid_editor.attach (label_brackets_completion_header, 0, 9, 1, 1);
       grid_editor.attach (label_brackets_completion, 0, 10, 1, 1);
       grid_editor.attach (button_brackets_completion, 1, 10, 1, 1);
+      grid_editor.attach (label_recents_header, 0, 11, 1, 1);
+      grid_editor.attach (label_restore_recents, 0, 12, 1, 1);
+      grid_editor.attach (button_restore_recents, 1, 12, 1, 1);
       grid_editor.set_can_focus (false);
       grid_editor.set_margin_start (10);
       grid_editor.set_margin_end (10);
