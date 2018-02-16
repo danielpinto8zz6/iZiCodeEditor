@@ -215,9 +215,9 @@ namespace iZiCodeEditor {
 
       set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height"));
 
-      rightPaned.position = (Application.saved_state.get_int ("width") - 180);
-
-      mainPaned.position = (Application.saved_state.get_int ("height") - 150);
+      rightPaned.position = Application.saved_state.get_int ("left-paned-size");
+      leftPaned.position = Application.saved_state.get_int ("right-paned-size");
+      mainPaned.position = Application.saved_state.get_int ("main-paned-size");
 
       restore_recent_files ();
     }
@@ -412,6 +412,10 @@ namespace iZiCodeEditor {
       Application.saved_state.set_boolean ("maximized", is_maximized);
       Application.saved_state.set_int ("width", width);
       Application.saved_state.set_int ("height", height);
+      Application.saved_state.set_int ("left-paned-size", leftPaned.position);
+      Application.saved_state.set_int ("right-paned-size", rightPaned.position);
+      Application.saved_state.set_int ("main-paned-size", mainPaned.position);
+
       set_recent_files ();
       Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
     }

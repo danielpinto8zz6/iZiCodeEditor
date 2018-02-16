@@ -25,6 +25,21 @@
       <summary>active-tab</summary>
       <description>Active tab position</description>
     </key>
+    <key name="left-paned-size" type="i">
+      <default>125</default>
+      <summary></summary>
+      <description></description>
+    </key>
+    <key name="right-paned-size" type="i">
+      <default>125</default>
+      <summary></summary>
+      <description></description>
+    </key>
+    <key name="main-paned-size" type="i">
+      <default>125</default>
+      <summary></summary>
+      <description></description>
+    </key>
   </schema>
   <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.view" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/view/">
     <key name="numbers-show" type="b">
