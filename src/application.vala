@@ -6,7 +6,7 @@ namespace iZiCodeEditor {
   const string ICON = "accessories-text-editor";
   const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null };
 
-  private class Application : Gtk.Application {
+  public class Application : Gtk.Application {
 
     private ApplicationWindow window;
 
@@ -46,6 +46,17 @@ namespace iZiCodeEditor {
       flags |= ApplicationFlags.HANDLES_COMMAND_LINE;
 
       application_id = APPLICATION_ID;
+    }
+
+    public static Application _instance = null;
+
+    public static Application instance {
+      get {
+        if (_instance == null) {
+          _instance = new Application ();
+        }
+        return _instance;
+      }
     }
 
     private int _command_line (ApplicationCommandLine command_line) {
@@ -197,7 +208,7 @@ namespace iZiCodeEditor {
     }
 
     private static int main (string[] args) {
-      Application app = new Application ();
+      Application app = Application.instance;
       return app.run (args);
     }
   }

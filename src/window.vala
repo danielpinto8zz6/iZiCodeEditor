@@ -1,5 +1,6 @@
 namespace iZiCodeEditor {
   public class ApplicationWindow : Gtk.ApplicationWindow {
+    public weak Application app { get; construct; }
 
     public iZiCodeEditor.Notebook notebook;
     public Gtk.Notebook bottomBar;
@@ -69,7 +70,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    public ApplicationWindow (Gtk.Application app) {
+    public ApplicationWindow (Application app) {
 
       Object (
         application: app,
@@ -426,7 +427,7 @@ namespace iZiCodeEditor {
       string[] recent_files = {};
       for (int i = 0; i < notebook.docs.length (); i++) {
         var sel_doc = notebook.docs.nth_data (i);
-        if (sel_doc == null || sel_doc.file == null) {
+        if (sel_doc == null || sel_doc.is_file_temporary) {
           continue;
         }
         recent_files += sel_doc.file.get_uri ();

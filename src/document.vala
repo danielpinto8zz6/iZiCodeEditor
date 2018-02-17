@@ -18,6 +18,8 @@ namespace iZiCodeEditor {
       }
       set {
         sourcefile.set_location (value);
+        label.label = get_file_name ();
+        label.tooltip_text = get_file_path ();
       }
     }
 
@@ -30,6 +32,8 @@ namespace iZiCodeEditor {
     private bool ask_if_externally_modified = false;
     private bool ask_if_deleted = false;
 
+    public bool is_file_temporary = false;
+
     public unowned Notebook notebook { get; construct set; }
 
     public Document (File file, Notebook notebook) {
@@ -39,16 +43,13 @@ namespace iZiCodeEditor {
       open.begin ();
 
       sourceview.update_syntax_highlighting ();
-
-      label.label = get_file_name ();
-      label.tooltip_text = get_file_path ();
     }
 
     public Document.new_doc (Notebook notebook) {
       Object (notebook: notebook);
+      is_file_temporary = true;
 
       label.label = get_file_name ();
-      label.tooltip_text = get_file_path ();
     }
 
     construct {
@@ -226,7 +227,7 @@ namespace iZiCodeEditor {
     public async bool save () {
       if (!sourceview.buffer.get_modified ()) {
         return false;
-      } else if (file == null) {
+      } else if (is_file_temporary) {
         save_as.begin ();
       }
 
@@ -275,13 +276,13 @@ namespace iZiCodeEditor {
         file = File.new_for_uri (dialog.get_file ().get_uri ());
 
         sourceview.buffer.set_modified (true);
+
+        is_file_temporary = false;
+        
         var is_saved = yield save ();
 
         if (is_saved) {
           sourceview.update_syntax_highlighting ();
-
-          label.label = get_file_name ();
-          label.tooltip_text = get_file_path ();
         }
 
         dialog.destroy ();
@@ -306,11 +307,11 @@ namespace iZiCodeEditor {
     }
 
     public string get_file_name () {
-      return file != null ? file.get_basename () : "New document";
+      return !is_file_temporary ? file.get_basename () : "New document";
     }
 
     public string get_file_path () {
-      return file != null ? file.get_parse_name () : null;
+      return !is_file_temporary ? file.get_parse_name () : null;
     }
   }
 }

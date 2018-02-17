@@ -141,7 +141,7 @@ namespace iZiCodeEditor {
           continue;
         }
 
-        if (sel_doc.file != null && sel_doc.file.get_uri () == file.get_uri ()) {
+        if (!sel_doc.is_file_temporary && sel_doc.file.get_uri () == file.get_uri ()) {
           set_current_page (page_num (sel_doc));
           stderr.printf ("This file is already loaded: %s\n", file.get_parse_name ());
           return;
@@ -152,7 +152,7 @@ namespace iZiCodeEditor {
       add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
-      if (current != null && current.file == null && !current.sourceview.buffer.get_modified ()) {
+      if (current != null && current.is_file_temporary && !current.sourceview.buffer.get_modified ()) {
         close (current);
       }
     }
@@ -181,7 +181,7 @@ namespace iZiCodeEditor {
           continue;
         }
         if (sel_doc.sourceview.buffer.get_modified ()) {
-          if (sel_doc.file != null) {
+          if (!sel_doc.is_file_temporary) {
             sel_doc.save.begin ();
           } else {
             save_opened (sel_doc);
@@ -193,7 +193,7 @@ namespace iZiCodeEditor {
     public void text_wrap_mode () {
       for (int n = 0; n <= docs.length (); n++) {
         var sel_doc = docs.nth_data (n);
-        if (sel_doc == null && sel_doc.file == null) {
+        if (sel_doc == null && sel_doc.is_file_temporary) {
           continue;
         }
         if (sel_doc.sourceview.get_wrap_mode () == Gtk.WrapMode.WORD) {
