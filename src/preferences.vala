@@ -399,7 +399,7 @@ namespace iZiCodeEditor {
       content.add (pref_notebook);
     }
 
-    public void reset_all () {
+    private void reset_all () {
       var dialog = new Gtk.MessageDialog (get_toplevel () as Gtk.Window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
                                           "Are you sure you want to reset all preferences?");

@@ -14,9 +14,7 @@ namespace iZiCodeEditor {
 
     private Gtk.Button line_button;
 
-    private Gtk.Label status_label;
-
-    public Gtk.Label insmode_label;
+    private Gtk.Label insmode_label;
 
     private unowned Document ? doc = null;
 
@@ -28,9 +26,6 @@ namespace iZiCodeEditor {
     construct {
       manager = Gtk.SourceLanguageManager.get_default ();
 
-      status_label = new Gtk.Label ("");
-      set_center_widget (status_label);
-
       insmode_label = new Gtk.Label ("");
       insmode_label.width_request = 60;
       pack_end (insmode_label);
@@ -41,33 +36,24 @@ namespace iZiCodeEditor {
       language_popover ();
     }
 
-    public void status_messages (string message) {
-      status_label.set_label (message);
-      /* After 1.5 seconds clear message */
-      Timeout.add (1500, clear_status_messages);
-    }
-
-    private bool clear_status_messages () {
-      status_label.set_label ("");
-      return false;
-    }
-
-    public void update_statusbar (Document doc) {
+    public void set_doc (Document doc) {
       if (this.doc != null) {
         this.doc.sourceview.buffer.notify["cursor-position"].disconnect (update_statusbar_line);
+        this.doc.sourceview.notify["overwrite"].disconnect (update_statusbar_insmode);
       }
       this.doc = doc;
       update_statusbar_language ();
       update_statusbar_line ();
       update_statusbar_insmode ();
       this.doc.sourceview.buffer.notify["cursor-position"].connect (update_statusbar_line);
+      this.doc.sourceview.notify["overwrite"].connect (update_statusbar_insmode);
     }
 
     private void update_statusbar_insmode () {
       insmode_label.set_label (doc.sourceview.overwrite ? "OVR" : "INS");
     }
 
-    public void update_statusbar_line () {
+    private void update_statusbar_line () {
       var buffer = doc.sourceview.buffer;
       var position = doc.sourceview.buffer.cursor_position;
       Gtk.TextIter iter;
@@ -75,7 +61,7 @@ namespace iZiCodeEditor {
       line_button.set_label ("Ln %d, Col %d".printf (iter.get_line () + 1, iter.get_line_offset () + 1));
     }
 
-    public void update_statusbar_language () {
+    private void update_statusbar_language () {
       var language = doc.sourceview.language;
       if (language != null) {
         lang_button.set_label (language.name);

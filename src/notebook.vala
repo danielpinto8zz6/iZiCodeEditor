@@ -57,11 +57,11 @@ namespace iZiCodeEditor {
       docs.insert (doc, (int) new_pos);
     }
 
-    public void on_notebook_page_switched (Gtk.Widget page, uint page_num = 0) {
+    private void on_notebook_page_switched (Gtk.Widget page, uint page_num = 0) {
       var doc = (Document) page;
 
       window.headerbar.set_doc (doc);
-      window.status_bar.update_statusbar (doc);
+      window.status_bar.set_doc (doc);
     }
 
     private bool on_focus_in_event () {
@@ -73,7 +73,7 @@ namespace iZiCodeEditor {
       return false;
     }
 
-    public void on_tabs_changed () {
+    private void on_tabs_changed () {
       var pages = get_n_pages ();
       set_show_tabs (pages > 1);
       no_show_all = (pages == 0);
@@ -88,7 +88,7 @@ namespace iZiCodeEditor {
       doc.sourceview.grab_focus ();
     }
 
-    public void save_opened (Document doc) {
+    private void save_opened (Document doc) {
       set_current_page (page_num (doc));
       var dialog = new Gtk.MessageDialog (window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
@@ -190,7 +190,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    public void text_wrap_mode () {
+    private void text_wrap_mode () {
       for (int n = 0; n <= docs.length (); n++) {
         var sel_doc = docs.nth_data (n);
         if (sel_doc == null && sel_doc.is_file_temporary) {
@@ -204,7 +204,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    public void add_doc (Document doc) {
+    private void add_doc (Document doc) {
       append_page (doc, doc.get_tab_label ());
     }
   }

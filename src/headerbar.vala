@@ -1,11 +1,11 @@
 namespace iZiCodeEditor {
 
   public class HeaderBar : Gtk.HeaderBar {
-    public Gtk.Button searchButton;
+    private Gtk.Button searchButton;
     public iZiCodeEditor.Search search;
     public iZiCodeEditor.GoToLine gotoline;
 
-    public unowned Document ? doc = null;
+    private unowned Document ? doc = null;
 
     public unowned ApplicationWindow window { get; construct set; }
 

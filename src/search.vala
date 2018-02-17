@@ -65,7 +65,7 @@ namespace iZiCodeEditor {
     }
 
     // Search forward
-    public void forward () {
+    private void forward () {
       Gtk.TextIter sel_st;
       Gtk.TextIter sel_end;
       Gtk.TextIter match_st;
@@ -90,7 +90,7 @@ namespace iZiCodeEditor {
     }
 
     // Search backward
-    public void backward () {
+    private void backward () {
       Gtk.TextIter sel_st;
       Gtk.TextIter sel_end;
       Gtk.TextIter match_st;
@@ -119,7 +119,7 @@ namespace iZiCodeEditor {
         context.set_highlight (false);
     }
 
-    public bool on_search_entry_key_press (Gdk.EventKey event) {
+    private bool on_search_entry_key_press (Gdk.EventKey event) {
 
       string key = Gdk.keyval_name (event.keyval);
       if (event.state == Gdk.ModifierType.SHIFT_MASK) {

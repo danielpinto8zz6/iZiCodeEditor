@@ -52,6 +52,16 @@ namespace iZiCodeEditor {
       label.label = get_file_name ();
     }
 
+    static construct {
+      try {
+        var provider = new Gtk.CssProvider ();
+        var css_stuff = """ .close-tab-button { padding :0; } """;
+        provider.load_from_data (css_stuff, css_stuff.length);
+      } catch (Error e) {
+        stderr.printf ("Error: %s\n", e.message);
+      }
+    }
+
     construct {
 
       label = new Gtk.Label ("");
@@ -70,14 +80,6 @@ namespace iZiCodeEditor {
                                                       Gtk.IconSize.MENU);
       tab_button.set_relief (Gtk.ReliefStyle.NONE);
       tab_button.set_hexpand (false);
-
-      try {
-        var provider = new Gtk.CssProvider ();
-        var css_stuff = """ .close-tab-button { padding :0; } """;
-        provider.load_from_data (css_stuff, css_stuff.length);
-      } catch (Error e) {
-        stderr.printf ("Error: %s\n", e.message);
-      }
 
       tab_button.get_style_context ().add_class ("close-tab-button");
       tab_button.clicked.connect (() => {
@@ -119,6 +121,10 @@ namespace iZiCodeEditor {
       });
 
       sourceview.focus_in_event.connect (view_focused_in);
+
+      sourceview.buffer.modified_changed.connect (() => {
+        set_status ();
+      });
 
       attach (scroll, 0, 1, 1, 1);
       attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
@@ -194,7 +200,7 @@ namespace iZiCodeEditor {
       return false;
     }
 
-    public async bool open () {
+    private async bool open () {
       sourceview.sensitive = false;
 
       var buffer = new Gtk.SourceBuffer (null);
@@ -245,7 +251,7 @@ namespace iZiCodeEditor {
       return true;
     }
 
-    public void save_fallback () {
+    private void save_fallback () {
       var dialog = new Gtk.MessageDialog (window,
                                           Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE,
                                           "Error saving file %s.\n", file.get_parse_name ());
@@ -278,7 +284,7 @@ namespace iZiCodeEditor {
         sourceview.buffer.set_modified (true);
 
         is_file_temporary = false;
-        
+
         var is_saved = yield save ();
 
         if (is_saved) {

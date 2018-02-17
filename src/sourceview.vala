@@ -2,12 +2,12 @@ namespace iZiCodeEditor {
   public class SourceView : Gtk.SourceView {
 
     private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } };
-    Gee.HashMap<string, string> brackets;
-    Gee.HashMap<uint, string> keys;
-    const string[] valid_next_chars = {
+    private Gee.HashMap<string, string> brackets;
+    private Gee.HashMap<uint, string> keys;
+    private const string[] valid_next_chars = {
       "", " ", "\b", "\r", "\n", "\t", ",", ".", ";", ":"
     };
-    public Gtk.SourceLanguageManager manager;
+    private Gtk.SourceLanguageManager manager;
 
     public unowned Document doc { get; construct set; }
 
@@ -141,21 +141,10 @@ namespace iZiCodeEditor {
         }
         return false;
       });
-
-      window.status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
-
-      notify["overwrite"].connect (() => {
-        window.status_bar.insmode_label.set_label (overwrite ? "OVR" : "INS");
-      });
-
-      buffer.modified_changed.connect (() => {
-        doc.set_status ();
-      });
-
       show_all ();
     }
 
-    string get_next_char () {
+    private string get_next_char () {
       Gtk.TextIter start, end;
 
       buffer.get_selection_bounds (out start, out end);
@@ -164,7 +153,7 @@ namespace iZiCodeEditor {
       return buffer.get_text (start, end, true);
     }
 
-    string get_previous_char () {
+    private string get_previous_char () {
       Gtk.TextIter start, end;
 
       buffer.get_selection_bounds (out start, out end);
@@ -173,7 +162,7 @@ namespace iZiCodeEditor {
       return buffer.get_text (start, end, true);
     }
 
-    void on_backspace () {
+    private void on_backspace () {
       if (Application.settings_editor.get_boolean ("brackets-completion")) {
         if (!buffer.has_selection) {
           string left_char = get_previous_char ();
@@ -191,7 +180,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    void complete_brackets (string opening_bracket) {
+    private void complete_brackets (string opening_bracket) {
       Gtk.TextIter start, end;
       buffer.get_selection_bounds (out start, out end);
 
@@ -212,7 +201,7 @@ namespace iZiCodeEditor {
       buffer.end_user_action ();
     }
 
-    void skip_char () {
+    private void skip_char () {
       Gtk.TextIter start, end;
 
       buffer.get_selection_bounds (out start, out end);
@@ -220,13 +209,13 @@ namespace iZiCodeEditor {
       buffer.place_cursor (end);
     }
 
-    bool has_valid_next_char (string next_char) {
+    private bool has_valid_next_char (string next_char) {
       return next_char in valid_next_chars ||
              next_char in brackets.values ||
              brackets.has_key (next_char);
     }
 
-    bool on_key_press (Gdk.EventKey event) {
+    private bool on_key_press (Gdk.EventKey event) {
       if (Application.settings_editor.get_boolean ("brackets-completion")) {
         if (keys.has_key (event.keyval) &&
             !(Gdk.ModifierType.MOD1_MASK in event.state) &&
@@ -247,7 +236,7 @@ namespace iZiCodeEditor {
       return false;
     }
 
-    public string pango_font_description_to_css (string font) {
+    private string pango_font_description_to_css (string font) {
       StringBuilder str = new StringBuilder ();
 
       Pango.FontDescription desc = Pango.FontDescription.from_string (font);
@@ -535,7 +524,6 @@ namespace iZiCodeEditor {
     }
 
     public void on_toggle_comment () {
-
       Gtk.TextIter start, end;
       var sel = buffer.get_selection_bounds (out start, out end);
       var num_lines = 0;

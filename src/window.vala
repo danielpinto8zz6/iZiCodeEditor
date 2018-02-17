@@ -257,8 +257,8 @@ namespace iZiCodeEditor {
       });
     }
 
-    public void action_comment () {
-      notebook.current_doc.sourceview.on_toggle_comment ();
+    private void action_comment () {
+      current_doc.sourceview.on_toggle_comment ();
     }
 
     public void action_zoom_in () {
@@ -288,7 +288,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    public void handle_zoom (Gdk.ScrollDirection direction) {
+    private void handle_zoom (Gdk.ScrollDirection direction) {
       string font = get_current_font ();
       int font_size = (int) get_current_font_size ();
 
@@ -308,7 +308,7 @@ namespace iZiCodeEditor {
       Application.settings_fonts_colors.set_string ("font", new_font);
     }
 
-    public string get_current_font () {
+    private string get_current_font () {
       string font = Application.settings_fonts_colors.get_string ("font");
       string font_family = font.substring (0, font.last_index_of (" "));
       return font_family;
@@ -326,80 +326,80 @@ namespace iZiCodeEditor {
       return font_family;
     }
 
-    public void action_undo () {
+    private void action_undo () {
       if (notebook.get_n_pages () > 0) {
-        notebook.current_doc.sourceview.undo ();
+        current_doc.sourceview.undo ();
       }
     }
 
-    public void action_redo () {
+    private void action_redo () {
       if (notebook.get_n_pages () > 0) {
-        notebook.current_doc.sourceview.redo ();
+        current_doc.sourceview.redo ();
       }
     }
 
-    public void action_open () {
+    private void action_open () {
       notebook.open_dialog ();
     }
 
-    public void action_save () {
+    private void action_save () {
       if (notebook.get_n_pages () > 0) {
-        notebook.current_doc.save.begin ();
+        current_doc.save.begin ();
       }
     }
 
-    public void action_search () {
+    private void action_search () {
       if (notebook.get_n_pages () > 0) {
         headerbar.search.show ();
       }
     }
 
-    public void action_gotoline () {
+    private void action_gotoline () {
       if (notebook.get_n_pages () > 0) {
         headerbar.gotoline.show ();
       }
     }
 
-    public void action_new () {
+    private void action_new () {
       notebook.new_tab ();
     }
 
-    public void action_save_as () {
+    private void action_save_as () {
       if (notebook.get_n_pages () > 0) {
-        notebook.current_doc.save_as.begin ();
+        current_doc.save_as.begin ();
       }
     }
 
-    public void action_save_all () {
+    private void action_save_all () {
       if (notebook.get_n_pages () > 0) {
         notebook.save_all ();
       }
     }
 
-    public void action_replace () {
+    private void action_replace () {
       if (notebook.get_n_pages () > 0) {
         replace = new iZiCodeEditor.Replace (this);
         replace.show_all ();
       }
     }
 
-    public void action_close () {
+    private void action_close () {
       if (notebook.get_n_pages () > 0)
         notebook.close (notebook.get_nth_page (notebook.get_current_page ()));
     }
 
-    public void action_close_all () {
+    private void action_close_all () {
       if (notebook.get_n_pages () > 0) {
         notebook.close_all ();
       }
     }
 
-    public void action_preferences () {
+    private void action_preferences () {
       preferences = new iZiCodeEditor.Preferences (this);
       preferences.show_all ();
     }
 
-    public void action_about () {
+    private void action_about () {
       show_about ();
     }
 
@@ -423,7 +423,7 @@ namespace iZiCodeEditor {
       Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
     }
 
-    public void set_recent_files () {
+    private void set_recent_files () {
       string[] recent_files = {};
       for (int i = 0; i < notebook.docs.length (); i++) {
         var sel_doc = notebook.docs.nth_data (i);
@@ -435,7 +435,7 @@ namespace iZiCodeEditor {
       Application.saved_state.set_strv ("recent-files", recent_files);
     }
 
-    public void show_about () {
+    private void show_about () {
       var about = new Gtk.AboutDialog ();
       about.set_program_name (NAME);
       about.set_version (VERSION);
