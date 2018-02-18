@@ -219,13 +219,9 @@ namespace iZiCodeEditor {
       rightPaned.position = Application.saved_state.get_int ("left-paned-size");
       leftPaned.position = Application.saved_state.get_int ("right-paned-size");
       mainPaned.position = Application.saved_state.get_int ("main-paned-size");
-
-      if (Application.settings_editor.get_boolean ("restore-recent-files")) {
-        restore_recent_files ();
-      }
     }
 
-    private void restore_recent_files () {
+    public void restore_recent_files () {
       string[] recent_files = Application.saved_state.get_strv ("recent-files");
       if (recent_files.length > 0) {
         foreach (string uri in recent_files) {

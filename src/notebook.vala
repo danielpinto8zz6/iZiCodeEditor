@@ -62,6 +62,7 @@ namespace iZiCodeEditor {
 
       window.headerbar.set_doc (doc);
       window.status_bar.set_doc (doc);
+      doc.sourceview.grab_focus();
     }
 
     private bool on_focus_in_event () {
@@ -152,6 +153,7 @@ namespace iZiCodeEditor {
       add_doc (doc);
       set_current_page (page_num (doc));
       set_tab_reorderable (doc, true);
+
       if (current != null && current.is_file_temporary && !current.sourceview.buffer.get_modified ()) {
         close (current);
       }

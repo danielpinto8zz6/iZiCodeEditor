@@ -40,7 +40,13 @@ namespace iZiCodeEditor {
       Object (notebook: notebook,
               file: file);
 
-      open.begin ();
+      Idle.add_full (GLib.Priority.LOW, () => {
+        open.begin ((obj, res) => {
+          open.end (res);
+        });
+
+        return false;
+      });
 
       sourceview.update_syntax_highlighting ();
     }
@@ -218,12 +224,12 @@ namespace iZiCodeEditor {
 
       sourceview.buffer.set_modified (false);
 
-      sourceview.sensitive = true;
-
       Gtk.TextIter iter_st;
       sourceview.buffer.get_start_iter (out iter_st);
       sourceview.buffer.place_cursor (iter_st);
       sourceview.scroll_to_iter (iter_st, 0.10, false, 0, 0);
+
+      sourceview.sensitive = true;
 
       sourceview.grab_focus ();
 

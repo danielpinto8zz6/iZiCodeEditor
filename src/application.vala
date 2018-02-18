@@ -7,9 +7,6 @@ namespace iZiCodeEditor {
   const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null };
 
   public class Application : Gtk.Application {
-
-    private ApplicationWindow window;
-
     private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor");
     public static GLib.Settings settings_editor {
       get {
@@ -204,7 +201,21 @@ namespace iZiCodeEditor {
     }
 
     public override void activate () {
-      window = new ApplicationWindow (this);
+      // If there is no windows open, restore recent files, otherwise, open blank tab
+      if (get_last_window () == null) {
+        var window = this.new_window ();
+        window.show ();
+        if (settings_editor.get_boolean ("restore-recent-files")) {
+          window.restore_recent_files ();
+        }
+      } else {
+        var window = this.new_window ();
+        window.show ();
+      }
+    }
+
+    public ApplicationWindow new_window () {
+      return new ApplicationWindow (this);
     }
 
     private static int main (string[] args) {
