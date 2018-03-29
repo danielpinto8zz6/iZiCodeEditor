@@ -10,7 +10,14 @@ vala_sources = [
     'statusbar.vala',
     'terminal.vala',
     'window.vala',
-    'document.vala'
+    'document.vala',
+    'FolderManager/File.vala',
+    'FolderManager/FileItem.vala',
+    'FolderManager/FileView.vala',
+    'FolderManager/FolderItem.vala',
+    'FolderManager/Item.vala',
+    'FolderManager/MainFolderItem.vala',
+    'project_browser.vala'
 ]
 
 vala_args = [
@@ -25,4 +32,4 @@ iZiCodeEditor = executable('iZiCodeEditor',
                      vala_sources,
                      vala_args: vala_args,
                      install: true,
-                     dependencies : [gtk, sourceview, gee, vte])
+                     dependencies : [gtk, sourceview, gee, vte, granite])

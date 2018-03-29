@@ -6,6 +6,7 @@ gtk = dependency('gtk+-3.0')
 sourceview = dependency('gtksourceview-3.0')
 gee = dependency ('gee-0.8')
 vte = dependency ('vte-2.91')
+granite = dependency('granite')
 
 subdir('src')
 subdir('data')

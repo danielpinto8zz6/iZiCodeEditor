@@ -159,4 +159,11 @@
       <description>Terminal foreground color</description>
     </key>
   </schema>
+  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.folder-manager" path="/com/github/danielpinto8zz6/iZiCodeEditor/folder-manager/">
+    <key name="opened-folders" type="as">
+    <default>[]</default>
+    <summary>Opened folders.</summary>
+    <description>Opened folders that should be restored in startup</description>
+    </key>
+  </schema>
 </schemalist>
