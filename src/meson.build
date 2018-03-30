@@ -11,7 +11,8 @@ vala_sources = [
     'terminal.vala',
     'window.vala',
     'document.vala',
-    'comment.vala'
+    'comment.vala',
+    'zoom.vala'
 ]
 
 vala_args = [

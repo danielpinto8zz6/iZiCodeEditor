@@ -14,9 +14,6 @@ namespace iZiCodeEditor {
         private Gtk.Paned rightPaned;
         private Gtk.Paned mainPaned;
 
-        private int FONT_SIZE_MAX = 72;
-        private int FONT_SIZE_MIN = 7;
-
         public const string ACTION_PREFIX = "win.";
         public const string ACTION_NEXT_PAGE = "next-page";
         public const string ACTION_UNDO = "undo";
@@ -109,6 +106,7 @@ namespace iZiCodeEditor {
         }
 
         construct {
+            set_size_request (2000,200);
             files = new GLib.List<string>();
 
             // window
@@ -264,15 +262,15 @@ namespace iZiCodeEditor {
         }
 
         public void action_zoom_in () {
-            handle_zoom (Gdk.ScrollDirection.UP);
+            Zoom.handle_zoom (Gdk.ScrollDirection.UP);
         }
 
         public void action_zoom_out () {
-            handle_zoom (Gdk.ScrollDirection.DOWN);
+            Zoom.handle_zoom (Gdk.ScrollDirection.DOWN);
         }
 
         private void action_set_default_zoom () {
-            Application.settings_fonts_colors.set_string ("font", get_default_font () + " 14");
+            Zoom.set_default_zoom ();
         }
 
         private void on_bars_changed (Gtk.Notebook notebook) {
@@ -288,44 +286,6 @@ namespace iZiCodeEditor {
             } else {
                 notebook.next_page ();
             }
-        }
-
-        private void handle_zoom (Gdk.ScrollDirection direction) {
-            string font = get_current_font ();
-            int font_size = (int)get_current_font_size ();
-
-            if (direction == Gdk.ScrollDirection.DOWN) {
-                font_size--;
-                if (font_size < FONT_SIZE_MIN) {
-                    return;
-                }
-            } else if (direction == Gdk.ScrollDirection.UP) {
-                font_size++;
-                if (font_size > FONT_SIZE_MAX) {
-                    return;
-                }
-            }
-
-            string new_font = font + " " + font_size.to_string ();
-            Application.settings_fonts_colors.set_string ("font", new_font);
-        }
-
-        private string get_current_font () {
-            string font = Application.settings_fonts_colors.get_string ("font");
-            string font_family = font.substring (0, font.last_index_of (" "));
-            return font_family;
-        }
-
-        public double get_current_font_size () {
-            string font = Application.settings_fonts_colors.get_string ("font");
-            string font_size = font.substring (font.last_index_of (" ") + 1);
-            return double.parse (font_size);
-        }
-
-        private string get_default_font () {
-            string font = Application.settings_fonts_colors.get_string ("font");
-            string font_family = font.substring (0, font.last_index_of (" "));
-            return font_family;
         }
 
         private void action_undo () {
