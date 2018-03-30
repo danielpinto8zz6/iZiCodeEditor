@@ -252,7 +252,15 @@ namespace iZiCodeEditor {
         }
 
         private void action_comment () {
-            current_doc.sourceview.on_toggle_comment ();
+            var doc = current_doc;
+            if (doc == null) {
+                return;
+            }
+
+            var buffer = doc.sourceview.buffer;
+            if (buffer is Gtk.SourceBuffer) {
+                Comment.toggle_comment (buffer as Gtk.SourceBuffer);
+            }
         }
 
         public void action_zoom_in () {
