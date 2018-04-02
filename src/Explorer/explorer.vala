@@ -32,7 +32,7 @@ namespace iZiCodeEditor {
             Folder folder = new Folder (path);
             opened_folders.append (folder);
             folder_view.add (folder);
-            folder.removed.connect (close_folder);
+            folder.closed.connect (close_folder);
             folder.file_clicked.connect ((path) => {
                 file_clicked (path);
             });
