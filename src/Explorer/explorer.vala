@@ -55,8 +55,13 @@ namespace iZiCodeEditor {
             try {
                 File file = File.new_for_path (path);
                 FileInfo info = file.query_info ("standard::*", 0);
-                if (info.get_file_type () == FileType.DIRECTORY)
+
+                if (info.get_is_hidden () || info.get_is_backup ()) {
+                    return false;
+                }
+                if (info.get_file_type () == FileType.DIRECTORY) {
                     return true;
+                }
             } catch (Error error) {
                 warning (error.message);
             }

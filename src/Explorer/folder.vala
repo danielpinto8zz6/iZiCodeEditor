@@ -114,9 +114,12 @@ namespace iZiCodeEditor {
         }
 
         private void add_file (File file, Gtk.TreeIter ? parent = null, Cancellable ?  cancellable = null, bool is_root_dir = false) throws Error {
+            FileInfo info = file.query_info ("standard::*", 0);
+            if (!is_valid (info)) {
+                return;
+            }
             Gtk.TreeIter iter;
             store.append (out iter, parent);
-            var info = file.query_info ("standard::*", 0);
             bool is_dir = is_directory (info);
             store.set (iter, 0, info.get_icon (), 1, info.get_display_name (), 2, file.get_parse_name (), 3, is_dir, 4, is_root_dir);
             if (is_dir) {
@@ -129,6 +132,23 @@ namespace iZiCodeEditor {
                     throw new IOError.CANCELLED ("Operation was cancelled");
                 }
             }
+        }
+
+        private bool is_valid (FileInfo info) {
+            if (info.get_is_backup ()) {
+                return false;
+            }
+            if (is_directory (info)) {
+                if (info.get_is_hidden ()) {
+                    return false;
+                }
+                return true;
+            }
+            if (info.get_file_type () == FileType.REGULAR &&
+                ContentType.is_a (info.get_content_type (), "text/*")) {
+                return true;
+            }
+            return false;
         }
 
         private void start_monitoring (File folder) {
@@ -364,11 +384,13 @@ namespace iZiCodeEditor {
         }
 
         private void open_externally (string uri) {
-            try {
-                GLib.AppInfo.launch_default_for_uri (uri,null);
-            } catch (Error error) {
-                warning (error.message);
-            }
+            AppInfo.launch_default_for_uri_async.begin (uri, null, null, (obj, res) => {
+                try {
+                    AppInfo.launch_default_for_uri_async.end (res);
+                } catch (Error error) {
+                    warning (error.message);
+                }
+            });
         }
 
         private void rename (File file, string new_name) {

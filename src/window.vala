@@ -330,7 +330,8 @@ namespace iZiCodeEditor {
             chooser.select_multiple = true;
 
             if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-                chooser.get_files ().foreach ((file) => {
+                SList<File> files = chooser.get_files ();
+                files.foreach ((file) => {
                     explorer.open_folder (file.get_path ());
                 });
             }
