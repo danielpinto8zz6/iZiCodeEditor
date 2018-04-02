@@ -12,7 +12,9 @@ vala_sources = [
     'window.vala',
     'document.vala',
     'comment.vala',
-    'zoom.vala'
+    'zoom.vala',
+    'Explorer/explorer.vala',
+    'Explorer/folder.vala'
 ]
 
 vala_args = [

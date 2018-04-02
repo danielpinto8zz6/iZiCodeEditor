@@ -20,6 +20,11 @@
       <summary>Recently opened files</summary>
       <description>Recently opened files</description>
     </key>
+    <key name="recent-folders" type="as">
+      <default>[]</default>
+      <summary>Recently opened folders.</summary>
+      <description>Recently opened folders</description>
+    </key>
     <key name="active-tab" type="u">
       <default>0</default>
       <summary>active-tab</summary>

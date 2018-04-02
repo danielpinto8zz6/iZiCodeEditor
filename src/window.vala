@@ -4,11 +4,13 @@ namespace iZiCodeEditor {
 
         public iZiCodeEditor.Notebook notebook;
         public Gtk.Notebook bottomBar;
+        public Gtk.Notebook leftBar;
         private iZiCodeEditor.Terminal terminal;
         public iZiCodeEditor.HeaderBar headerbar;
         public iZiCodeEditor.StatusBar status_bar;
         public iZiCodeEditor.Replace replace;
         public iZiCodeEditor.Preferences preferences;
+        private iZiCodeEditor.Explorer explorer;
         public GLib.List<string> files;
         private Gtk.Paned leftPaned;
         private Gtk.Paned rightPaned;
@@ -19,6 +21,7 @@ namespace iZiCodeEditor {
         public const string ACTION_UNDO = "undo";
         public const string ACTION_REDO = "redo";
         public const string ACTION_OPEN = "open";
+        public const string ACTION_OPEN_FOLDER = "open-folder";
         public const string ACTION_SAVE = "save";
         public const string ACTION_SEARCH = "search";
         public const string ACTION_GOTOLINE = "go-to";
@@ -43,6 +46,7 @@ namespace iZiCodeEditor {
             { ACTION_UNDO, action_undo },
             { ACTION_REDO, action_redo },
             { ACTION_OPEN, action_open },
+            { ACTION_OPEN_FOLDER, action_open_folder },
             { ACTION_SAVE, action_save },
             { ACTION_SEARCH, action_search },
             { ACTION_GOTOLINE, action_gotoline },
@@ -78,6 +82,7 @@ namespace iZiCodeEditor {
             action_accelerators.set (ACTION_UNDO,         "<Control>Z");
             action_accelerators.set (ACTION_REDO,         "<Control>Y");
             action_accelerators.set (ACTION_OPEN,         "<Control>O");
+            action_accelerators.set (ACTION_OPEN_FOLDER,  "<Control><Shift>O");
             action_accelerators.set (ACTION_SAVE,         "<Control>S");
             action_accelerators.set (ACTION_NEW,          "<Control>N");
             action_accelerators.set (ACTION_SAVE_ALL,     "<Control><Shift>S");
@@ -106,7 +111,6 @@ namespace iZiCodeEditor {
         }
 
         construct {
-            set_size_request (2000,200);
             files = new GLib.List<string>();
 
             // window
@@ -128,6 +132,12 @@ namespace iZiCodeEditor {
             content.width_request = 200;
             content.pack_start (notebook, true, true, 0);
 
+            //  // Left Bar
+            leftBar = new Gtk.Notebook ();
+            leftBar.no_show_all = true;
+            leftBar.page_added.connect (() => { on_bars_changed (leftBar); });
+            leftBar.page_removed.connect (() => { on_bars_changed (leftBar); });
+
             // Bottom Bar
             bottomBar = new Gtk.Notebook ();
             bottomBar.no_show_all = true;
@@ -136,7 +146,7 @@ namespace iZiCodeEditor {
 
             leftPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             leftPaned.position = 180;
-            // leftPaned.pack1 (leftBar, false, false) ;
+            leftPaned.pack1 (leftBar, false, false);
             leftPaned.pack2 (content, true, false);
 
             rightPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -146,6 +156,14 @@ namespace iZiCodeEditor {
             mainPaned = new Gtk.Paned (Gtk.Orientation.VERTICAL);
             mainPaned.pack1 (rightPaned, true, false);
             mainPaned.pack2 (bottomBar, false, false);
+
+            explorer = new iZiCodeEditor.Explorer ();
+            explorer.restore_recent_folders ();
+            explorer.file_clicked.connect ((path) => {
+                notebook.open (File.new_for_path (path));
+            });
+
+            leftBar.append_page (explorer, new Gtk.Label ("Explorer"));
 
             terminal = new iZiCodeEditor.Terminal ();
 
@@ -304,6 +322,22 @@ namespace iZiCodeEditor {
             notebook.open_dialog ();
         }
 
+        private void action_open_folder () {
+            var chooser = new Gtk.FileChooserDialog (
+                "Select a folder.", this, Gtk.FileChooserAction.SELECT_FOLDER,
+                "Cancel", Gtk.ResponseType.CANCEL,
+                "Open", Gtk.ResponseType.ACCEPT);
+            chooser.select_multiple = true;
+
+            if (chooser.run () == Gtk.ResponseType.ACCEPT) {
+                chooser.get_files ().foreach ((file) => {
+                    explorer.open_folder (file.get_path ());
+                });
+            }
+
+            chooser.destroy ();
+        }
+
         private void action_save () {
             if (notebook.get_n_pages () > 0) {
                 current_doc.save.begin ();
@@ -361,6 +395,7 @@ namespace iZiCodeEditor {
             preferences.show_all ();
         }
 
+
         private void action_about () {
             show_about ();
         }
@@ -382,6 +417,8 @@ namespace iZiCodeEditor {
             Application.saved_state.set_int ("main-paned-size",  mainPaned.position);
 
             set_recent_files ();
+            explorer.set_recent_folders ();
+
             Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
         }
 
