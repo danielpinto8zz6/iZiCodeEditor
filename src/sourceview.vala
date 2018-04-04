@@ -79,7 +79,8 @@ namespace iZiCodeEditor {
             } else {
                 set_wrap_mode (Gtk.WrapMode.NONE);
             }
-            Application.settings_view.changed["pattern-show"].connect (() => {
+
+            Application.settings_view.changed["text-wrap"].connect (() => {
                 if (Application.settings_view.get_boolean ("text-wrap")) {
                     set_wrap_mode (Gtk.WrapMode.WORD);
                 } else {

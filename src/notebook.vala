@@ -20,10 +20,6 @@ namespace iZiCodeEditor {
         construct {
             docs = new GLib.List<Document> ();
 
-            Application.settings_view.changed["text-wrap"].connect (() => {
-                text_wrap_mode ();
-            });
-
             scrollable = true;
 
             on_tabs_changed ();
@@ -143,20 +139,6 @@ namespace iZiCodeEditor {
         public void close_all () {
             for (uint i = docs.length (); i > 0; i--) {
                 close (current_doc);
-            }
-        }
-
-        private void text_wrap_mode () {
-            for (int n = 0; n <= docs.length (); n++) {
-                var sel_doc = docs.nth_data (n);
-                if (sel_doc == null && sel_doc.is_file_temporary) {
-                    continue;
-                }
-                if (sel_doc.sourceview.get_wrap_mode () == Gtk.WrapMode.WORD) {
-                    sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.NONE);
-                } else {
-                    sel_doc.sourceview.set_wrap_mode (Gtk.WrapMode.WORD);
-                }
             }
         }
 
