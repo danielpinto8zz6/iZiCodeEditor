@@ -210,43 +210,11 @@ namespace iZiCodeEditor {
 
             support_drag_and_drop ();
 
-            this.delete_event.connect (() => {
-                action_quit ();
-                return true;
-            });
+            create_unsaved_documents_directory ();
 
             restore_saved_state ();
 
-            if (notebook.get_n_pages () == 0)
-                action_new ();
-
             show ();
-        }
-
-        private void restore_saved_state () {
-            if (Application.saved_state.get_boolean ("maximized")) {
-                maximize ();
-            }
-
-            set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height"));
-
-            rightPaned.position = Application.saved_state.get_int ("left-paned-size");
-            leftPaned.position = Application.saved_state.get_int ("right-paned-size");
-            mainPaned.position = Application.saved_state.get_int ("main-paned-size");
-        }
-
-        public void restore_recent_files () {
-            string[] recent_files = Application.saved_state.get_strv ("recent-files");
-            if (recent_files.length > 0) {
-                foreach (string uri in recent_files) {
-                    if (uri != "") {
-                        var file = File.new_for_uri (uri);
-                        if (file.query_exists ())
-                            notebook.open (file);
-                    }
-                }
-                notebook.set_current_page ((int)Application.saved_state.get_uint ("active-tab"));
-            }
         }
 
         private void support_drag_and_drop () {
@@ -340,8 +308,12 @@ namespace iZiCodeEditor {
         }
 
         private void action_save () {
-            if (notebook.get_n_pages () > 0) {
-                current_doc.save.begin ();
+            if (current_doc != null) {
+                if (current_doc.is_file_temporary == true) {
+                    action_save_as ();
+                } else {
+                    current_doc.save.begin ();
+                }
             }
         }
 
@@ -362,14 +334,22 @@ namespace iZiCodeEditor {
         }
 
         private void action_save_as () {
-            if (notebook.get_n_pages () > 0) {
+            if (current_doc != null) {
                 current_doc.save_as.begin ();
             }
         }
 
         private void action_save_all () {
             if (notebook.get_n_pages () > 0) {
-                notebook.save_all ();
+                foreach (var doc in notebook.docs) {
+                    if (doc != null) {
+                        if (doc.is_file_temporary == true) {
+                            action_save_as ();
+                        } else {
+                            doc.save.begin ();
+                        }
+                    }
+                }
             }
         }
 
@@ -403,8 +383,12 @@ namespace iZiCodeEditor {
 
         private void action_quit () {
             set_saved_state ();
-            notebook.close_all ();
             destroy ();
+        }
+
+        protected override bool delete_event (Gdk.EventAny event) {
+            set_saved_state ();
+            return false;
         }
 
         private void set_saved_state () {
@@ -417,22 +401,77 @@ namespace iZiCodeEditor {
             Application.saved_state.set_int ("right-paned-size", rightPaned.position);
             Application.saved_state.set_int ("main-paned-size",  mainPaned.position);
 
-            set_recent_files ();
             explorer.set_recent_folders ();
 
-            Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+            save_opened ();
+
+            if (set_opened_docs ()) {
+                Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+            }
         }
 
-        private void set_recent_files () {
-            string[] recent_files = { };
-            for (int i = 0; i < notebook.docs.length (); i++) {
-                var sel_doc = notebook.docs.nth_data (i);
-                if (sel_doc == null || sel_doc.is_file_temporary) {
-                    continue;
+        private void save_opened () {
+            if (notebook.docs.length () > 0) {
+                foreach (var doc in notebook.docs) {
+                    doc.save.begin ();
                 }
-                recent_files += sel_doc.file.get_uri ();
             }
-            Application.saved_state.set_strv ("recent-files", recent_files);
+        }
+
+        private bool set_opened_docs () {
+            if (notebook.docs.length () > 0) {
+                string[] recent_files = { };
+
+                foreach (var doc in notebook.docs) {
+                    if (doc.file != null && doc.exists ()) {
+                        recent_files += doc.file.get_uri ();
+                    }
+                }
+                Application.saved_state.set_strv ("recent-files", recent_files);
+                return true;
+            }
+            return false;
+        }
+
+        private void create_unsaved_documents_directory () {
+            File dir = File.new_for_path (Application.instance.unsaved_files_directory);
+            if (!dir.query_exists ()) {
+                try {
+                    dir.make_directory_with_parents ();
+                } catch (Error e) {
+                    critical ("Unable to create the 'unsaved' directory: '%s': %s", dir.get_path (), e.message);
+                }
+            }
+        }
+
+        private void restore_saved_state () {
+            if (Application.saved_state.get_boolean ("maximized")) {
+                maximize ();
+            }
+
+            set_default_size (Application.saved_state.get_int ("width"), Application.saved_state.get_int ("height"));
+
+            rightPaned.position = Application.saved_state.get_int ("left-paned-size");
+            leftPaned.position = Application.saved_state.get_int ("right-paned-size");
+            mainPaned.position = Application.saved_state.get_int ("main-paned-size");
+        }
+
+        public void restore_recent_files () {
+            string[] recent_files = Application.saved_state.get_strv ("recent-files");
+            if (recent_files.length > 0) {
+                foreach (string uri in recent_files) {
+                    if (uri != "") {
+                        File file;
+                        if (Uri.parse_scheme (uri) != null) {
+                            file = File.new_for_uri (uri);
+                        } else {
+                            file = File.new_for_commandline_arg (uri);
+                        }
+                        notebook.open (file);
+                    }
+                }
+                notebook.set_current_page ((int)Application.saved_state.get_uint ("active-tab"));
+            }
         }
 
         private void show_about () {

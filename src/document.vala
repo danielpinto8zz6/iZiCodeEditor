@@ -32,7 +32,18 @@ namespace iZiCodeEditor {
         private bool ask_if_externally_modified = false;
         private bool ask_if_deleted = false;
 
-        public bool is_file_temporary = false;
+        public bool is_file_temporary {
+            get {
+                return file.get_path ().has_prefix (Application.instance.unsaved_files_directory);
+            }
+        }
+        public bool saved = true;
+        private bool loaded = false;
+
+        private Cancellable save_cancellable;
+        private Cancellable load_cancellable;
+
+        public signal void doc_closed ();
 
         public unowned Notebook notebook { get; construct set; }
 
@@ -53,9 +64,15 @@ namespace iZiCodeEditor {
 
         public Document.new_doc (Notebook notebook) {
             Object (notebook: notebook);
-            is_file_temporary = true;
 
-            label.label = get_file_name ();
+            file = get_temporary_file ();
+
+            Idle.add_full (GLib.Priority.LOW, () => {
+                open.begin ((obj, res) => {
+                    open.end (res);
+                });
+                return false;
+            });
         }
 
         static construct {
@@ -125,19 +142,16 @@ namespace iZiCodeEditor {
                 }
             });
 
-            sourceview.focus_in_event.connect (view_focused_in);
-
-            sourceview.buffer.modified_changed.connect (() => {
-                set_status ();
-            });
-
             attach (scroll, 0, 1, 1, 1);
             attach_next_to (source_map, scroll, Gtk.PositionType.RIGHT, 1, 1);
 
             show_all ();
         }
 
-        private bool view_focused_in () {
+        private bool check_file () {
+            if (!loaded) {
+                return false;
+            }
             sourcefile.check_file_on_disk ();
 
             if (!ask_if_deleted && sourcefile.is_deleted ()) {
@@ -205,23 +219,53 @@ namespace iZiCodeEditor {
             return false;
         }
 
-        private async bool open () {
+        private async void open () {
+            if (load_cancellable != null) {
+                load_cancellable.cancel ();
+            }
+
+            load_cancellable = new Cancellable ();
+
+            if (!exists (load_cancellable)) {
+                try {
+                    FileUtils.set_contents (file.get_path (), "");
+                } catch (FileError error) {
+                    warning ("Cannot create file \"%s\": %s", get_file_name (), error.message);
+                    return;
+                }
+            }
+
             sourceview.sensitive = false;
+            loaded = false;
+
+            while (Gtk.events_pending ()) {
+                Gtk.main_iteration ();
+            }
 
             var buffer = new Gtk.SourceBuffer (null);
 
             try {
                 var source_file_loader = new Gtk.SourceFileLoader (buffer, sourcefile);
-                yield source_file_loader.load_async (GLib.Priority.DEFAULT, null, null);
-
+                yield source_file_loader.load_async (GLib.Priority.LOW, load_cancellable, null);
                 sourceview.buffer.text = buffer.text;
+                loaded = true;
             } catch (Error e) {
                 sourceview.buffer.text = "";
                 critical (e.message);
-                return false;
+                return;
+            } finally {
+                load_cancellable = null;
             }
 
+            sourceview.focus_in_event.connect (check_file);
+
             sourceview.buffer.set_modified (false);
+
+            sourceview.buffer.modified_changed.connect (() => {
+                if (sourceview.buffer.get_modified ()) {
+                    set_saved_status (false);
+                }
+            });
 
             Gtk.TextIter iter_st;
             sourceview.buffer.get_start_iter (out iter_st);
@@ -231,51 +275,43 @@ namespace iZiCodeEditor {
             sourceview.sensitive = true;
 
             sourceview.grab_focus ();
-
-            return true;
         }
 
         public async bool save () {
-            if (!sourceview.buffer.get_modified ()) {
+            if (!sourceview.buffer.get_modified () || loaded == false) {
                 return false;
-            } else if (is_file_temporary) {
-                save_as.begin ();
             }
+
+            save_cancellable.cancel ();
+            save_cancellable = new GLib.Cancellable ();
+
+            var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile);
 
             try {
-                var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile);
-
-                yield source_file_saver.save_async (GLib.Priority.DEFAULT, null, null);
+                print ("I came here");
+                yield source_file_saver.save_async (GLib.Priority.DEFAULT, save_cancellable, null);
+                print ("But I never passed");
             } catch (Error e) {
-                save_fallback ();
-                stderr.printf ("error: %s\n", e.message);
+                warning ("Cannot save \"%s\": %s", get_file_name (), e.message);
                 return false;
             }
+
             sourceview.buffer.set_modified (false);
+
+            set_saved_status (true);
 
             return true;
         }
 
-        private void save_fallback () {
-            var dialog = new Gtk.MessageDialog (window,
-                                                Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.NONE,
-                                                "Error saving file %s.\n", file.get_parse_name ());
-            dialog.add_button ("Don't save",          Gtk.ResponseType.NO);
-            dialog.add_button ("Select New Location", Gtk.ResponseType.YES);
-            dialog.set_resizable (false);
-            dialog.set_default_response (Gtk.ResponseType.YES);
-            int response = dialog.run ();
-            switch (response) {
-            case Gtk.ResponseType.NO :
-                break;
-            case Gtk.ResponseType.YES :
-                save_as.begin ();
-                break;
-            }
-            dialog.destroy ();
-        }
-
         public async bool save_as () {
+            if (!loaded) {
+                return false;
+            }
+
+            bool success = false;
+            bool is_current_file_temporary = is_file_temporary;
+            string current_file = file.get_path ();
+
             var dialog = new Gtk.FileChooserDialog ("Save As...", window,
                                                     Gtk.FileChooserAction.SAVE,
                                                     "Cancel", Gtk.ResponseType.CANCEL,
@@ -286,26 +322,36 @@ namespace iZiCodeEditor {
             if (dialog.run () == Gtk.ResponseType.ACCEPT) {
                 file = File.new_for_uri (dialog.get_file ().get_uri ());
 
+                success = true;
+            }
+
+            if (success) {
                 sourceview.buffer.set_modified (true);
-
-                is_file_temporary = false;
-
                 var is_saved = yield save ();
 
-                if (is_saved) {
-                    sourceview.update_syntax_highlighting ();
+                if (is_saved && is_current_file_temporary) {
+                    try {
+                        File.new_for_path (current_file).delete ();
+                    } catch (Error err) {
+                        message ("Temporary file cannot be deleted: %s", current_file);
+                    }
                 }
 
-                dialog.destroy ();
+                sourceview.update_syntax_highlighting ();
             }
-            return true;
+
+            dialog.destroy ();
+
+            return success;
         }
 
-        public void set_status () {
+        public void set_saved_status (bool val) {
+            saved = val;
+
             string unsaved_identifier = "* ";
 
-            if (sourceview.buffer.get_modified ()) {
-                if (!(unsaved_identifier in name)) {
+            if (!val) {
+                if (!(unsaved_identifier in label.label)) {
                     label.label = unsaved_identifier + label.label;
                 }
             } else {
@@ -318,11 +364,103 @@ namespace iZiCodeEditor {
         }
 
         public string get_file_name () {
-            return !is_file_temporary ? file.get_basename () : "New document";
+            return file.get_basename ();
         }
 
         public string get_file_path () {
             return !is_file_temporary ? file.get_parse_name () : null;
+        }
+
+        private File get_temporary_file () {
+            File folder = File.new_for_path (Application.instance.unsaved_files_directory);
+
+            int n = 1;
+
+            File new_file = folder.get_child ("Untitled_%d".printf (n));
+
+            while (new_file.query_exists ()) {
+                new_file = folder.get_child ("Untitled_%d".printf (n));
+                n++;
+            }
+
+            new_file.create_async.begin (0, Priority.DEFAULT, null, (obj, res) => {
+                try {
+                    new_file.create_async.end (res);
+                } catch (Error error) {
+                    warning (error.message);
+                }
+            });
+
+            return new_file;
+        }
+
+        private bool delete_temporary_file (bool force = false) {
+            if (!is_file_temporary || (sourceview.buffer.text.length > 0 && !force)) {
+                return false;
+            }
+
+            try {
+                file.delete ();
+                return true;
+            } catch (Error e) {
+                warning ("Cannot delete temporary file \"%s\": %s", file.get_path (), e.message);
+            }
+
+            return false;
+        }
+
+        public bool close () {
+            if (!loaded) {
+                load_cancellable.cancel ();
+                return true;
+            }
+
+            bool ret = true;
+
+            if (!saved || (is_file_temporary && !delete_temporary_file ())) {
+                var dialog = new Gtk.MessageDialog (window, Gtk.DialogFlags.MODAL,
+                                                    Gtk.MessageType.WARNING, Gtk.ButtonsType.NONE, "");
+                dialog.type_hint = Gdk.WindowTypeHint.DIALOG;
+                dialog.deletable = false;
+
+                dialog.use_markup = true;
+
+                dialog.text = ("<b>Save changes to document %s before closing?</b>").printf (get_file_name ());
+
+                dialog.add_button ("Close without saving", Gtk.ResponseType.NO);
+                dialog.add_button ("Cancel",               Gtk.ResponseType.CANCEL);
+                dialog.add_button ("Save",                 Gtk.ResponseType.YES);
+                dialog.set_default_response (Gtk.ResponseType.ACCEPT);
+
+                int response = dialog.run ();
+                switch (response) {
+                case Gtk.ResponseType.CANCEL :
+                case Gtk.ResponseType.DELETE_EVENT :
+                    ret = false;
+                    break;
+                case Gtk.ResponseType.YES :
+                    if (is_file_temporary)
+                        save_as.begin ();
+                    else
+                        save.begin ();
+                    break;
+                case Gtk.ResponseType.NO :
+                    if (is_file_temporary)
+                        delete_temporary_file (true);
+                    break;
+                }
+                dialog.destroy ();
+            }
+
+            if (ret) {
+                doc_closed ();
+            }
+
+            return ret;
+        }
+
+        public bool exists (Cancellable ? cancellable = null) {
+            return file.query_exists (cancellable);
         }
     }
 }

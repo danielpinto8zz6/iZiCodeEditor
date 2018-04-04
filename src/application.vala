@@ -7,6 +7,9 @@ namespace iZiCodeEditor {
     const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null };
 
     public class Application : Gtk.Application {
+        public string unsaved_files_directory { get { return _unsaved_files_directory; } }
+        private static string _unsaved_files_directory;
+
         private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor");
         public static GLib.Settings settings_editor {
             get {
@@ -43,6 +46,8 @@ namespace iZiCodeEditor {
             flags |= ApplicationFlags.HANDLES_COMMAND_LINE;
 
             application_id = APPLICATION_ID;
+
+            _unsaved_files_directory = Path.build_filename (Environment.get_user_data_dir (), NAME, "unsaved");
         }
 
         public static Application _instance = null;

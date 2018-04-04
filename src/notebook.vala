@@ -38,9 +38,6 @@ namespace iZiCodeEditor {
             docs.remove (doc);
             doc.sourceview.focus_in_event.disconnect (on_focus_in_event);
             on_tabs_changed ();
-            if (get_n_pages () == 0) {
-                new_tab ();
-            }
         }
 
         private void on_doc_added (Gtk.Widget tab, uint page_num) {
@@ -87,29 +84,6 @@ namespace iZiCodeEditor {
             set_current_page (page_num (doc));
             set_tab_reorderable (doc, true);
             doc.sourceview.grab_focus ();
-        }
-
-        private void save_opened (Document doc) {
-            set_current_page (page_num (doc));
-            var dialog = new Gtk.MessageDialog (window,
-                                                Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
-                                                "The file '%s' is not saved.\nDo you want to save it?", doc.get_file_name ());
-            dialog.add_button ("Don't save", Gtk.ResponseType.NO);
-            dialog.add_button ("Cancel",     Gtk.ResponseType.CANCEL);
-            dialog.add_button ("Save",       Gtk.ResponseType.YES);
-            dialog.set_resizable (false);
-            dialog.set_default_response (Gtk.ResponseType.YES);
-            int response = dialog.run ();
-            switch (response) {
-            case Gtk.ResponseType.NO :
-                break;
-            case Gtk.ResponseType.CANCEL :
-                break;
-            case Gtk.ResponseType.YES :
-                doc.save.begin ();
-                break;
-            }
-            dialog.destroy ();
         }
 
         public void open_dialog () {
@@ -162,33 +136,13 @@ namespace iZiCodeEditor {
         public void close (Gtk.Widget tab) {
             var doc = (Document)tab;
 
-            if (doc.sourceview.buffer.get_modified ()) {
-                save_opened (doc);
-                remove_page (page_num (doc));
-            } else {
-                remove_page (page_num (doc));
-            }
+            doc.close ();
+            remove_page (page_num (doc));
         }
 
         public void close_all () {
             for (uint i = docs.length (); i > 0; i--) {
                 close (current_doc);
-            }
-        }
-
-        public void save_all () {
-            for (int n = 0; n <= docs.length (); n++) {
-                var sel_doc = docs.nth_data (n);
-                if (sel_doc == null) {
-                    continue;
-                }
-                if (sel_doc.sourceview.buffer.get_modified ()) {
-                    if (!sel_doc.is_file_temporary) {
-                        sel_doc.save.begin ();
-                    } else {
-                        save_opened (sel_doc);
-                    }
-                }
             }
         }
 
