@@ -75,16 +75,6 @@ namespace iZiCodeEditor {
             });
         }
 
-        static construct {
-            try {
-                var provider = new Gtk.CssProvider ();
-                var css_stuff = """ .close-tab-button { padding :0; } """;
-                provider.load_from_data (css_stuff, css_stuff.length);
-            } catch (Error e) {
-                stderr.printf ("Error: %s\n", e.message);
-            }
-        }
-
         construct {
             label = new Gtk.Label ("");
             label.set_size_request (100, -1);
@@ -103,7 +93,6 @@ namespace iZiCodeEditor {
             tab_button.set_relief (Gtk.ReliefStyle.NONE);
             tab_button.set_hexpand (false);
 
-            tab_button.get_style_context ().add_class ("close-tab-button");
             tab_button.clicked.connect (() => {
                 notebook.close (this);
             });
