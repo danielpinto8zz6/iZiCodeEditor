@@ -419,18 +419,15 @@ namespace iZiCodeEditor {
         }
 
         private bool set_opened_docs () {
-            if (notebook.docs.length () > 0) {
-                string[] recent_files = { };
+            string[] recent_files = { };
 
-                foreach (var doc in notebook.docs) {
-                    if (doc.file != null && doc.exists ()) {
-                        recent_files += doc.file.get_uri ();
-                    }
+            foreach (var doc in notebook.docs) {
+                if (doc.file != null && doc.exists ()) {
+                    recent_files += doc.file.get_uri ();
                 }
-                Application.saved_state.set_strv ("recent-files", recent_files);
-                return true;
             }
-            return false;
+            Application.saved_state.set_strv ("recent-files", recent_files);
+            return true;
         }
 
         private void create_unsaved_documents_directory () {

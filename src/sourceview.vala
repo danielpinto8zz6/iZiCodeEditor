@@ -40,7 +40,7 @@ namespace iZiCodeEditor {
             try {
                 provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length);
             } catch (Error e) {
-                stderr.printf ("Error: %s\n", e.message);
+                critical (e.message);
             }
             get_style_context ().add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
@@ -48,7 +48,7 @@ namespace iZiCodeEditor {
                 try {
                     provider.load_from_data (pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")), pango_font_description_to_css (Application.settings_fonts_colors.get_string ("font")).length);
                 } catch (Error e) {
-                    stderr.printf ("Error: %s\n", e.message);
+                    critical (e.message);
                 }
                 get_style_context ().add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             });

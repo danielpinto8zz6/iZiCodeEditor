@@ -33,6 +33,10 @@ namespace iZiCodeEditor {
             zoom_grid.add (zoom_default_button);
             zoom_grid.add (zoom_in_button);
 
+            var save_button = new Gtk.ModelButton ();
+            save_button.text = "Save";
+            save_button.action_name = "win.save";
+
             var save_as_button = new Gtk.ModelButton ();
             save_as_button.text = "Save as...";
             save_as_button.action_name = "win.save-as";
@@ -135,12 +139,17 @@ namespace iZiCodeEditor {
             });
         }
 
-        public void set_doc (Document doc) {
-            this.doc = doc;
-            set_title (doc.get_file_name ());
-            set_subtitle (doc.get_file_path ());
-            search.set_sourceview (doc.sourceview);
-            gotoline.set_sourceview (doc.sourceview);
+        public void set_doc (Document ? doc = null) {
+            if (doc != null) {
+                this.doc = doc;
+                title = doc.get_file_name ();
+                subtitle = doc.get_file_path ();
+                search.set_sourceview (doc.sourceview);
+                gotoline.set_sourceview (doc.sourceview);
+            } else {
+                title = "iZiCodeEditor";
+                subtitle = "";
+            }
         }
     }
 }

@@ -32,20 +32,21 @@ namespace iZiCodeEditor {
         private void on_doc_removed (Gtk.Widget tab, uint page_num) {
             var doc = (Document)tab;
             docs.remove (doc);
-            doc.sourceview.focus_in_event.disconnect (on_focus_in_event);
             on_tabs_changed ();
+            if (current_doc == null) {
+                window.headerbar.set_doc (null);
+                window.status_bar.set_doc (null);
+            }
         }
 
         private void on_doc_added (Gtk.Widget tab, uint page_num) {
             var doc = (Document)tab;
             docs.append (doc);
-            doc.sourceview.focus_in_event.connect_after (on_focus_in_event);
             on_tabs_changed ();
         }
 
         private void on_doc_reordered (Gtk.Widget tab, uint new_pos) {
             var doc = (Document)tab;
-
             docs.remove (doc);
             docs.insert (doc, (int)new_pos);
         }
@@ -53,18 +54,11 @@ namespace iZiCodeEditor {
         private void on_notebook_page_switched (Gtk.Widget page, uint page_num = 0) {
             var doc = (Document)page;
 
-            window.headerbar.set_doc (doc);
-            window.status_bar.set_doc (doc);
-            doc.sourceview.grab_focus ();
-        }
-
-        private bool on_focus_in_event () {
-            var doc = current_doc;
             if (doc != null) {
-                on_notebook_page_switched (doc);
+                window.headerbar.set_doc (doc);
+                window.status_bar.set_doc (doc);
+                doc.sourceview.grab_focus ();
             }
-
-            return false;
         }
 
         private void on_tabs_changed () {
@@ -75,11 +69,33 @@ namespace iZiCodeEditor {
         }
 
         public void new_tab () {
-            var doc = new Document.new_doc (this);
-            add_doc (doc);
-            set_current_page (page_num (doc));
-            set_tab_reorderable (doc, true);
-            doc.sourceview.grab_focus ();
+            File file = generate_temporary_file ();
+            if (file != null) {
+                open (file);
+            }
+        }
+
+        private File generate_temporary_file () {
+            File folder = File.new_for_path (Application.instance.unsaved_files_directory);
+
+            int n = 1;
+
+            File new_file = folder.get_child ("Untitled_%d".printf (n));
+
+            while (new_file.query_exists ()) {
+                new_file = folder.get_child ("Untitled_%d".printf (n));
+                n++;
+            }
+
+            new_file.create_async.begin (0, Priority.DEFAULT, null, (obj, res) => {
+                try {
+                    new_file.create_async.end (res);
+                } catch (Error error) {
+                    warning (error.message);
+                }
+            });
+
+            return new_file;
         }
 
         public void open_dialog () {
@@ -106,27 +122,22 @@ namespace iZiCodeEditor {
         }
 
         public void open (File file) {
-            for (int n = 0; n <= docs.length (); n++) {
+            for (int n = 0; n < docs.length (); n++) {
                 var sel_doc = docs.nth_data (n);
                 if (sel_doc == null) {
                     continue;
                 }
 
-                if (!sel_doc.is_file_temporary && sel_doc.file.get_uri () == file.get_uri ()) {
+                if (sel_doc.file.get_uri () == file.get_uri ()) {
                     set_current_page (page_num (sel_doc));
-                    stderr.printf ("This file is already loaded: %s\n", file.get_parse_name ());
+                    warning ("This file is already loaded: %s\n", file.get_parse_name ());
                     return;
                 }
             }
-            var current = current_doc;
             var doc = new Document (file, this);
-            add_doc (doc);
+            append_page (doc, doc.get_tab_label ());
             set_current_page (page_num (doc));
             set_tab_reorderable (doc, true);
-
-            if (current != null && current.is_file_temporary && !current.sourceview.buffer.get_modified ()) {
-                close (current);
-            }
         }
 
         public void close (Gtk.Widget tab) {
@@ -140,10 +151,6 @@ namespace iZiCodeEditor {
             for (uint i = docs.length (); i > 0; i--) {
                 close (current_doc);
             }
-        }
-
-        private void add_doc (Document doc) {
-            append_page (doc, doc.get_tab_label ());
         }
     }
 }

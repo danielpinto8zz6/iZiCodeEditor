@@ -62,19 +62,6 @@ namespace iZiCodeEditor {
             sourceview.update_syntax_highlighting ();
         }
 
-        public Document.new_doc (Notebook notebook) {
-            Object (notebook: notebook);
-
-            file = get_temporary_file ();
-
-            Idle.add_full (GLib.Priority.LOW, () => {
-                open.begin ((obj, res) => {
-                    open.end (res);
-                });
-                return false;
-            });
-        }
-
         construct {
             label = new Gtk.Label ("");
             label.set_size_request (100, -1);
@@ -277,9 +264,7 @@ namespace iZiCodeEditor {
             var source_file_saver = new Gtk.SourceFileSaver ((Gtk.SourceBuffer)sourceview.buffer, sourcefile);
 
             try {
-                print ("I came here");
                 yield source_file_saver.save_async (GLib.Priority.DEFAULT, save_cancellable, null);
-                print ("But I never passed");
             } catch (Error e) {
                 warning ("Cannot save \"%s\": %s", get_file_name (), e.message);
                 return false;
@@ -358,29 +343,6 @@ namespace iZiCodeEditor {
 
         public string get_file_path () {
             return !is_file_temporary ? file.get_parse_name () : null;
-        }
-
-        private File get_temporary_file () {
-            File folder = File.new_for_path (Application.instance.unsaved_files_directory);
-
-            int n = 1;
-
-            File new_file = folder.get_child ("Untitled_%d".printf (n));
-
-            while (new_file.query_exists ()) {
-                new_file = folder.get_child ("Untitled_%d".printf (n));
-                n++;
-            }
-
-            new_file.create_async.begin (0, Priority.DEFAULT, null, (obj, res) => {
-                try {
-                    new_file.create_async.end (res);
-                } catch (Error error) {
-                    warning (error.message);
-                }
-            });
-
-            return new_file;
         }
 
         private bool delete_temporary_file (bool force = false) {
