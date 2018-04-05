@@ -16,6 +16,9 @@ namespace iZiCodeEditor {
         private Gtk.Paned rightPaned;
         private Gtk.Paned mainPaned;
 
+        private const int64 USEC_PER_SEC = 1000000;
+        private const int64 FORCE_SHUTDOWN_USEC = 5 * USEC_PER_SEC;
+
         public const string ACTION_PREFIX = "win.";
         public const string ACTION_NEXT_PAGE = "next-page";
         public const string ACTION_UNDO = "undo";
@@ -214,6 +217,11 @@ namespace iZiCodeEditor {
 
             restore_saved_state ();
 
+            delete_event.connect (() => {
+                action_quit ();
+                return true;
+            });
+
             show ();
         }
 
@@ -382,13 +390,25 @@ namespace iZiCodeEditor {
         }
 
         private void action_quit () {
-            set_saved_state ();
-            destroy ();
-        }
+            hide ();
 
-        protected override bool delete_event (Gdk.EventAny event) {
             set_saved_state ();
-            return false;
+
+            int64 start_usec = get_monotonic_time ();
+
+            while (Gtk.events_pending ()) {
+                Gtk.main_iteration ();
+
+                int64 delta_usec = get_monotonic_time () - start_usec;
+                if (delta_usec >= FORCE_SHUTDOWN_USEC) {
+                    debug ("Forcing shutdown, %ss passed...", (delta_usec / USEC_PER_SEC).to_string ());
+                    destroy ();
+                }
+            }
+            if (set_opened_docs ()) {
+                Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+            }
+            destroy ();
         }
 
         private void set_saved_state () {
