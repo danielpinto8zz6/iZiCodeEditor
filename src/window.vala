@@ -161,9 +161,8 @@ namespace iZiCodeEditor {
             mainPaned.pack2 (bottomBar, false, false);
 
             explorer = new iZiCodeEditor.Explorer ();
-            explorer.restore_recent_folders ();
             explorer.file_clicked.connect ((path) => {
-                notebook.open (File.new_for_path (path));
+                notebook.open_doc (File.new_for_path (path));
             });
 
             leftBar.append_page (explorer, new Gtk.Label ("Explorer"));
@@ -186,7 +185,7 @@ namespace iZiCodeEditor {
                 }
             });
 
-            status_bar = new iZiCodeEditor.StatusBar (this);
+            status_bar = new iZiCodeEditor.StatusBar ();
 
             var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
@@ -198,24 +197,15 @@ namespace iZiCodeEditor {
 
             add (mainBox);
 
-            if (Application.settings_view.get_boolean ("status-bar")) {
-                status_bar.show ();
-            } else {
-                status_bar.hide ();
-            }
-            Application.settings_view.changed["status-bar"].connect (() => {
-                if (Application.settings_view.get_boolean ("status-bar")) {
-                    status_bar.show ();
-                } else {
-                    status_bar.hide ();
-                }
-            });
-
             support_drag_and_drop ();
 
             create_unsaved_documents_directory ();
 
             restore_saved_state ();
+
+            if (notebook.get_n_pages () == 0) {
+                status_bar.hide_buttons ();
+            }
 
             delete_event.connect (() => {
                 action_quit ();
@@ -237,7 +227,7 @@ namespace iZiCodeEditor {
                 }
 
                 foreach (File file in files)
-                    notebook.open (file);
+                    notebook.open_doc (file);
 
                 Gtk.drag_finish (dc, true, true, time);
             });
@@ -295,7 +285,7 @@ namespace iZiCodeEditor {
         }
 
         private void action_open () {
-            notebook.open_dialog ();
+            notebook.open_doc_dialog ();
         }
 
         private void action_open_folder () {
@@ -306,8 +296,7 @@ namespace iZiCodeEditor {
             chooser.select_multiple = true;
 
             if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-                SList<File> files = chooser.get_files ();
-                files.foreach ((file) => {
+                chooser.get_files ().foreach ((file) => {
                     explorer.open_folder (file.get_path ());
                 });
             }
@@ -338,7 +327,7 @@ namespace iZiCodeEditor {
         }
 
         private void action_new () {
-            notebook.new_tab ();
+            notebook.new_doc ();
         }
 
         private void action_save_as () {
@@ -392,7 +381,7 @@ namespace iZiCodeEditor {
         private void action_quit () {
             hide ();
 
-            set_saved_state ();
+            handle_quit ();
 
             int64 start_usec = get_monotonic_time ();
 
@@ -405,10 +394,18 @@ namespace iZiCodeEditor {
                     destroy ();
                 }
             }
-            if (set_opened_docs ()) {
-                Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
-            }
+
             destroy ();
+        }
+
+        private void handle_quit () {
+            set_saved_state ();
+
+            set_opened_folders ();
+
+            set_opened_docs ();
+
+            save_opened_docs ();
         }
 
         private void set_saved_state () {
@@ -421,16 +418,14 @@ namespace iZiCodeEditor {
             Application.saved_state.set_int ("right-paned-size", rightPaned.position);
             Application.saved_state.set_int ("main-paned-size",  mainPaned.position);
 
-            explorer.set_recent_folders ();
-
-            save_opened ();
-
-            if (set_opened_docs ()) {
+            if (notebook.docs.length () > 0) {
                 Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+            } else {
+                Application.saved_state.reset ("active-tab");
             }
         }
 
-        private void save_opened () {
+        private void save_opened_docs () {
             if (notebook.docs.length () > 0) {
                 foreach (var doc in notebook.docs) {
                     doc.save.begin ();
@@ -438,16 +433,15 @@ namespace iZiCodeEditor {
             }
         }
 
-        private bool set_opened_docs () {
-            string[] recent_files = { };
+        private void set_opened_docs () {
+            string[] opened_docs = { };
 
             foreach (var doc in notebook.docs) {
                 if (doc.file != null && doc.exists ()) {
-                    recent_files += doc.file.get_uri ();
+                    opened_docs += doc.file.get_uri ();
                 }
             }
-            Application.saved_state.set_strv ("recent-files", recent_files);
-            return true;
+            Application.saved_state.set_strv ("recent-files", opened_docs);
         }
 
         private void create_unsaved_documents_directory () {
@@ -473,7 +467,7 @@ namespace iZiCodeEditor {
             mainPaned.position = Application.saved_state.get_int ("main-paned-size");
         }
 
-        public void restore_recent_files () {
+        public void restore_opened_docs () {
             string[] recent_files = Application.saved_state.get_strv ("recent-files");
             if (recent_files.length > 0) {
                 foreach (string uri in recent_files) {
@@ -484,10 +478,35 @@ namespace iZiCodeEditor {
                         } else {
                             file = File.new_for_commandline_arg (uri);
                         }
-                        notebook.open (file);
+                        notebook.open_doc (file);
                     }
                 }
                 notebook.set_current_page ((int)Application.saved_state.get_uint ("active-tab"));
+            }
+        }
+
+        private void set_opened_folders () {
+            string[] folders = { };
+            for (int i = 0; i < explorer.opened_folders.length (); i++) {
+                var folder = explorer.opened_folders.nth_data (i);
+                if (folder == null) {
+                    continue;
+                }
+                folders += folder.path;
+            }
+            Application.saved_state.set_strv ("recent-folders", folders);
+        }
+
+        public void restore_opened_folders () {
+            string[] folders = Application.saved_state.get_strv ("recent-folders");
+            if (folders.length > 0) {
+                foreach (string path in folders) {
+                    if (path != "") {
+                        if (File.new_for_path (path).query_exists ()) {
+                            explorer.open_folder (path);
+                        }
+                    }
+                }
             }
         }
 

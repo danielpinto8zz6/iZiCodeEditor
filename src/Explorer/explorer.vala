@@ -1,6 +1,6 @@
 namespace iZiCodeEditor {
     public class Explorer : Gtk.ScrolledWindow {
-        private List<Folder>opened_folders;
+        public List<Folder>opened_folders;
 
         private Gtk.Box folder_view;
 
@@ -72,31 +72,6 @@ namespace iZiCodeEditor {
             folder.clear ();
             folder.destroy ();
             opened_folders.remove (folder);
-        }
-
-        public void set_recent_folders () {
-            string[] folders = { };
-            for (int i = 0; i < opened_folders.length (); i++) {
-                var folder = opened_folders.nth_data (i);
-                if (folder == null) {
-                    continue;
-                }
-                folders += folder.path;
-            }
-            Application.saved_state.set_strv ("recent-folders", folders);
-        }
-
-        public void restore_recent_folders () {
-            string[] folders = Application.saved_state.get_strv ("recent-folders");
-            if (folders.length > 0) {
-                foreach (string path in folders) {
-                    if (path != "") {
-                        if (File.new_for_path (path).query_exists ()) {
-                            open_folder (path);
-                        }
-                    }
-                }
-            }
         }
     }
 }

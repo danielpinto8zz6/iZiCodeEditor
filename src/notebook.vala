@@ -4,7 +4,7 @@ namespace iZiCodeEditor {
 
         public Document current_doc {
             get {
-                return (Document)get_nth_page (window.notebook.get_current_page ());
+                return (Document)get_nth_page (get_current_page ());
             }
         }
 
@@ -14,13 +14,12 @@ namespace iZiCodeEditor {
             Object (
                 window: window,
                 expand: true,
-                show_border: false);
+                show_border: false,
+                scrollable: true);
         }
 
         construct {
             docs = new GLib.List<Document> ();
-
-            scrollable = true;
 
             on_tabs_changed ();
             page_added.connect (on_doc_added);
@@ -68,10 +67,13 @@ namespace iZiCodeEditor {
             visible = (pages > 0);
         }
 
-        public void new_tab () {
+        public void new_doc () {
             File file = generate_temporary_file ();
             if (file != null) {
-                open (file);
+                var doc = new Document (file, this);
+                append_page (doc, doc.get_tab_label ());
+                set_current_page (page_num (doc));
+                set_tab_reorderable (doc, true);
             }
         }
 
@@ -98,7 +100,7 @@ namespace iZiCodeEditor {
             return new_file;
         }
 
-        public void open_dialog () {
+        public void open_doc_dialog () {
             var chooser = new Gtk.FileChooserDialog (
                 "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
                 "_Cancel",
@@ -115,13 +117,17 @@ namespace iZiCodeEditor {
             if (chooser.run () == Gtk.ResponseType.ACCEPT) {
                 foreach (string uri in chooser.get_uris ()) {
                     var file = File.new_for_uri (uri);
-                    open (file);
+                    open_doc (file);
                 }
             }
             chooser.destroy ();
         }
 
-        public void open (File file) {
+        public void open_doc (File file) {
+            if (file == null) {
+                return;
+            }
+
             for (int n = 0; n < docs.length (); n++) {
                 var sel_doc = docs.nth_data (n);
                 if (sel_doc == null) {
@@ -134,6 +140,7 @@ namespace iZiCodeEditor {
                     return;
                 }
             }
+
             var doc = new Document (file, this);
             append_page (doc, doc.get_tab_label ());
             set_current_page (page_num (doc));
@@ -148,9 +155,9 @@ namespace iZiCodeEditor {
         }
 
         public void close_all () {
-            for (uint i = docs.length (); i > 0; i--) {
-                close (current_doc);
-            }
+            docs.foreach ((sel_doc) => {
+                close (sel_doc);
+            });
         }
     }
 }

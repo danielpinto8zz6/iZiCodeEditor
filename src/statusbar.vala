@@ -1,7 +1,5 @@
 namespace iZiCodeEditor {
     public class StatusBar : Gtk.ActionBar {
-        public unowned ApplicationWindow window { get; construct set; }
-
         private Gtk.SourceLanguageManager manager;
 
         private const string lang_fallback = "Plain text";
@@ -17,11 +15,6 @@ namespace iZiCodeEditor {
         private Gtk.Label insmode_label;
 
         private unowned Document ? doc = null;
-
-        public StatusBar (iZiCodeEditor.ApplicationWindow window) {
-            Object (
-                window: window);
-        }
 
         construct {
             manager = Gtk.SourceLanguageManager.get_default ();
@@ -139,8 +132,6 @@ namespace iZiCodeEditor {
             tab_grid.attach (label_tab_size,   0, 2, 1, 1);
             tab_grid.attach (button_tab_size,  1, 2, 1, 1);
 
-            tab_grid.show_all ();
-
             var tab_width_popover = new Gtk.Popover (tab_width_button);
 
             tab_width_popover.add (tab_grid);
@@ -196,8 +187,6 @@ namespace iZiCodeEditor {
             line_grid.attach (text_wrap_label,               0, 3, 1, 1);
             line_grid.attach (text_wrap_button,              1, 3, 1, 1);
 
-            line_grid.show_all ();
-
             var line_popover = new Gtk.Popover (line_button);
 
             line_popover.add (line_grid);
@@ -217,6 +206,20 @@ namespace iZiCodeEditor {
             pack_end (lang_button);
             pack_end (tab_width_button);
             pack_end (line_button);
+
+            if (Application.settings_view.get_boolean ("status-bar")) {
+                show ();
+            } else {
+                hide ();
+            }
+
+            Application.settings_view.changed["status-bar"].connect (() => {
+                if (Application.settings_view.get_boolean ("status-bar")) {
+                    show ();
+                } else {
+                    hide ();
+                }
+            });
         }
 
         private void update_statusbar_insmode () {
@@ -274,7 +277,7 @@ namespace iZiCodeEditor {
                 update_statusbar_insmode ();
                 this.doc.sourceview.buffer.notify["cursor-position"].connect (update_statusbar_line);
                 this.doc.sourceview.notify["overwrite"].connect (update_statusbar_insmode);
- 
+
                 lang_listbox.show ();
                 lang_button.show ();
                 line_button.show ();
@@ -287,6 +290,14 @@ namespace iZiCodeEditor {
                 insmode_label.hide ();
                 tab_width_button.hide ();
             }
+        }
+
+        public void hide_buttons () {
+            lang_listbox.hide ();
+            lang_button.hide ();
+            line_button.hide ();
+            insmode_label.hide ();
+            tab_width_button.hide ();
         }
     }
 }

@@ -197,7 +197,7 @@ namespace iZiCodeEditor {
             var window = get_last_window ();
 
             foreach (File file in files)
-                window.notebook.open (file);
+                window.notebook.open_doc (file);
         }
 
         public ApplicationWindow ? get_last_window () {
@@ -206,12 +206,13 @@ namespace iZiCodeEditor {
         }
 
         public override void activate () {
-            // If there is no windows open, restore recent files, otherwise, open blank tab
+            // If there is no windows open, restore recent docs & folders, otherwise, open blank tab
             if (get_last_window () == null) {
                 var window = this.new_window ();
                 window.show ();
                 if (settings_editor.get_boolean ("restore-recent-files")) {
-                    window.restore_recent_files ();
+                    window.restore_opened_docs ();
+                    window.restore_opened_folders ();
                 }
             } else {
                 var window = this.new_window ();
