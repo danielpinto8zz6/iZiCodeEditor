@@ -76,6 +76,8 @@ namespace iZiCodeEditor {
       column.add_attribute (pixbuf_cell,"gicon",0);
 
       text_cell = new Gtk.CellRendererText ();
+      text_cell.ellipsize = Pango.EllipsizeMode.END;
+      
       text_cell.edited.connect ((path, new_name)=>{
         Gtk.TreeIter iter;
         store.get_iter_from_string (out iter, path);
