@@ -30,6 +30,10 @@ namespace iZiCodeEditor {
       }
 
       Folder folder = new Folder (path);
+
+      /** Hack to make treeview background same as box background */
+      folder_view.override_background_color (Gtk.StateFlags.NORMAL, folder.get_style_context ().get_background_color (Gtk.StateFlags.NORMAL));
+
       opened_folders.append (folder);
       folder_view.add (folder);
       folder.closed.connect (close_folder);
