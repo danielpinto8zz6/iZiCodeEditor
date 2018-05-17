@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2018 iZiCodeEditor
+ * Copyright (c) 2018 EasyCode
  * Copyright (c) 2018 elementary LLC. (https://elementary.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  * Authored by: David Hewitt <davidmhewitt@gmail.com>
  */
 
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Comment {
     private enum CommentType {
       NONE,

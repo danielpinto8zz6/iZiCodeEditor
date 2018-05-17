@@ -1,14 +1,14 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Search : Gtk.Popover {
     private Gtk.Entry entry;
     private Gtk.SourceSearchContext context = null;
-    private iZiCodeEditor.SourceView ? sourceview = null;
+    private EasyCode.SourceView ? sourceview = null;
     private Gtk.TextBuffer ? buffer = null;
     private Gtk.Button label_occurrences;
 
-    public unowned ApplicationWindow window { get; construct set; }
+    public unowned Window window { get; construct set; }
 
-    public Search (iZiCodeEditor.ApplicationWindow window) {
+    public Search (Window window) {
       Object (window: window);
     }
 
@@ -138,7 +138,7 @@ namespace iZiCodeEditor {
       return false;
     }
 
-    public void set_sourceview (iZiCodeEditor.SourceView sourceview) {
+    public void set_sourceview (EasyCode.SourceView sourceview) {
       if (sourceview == null) {
         return;
       }

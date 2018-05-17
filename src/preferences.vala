@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Preferences : Gtk.Dialog {
     private Gtk.FontButton button_font;
     private Gtk.SourceStyleSchemeChooserWidget widget_scheme;
@@ -27,7 +27,7 @@ namespace iZiCodeEditor {
 
     private Gtk.HeaderBar header;
 
-    public Preferences (ApplicationWindow window) {
+    public Preferences (Window window) {
       Object (
         transient_for: window,
         resizable: true

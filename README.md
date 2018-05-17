@@ -1,4 +1,4 @@
-iZiCodeEditor
+EasyCode
 ====================
 
 This is a simple text editor written in vala.
@@ -18,5 +18,5 @@ Running
 -------
 ```shell
 cd build
-./src/iZiCodeEditor
+./src/easycode
 ```

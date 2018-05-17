@@ -1,63 +1,77 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Notebook : Gtk.Notebook {
-    public unowned ApplicationWindow window { get; construct set; }
+    public unowned Window window;
 
-    public Document current_doc {
+    private List<Document> _tabs;
+    public List<Document> tabs {
+      get { return _tabs; }
+    }
+
+    public Document current {
       get {
         return (Document)get_nth_page (get_current_page ());
       }
     }
 
-    public GLib.List<Document> docs;
-
-    public Notebook (iZiCodeEditor.ApplicationWindow window) {
-      Object (
-        window: window,
-        expand: true,
+    public Notebook (Window window) {
+      Object (expand: true,
         show_border: false,
         scrollable: true);
-    }
 
-    construct {
-      docs = new GLib.List<Document> ();
+      this.window = window;
+
+      _tabs = new List<Document>();
 
       on_tabs_changed ();
-      page_added.connect (on_doc_added);
-      page_removed.connect (on_doc_removed);
-      switch_page.connect (on_notebook_page_switched);
-      page_reordered.connect (on_doc_reordered);
+      page_added.connect (on_tab_added);
+      page_removed.connect (on_tab_removed);
+      switch_page.connect (on_tab_switched);
+      page_reordered.connect (on_tab_reordered);
     }
 
-    private void on_doc_removed (Gtk.Widget tab, uint page_num) {
-      var doc = (Document)tab;
-      docs.remove (doc);
+    private void on_tab_removed (Gtk.Widget widget, uint page_num) {
+      var tab = (Document)widget;
+
+      if (tab == null)
+        return;
+
+      _tabs.remove (tab);
       on_tabs_changed ();
-      if (current_doc == null) {
-        window.headerbar.set_doc (null);
+      if (current == null) {
+        window.header_bar.set_doc (null);
         window.status_bar.set_doc (null);
       }
     }
 
-    private void on_doc_added (Gtk.Widget tab, uint page_num) {
-      var doc = (Document)tab;
-      docs.append (doc);
+    private void on_tab_added (Gtk.Widget widget, uint page_num) {
+      var tab = (Document)widget;
+
+      if (tab == null)
+        return;
+
+      _tabs.append (tab);
       on_tabs_changed ();
     }
 
-    private void on_doc_reordered (Gtk.Widget tab, uint new_pos) {
-      var doc = (Document)tab;
-      docs.remove (doc);
-      docs.insert (doc, (int)new_pos);
+    private void on_tab_reordered (Gtk.Widget widget, uint new_pos) {
+      var tab = (Document)widget;
+
+      if (tab == null)
+        return;
+
+      _tabs.remove (tab);
+      _tabs.insert (tab, (int)new_pos);
     }
 
-    private void on_notebook_page_switched (Gtk.Widget page, uint page_num = 0) {
-      var doc = (Document)page;
+    private void on_tab_switched (Gtk.Widget widget, uint page_num = 0) {
+      var tab = (Document)widget;
 
-      if (doc != null) {
-        window.headerbar.set_doc (doc);
-        window.status_bar.set_doc (doc);
-        doc.sourceview.grab_focus ();
-      }
+      if (tab == null)
+        return;
+
+          window.header_bar.set_doc (tab);
+          window.status_bar.set_doc (tab);
+          tab.sourceview.grab_focus ();
     }
 
     private void on_tabs_changed () {
@@ -67,97 +81,42 @@ namespace iZiCodeEditor {
       visible = (pages > 0);
     }
 
-    public void new_doc () {
-      File file = generate_temporary_file ();
-      if (file != null) {
-        var doc = new Document (file, this);
-        append_page (doc, doc.get_tab_label ());
-        set_current_page (page_num (doc));
-        set_tab_reorderable (doc, true);
-      }
-    }
-
-    private File generate_temporary_file () {
-      File folder = File.new_for_path (Application.instance.unsaved_files_directory);
-
-      int n = 1;
-
-      File new_file = folder.get_child ("Untitled_%d".printf (n));
-
-      while (new_file.query_exists ()) {
-        new_file = folder.get_child ("Untitled_%d".printf (n));
-        n++;
-      }
-
-      new_file.create_async.begin (0, Priority.DEFAULT, null, (obj, res) => {
-        try {
-          new_file.create_async.end (res);
-        } catch (Error error) {
-          warning (error.message);
-        }
-      });
-
-      return new_file;
-    }
-
-    public void open_doc_dialog () {
-      var chooser = new Gtk.FileChooserDialog (
-        "Select a file to edit", window, Gtk.FileChooserAction.OPEN,
-        "_Cancel",
-        Gtk.ResponseType.CANCEL,
-        "_Open",
-        Gtk.ResponseType.ACCEPT);
-      var filter = new Gtk.FileFilter ();
-      filter.add_mime_type ("text/plain");
-
-      chooser.set_select_multiple (true);
-      chooser.set_modal (true);
-      chooser.set_filter (filter);
-      chooser.show ();
-      if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-        foreach (string uri in chooser.get_uris ()) {
-          var file = File.new_for_uri (uri);
-          open_doc (file);
-        }
-      }
-      chooser.destroy ();
-    }
-
-    public void open_doc (File file) {
-      if (file == null) {
+    public void add_tab (Document tab) {
+      if (tab == null)
         return;
-      }
 
-      for (int n = 0; n < docs.length (); n++) {
-        var sel_doc = docs.nth_data (n);
-        if (sel_doc == null) {
-          continue;
-        }
-
-        if (sel_doc.file.get_uri () == file.get_uri ()) {
-          set_current_page (page_num (sel_doc));
-          warning ("This file is already loaded: %s\n", file.get_parse_name ());
-          return;
-        }
-      }
-
-      var doc = new Document (file, this);
-      append_page (doc, doc.get_tab_label ());
-      set_current_page (page_num (doc));
-      set_tab_reorderable (doc, true);
+      this.append_page (tab, tab.tab_label);
+      //  tab.closed.connect (remove_tab);
+      this.set_current_page (page_num (tab));
+      this.set_tab_reorderable (tab, true);
     }
 
-    public void close (Gtk.Widget tab) {
-      var doc = (Document)tab;
+    public void remove_tab (Document tab) {
+      if (tab == null)
+        return;
 
-      doc.close ();
-      remove_page (page_num (doc));
+      var pos = page_num (tab);
+
+      if (pos != -1){
+        tab.close ();
+        this.remove_page (pos);
+      }
     }
 
-    public void close_all () {
-      docs.foreach ((sel_doc) => {
-        close (sel_doc);
+    public void remove_all_tabs () {
+      _tabs.foreach ((tab) => {
+        this.remove_tab (tab);
       });
+    }
+
+    public void set_taTab (Document tab) {
+      if (tab == null)
+        return;
+
+      var pos = page_num (tab);
+
+      if (pos != -1)
+        this.set_current_page (page_num (tab));
     }
   }
 }

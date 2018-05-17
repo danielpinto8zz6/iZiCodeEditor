@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class StatusBar : Gtk.ActionBar {
     private Gtk.SourceLanguageManager manager;
 

@@ -1,12 +1,12 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Document : Gtk.Grid {
-    public iZiCodeEditor.SourceView sourceview;
+    public EasyCode.SourceView sourceview;
 
     private Gtk.SourceMap source_map;
 
     private Gtk.SourceFile sourcefile = null;
 
-    public unowned ApplicationWindow window {
+    public unowned Window window {
       get {
         return notebook.window;
       }
@@ -71,7 +71,7 @@ namespace iZiCodeEditor {
       eventbox.add (label);
       eventbox.button_press_event.connect ((event) => {
         if (event.button == 2) {
-          notebook.close (this);
+          notebook.remove_tab (this);
         }
         return false;
       });
@@ -81,14 +81,14 @@ namespace iZiCodeEditor {
       tab_button.set_hexpand (false);
 
       tab_button.clicked.connect (() => {
-        notebook.close (this);
+        notebook.remove_tab (this);
       });
       tab_label = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
       tab_label.pack_start (eventbox);
       tab_label.pack_end (tab_button);
       tab_label.show_all ();
 
-      sourceview = new iZiCodeEditor.SourceView (this);
+      sourceview = new EasyCode.SourceView (this);
       source_map = new Gtk.SourceMap ();
       sourcefile = new Gtk.SourceFile ();
 

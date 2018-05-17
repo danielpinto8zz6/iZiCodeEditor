@@ -1,5 +1,5 @@
 <schemalist>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.saved-state" path="/com/github/danielpinto8zz6/iZiCodeEditor/saved-state/">
+  <schema id="com.github.danielpinto8zz6.EasyCode.saved-state" path="/com/github/danielpinto8zz6/EasyCode/saved-state/">
     <key name="width" type="i">
       <default>900</default>
       <summary>width</summary>
@@ -46,7 +46,7 @@
       <description></description>
     </key>
   </schema>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.view" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/view/">
+  <schema id="com.github.danielpinto8zz6.EasyCode.settings.view" path="/com/github/danielpinto8zz6/EasyCode/settings/view/">
     <key name="numbers-show" type="b">
       <default>true</default>
       <summary>numbers-show</summary>
@@ -88,7 +88,7 @@
       <description>Show / Hide status bar</description>
     </key>
   </schema>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.editor" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/editor/">
+  <schema id="com.github.danielpinto8zz6.EasyCode.settings.editor" path="/com/github/danielpinto8zz6/EasyCode/settings/editor/">
     <key name="tab-size" type="u">
       <default>4</default>
       <summary>tab-size</summary>
@@ -130,7 +130,7 @@
       <description>Restore recent opened files when open program</description>
     </key>
   </schema>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.fonts-colors" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/fonts-colors/">
+  <schema id="com.github.danielpinto8zz6.EasyCode.settings.fonts-colors" path="/com/github/danielpinto8zz6/EasyCode/settings/fonts-colors/">
     <key name="font" type="s">
       <default>'Monospace Regular 14'</default>
       <summary>font</summary>
@@ -142,7 +142,7 @@
       <description>Color scheme</description>
     </key>
   </schema>
-  <schema id="com.github.danielpinto8zz6.iZiCodeEditor.settings.terminal" path="/com/github/danielpinto8zz6/iZiCodeEditor/settings/terminal/">
+  <schema id="com.github.danielpinto8zz6.EasyCode.settings.terminal" path="/com/github/danielpinto8zz6/EasyCode/settings/terminal/">
     <key name="terminal" type="b">
       <default>false</default>
       <summary>terminal</summary>

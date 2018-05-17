@@ -1,12 +1,12 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class GoToLine : Gtk.Popover {
     private Gtk.Entry entry;
-    private iZiCodeEditor.SourceView ? sourceview = null;
+    private EasyCode.SourceView ? sourceview = null;
     private Gtk.TextBuffer ? buffer = null;
 
-    public unowned ApplicationWindow window { get; construct set; }
+    public unowned Window window { get; construct set; }
 
-    public GoToLine (iZiCodeEditor.ApplicationWindow window) {
+    public GoToLine (Window window) {
       Object (window: window);
     }
 
@@ -49,7 +49,7 @@ namespace iZiCodeEditor {
       sourceview.grab_focus ();
     }
 
-    public void set_sourceview (iZiCodeEditor.SourceView sourceview) {
+    public void set_sourceview (EasyCode.SourceView sourceview) {
       if (sourceview == null) {
         return;
       }

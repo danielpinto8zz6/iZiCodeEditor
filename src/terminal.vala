@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Terminal : Gtk.Grid {
     private Gtk.Menu context_menu;
     private GLib.Pid child_pid;

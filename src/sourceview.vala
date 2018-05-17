@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class SourceView : Gtk.SourceView {
     private const Gtk.TargetEntry[] targets = { { "text/uri-list", 0, 0 } };
     private Gee.HashMap<string, string> brackets;
@@ -19,7 +19,7 @@ namespace iZiCodeEditor {
       }
     }
 
-    public unowned ApplicationWindow window {
+    public unowned Window window {
       get {
         return doc.window;
       }

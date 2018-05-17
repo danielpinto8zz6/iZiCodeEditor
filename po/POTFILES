@@ -1,0 +1,5 @@
+data/org.gnome.Easycode.desktop.in
+data/org.gnome.Easycode.appdata.xml.in
+data/org.gnome.Easycode.gschema.xml
+src/window.uisrc/main.vala
+src/window.vala

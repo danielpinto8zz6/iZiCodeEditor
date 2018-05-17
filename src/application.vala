@@ -1,40 +1,33 @@
-namespace iZiCodeEditor {
-  const string NAME = "iZiCodeEditor";
-  const string APPLICATION_ID = "com.github.danielpinto8zz6.iZiCodeEditor";
-  const string VERSION = "0.1";
-  const string DESCRIPTION = "Simple text editor written in vala";
-  const string ICON = "accessories-text-editor";
-  const string[] AUTHORS = { "danielpinto8zz6 <https://github.com/danielpinto8zz6>", "Daniel Pinto <danielpinto8zz6-at-gmail-dot-com>", null };
-
+namespace EasyCode {
   public class Application : Gtk.Application {
     public string unsaved_files_directory { get { return _unsaved_files_directory; } }
     private static string _unsaved_files_directory;
 
-    private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.editor");
+    private static GLib.Settings _settings_editor = new GLib.Settings ("com.github.danielpinto8zz6.EasyCode.settings.editor");
     public static GLib.Settings settings_editor {
       get {
         return _settings_editor;
       }
     }
-    private static GLib.Settings _settings_fonts_colors = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.fonts-colors");
+    private static GLib.Settings _settings_fonts_colors = new GLib.Settings ("com.github.danielpinto8zz6.EasyCode.settings.fonts-colors");
     public static GLib.Settings settings_fonts_colors {
       get {
         return _settings_fonts_colors;
       }
     }
-    private static GLib.Settings _settings_terminal = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.terminal");
+    private static GLib.Settings _settings_terminal = new GLib.Settings ("com.github.danielpinto8zz6.EasyCode.settings.terminal");
     public static GLib.Settings settings_terminal {
       get {
         return _settings_terminal;
       }
     }
-    private static GLib.Settings _settings_view = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.settings.view");
+    private static GLib.Settings _settings_view = new GLib.Settings ("com.github.danielpinto8zz6.EasyCode.settings.view");
     public static GLib.Settings settings_view {
       get {
         return _settings_view;
       }
     }
-    private static GLib.Settings _saved_state = new GLib.Settings ("com.github.danielpinto8zz6.iZiCodeEditor.saved-state");
+    private static GLib.Settings _saved_state = new GLib.Settings ("com.github.danielpinto8zz6.EasyCode.saved-state");
     public static GLib.Settings saved_state {
       get {
         return _saved_state;
@@ -45,9 +38,9 @@ namespace iZiCodeEditor {
       flags |= ApplicationFlags.HANDLES_OPEN;
       flags |= ApplicationFlags.HANDLES_COMMAND_LINE;
 
-      application_id = APPLICATION_ID;
+      application_id = Constants.APP_ID;
 
-      _unsaved_files_directory = Path.build_filename (Environment.get_user_data_dir (), NAME, "unsaved");
+      _unsaved_files_directory = Path.build_filename (Environment.get_user_data_dir (), Constants.NAME, "unsaved");
     }
 
     public static Application _instance = null;
@@ -88,7 +81,7 @@ namespace iZiCodeEditor {
       }
 
       if (version) {
-        command_line.print ("%s %s\n", NAME, VERSION);
+        command_line.print ("%s %s\n", Constants.NAME, Constants.APP_VERSION);
         return 1;
       }
 
@@ -197,12 +190,12 @@ namespace iZiCodeEditor {
       var window = get_last_window ();
 
       foreach (File file in files)
-        window.notebook.open_doc (file);
+        window.open_doc (file);
     }
 
-    public ApplicationWindow ? get_last_window () {
+    public Window ? get_last_window () {
       unowned List<weak Gtk.Window> windows = get_windows ();
-      return windows.length () > 0 ? windows.last ().data as ApplicationWindow : null;
+      return windows.length () > 0 ? windows.last ().data as Window : null;
     }
 
     public override void activate () {
@@ -220,8 +213,8 @@ namespace iZiCodeEditor {
       }
     }
 
-    public ApplicationWindow new_window () {
-      return new ApplicationWindow (this);
+    public Window new_window () {
+      return new Window (this);
     }
 
     private static int main (string[] args) {

@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Explorer : Gtk.ScrolledWindow {
     public List<Folder>opened_folders;
 

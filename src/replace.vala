@@ -1,6 +1,6 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Replace : Gtk.Dialog {
-    public unowned ApplicationWindow window { get; construct set; }
+    public unowned Window window { get; construct set; }
 
     private Gtk.Entry entry_sch;
     private Gtk.Entry entry_rep;
@@ -11,7 +11,7 @@ namespace iZiCodeEditor {
     private Gtk.SourceSearchContext context = null;
     private Gtk.SourceView ? view = null;
 
-    public Replace (iZiCodeEditor.ApplicationWindow window) {
+    public Replace (Window window) {
       Object (
         window: window,
         transient_for: window,
@@ -28,7 +28,7 @@ namespace iZiCodeEditor {
     }
 
     construct {
-      view = window.notebook.current_doc.sourceview;
+      view = window.current_doc.sourceview;
       context = new Gtk.SourceSearchContext (view.buffer as Gtk.SourceBuffer, null);
       context.settings.set_wrap_around (true);
 

@@ -1,17 +1,42 @@
-namespace iZiCodeEditor {
-  public class ApplicationWindow : Gtk.ApplicationWindow {
+namespace EasyCode {
+  public class Window : Gtk.ApplicationWindow {
     public weak Application app { get; construct; }
 
-    public iZiCodeEditor.Notebook notebook;
-    public Gtk.Notebook bottomBar;
-    public Gtk.Notebook leftBar;
-    private iZiCodeEditor.Terminal terminal;
-    public iZiCodeEditor.HeaderBar headerbar;
-    public iZiCodeEditor.StatusBar status_bar;
-    public iZiCodeEditor.Replace replace;
-    public iZiCodeEditor.Preferences preferences;
-    private iZiCodeEditor.Explorer explorer;
-    public GLib.List<string> files;
+    private Notebook _notebook;
+    public Notebook notebook {
+      get { return _notebook; }
+    }
+
+    private BottomBar _bottom_bar;
+    public BottomBar bottom_bar {
+      get { return _bottom_bar; }
+    }
+
+    private LeftBar _left_bar;
+    public LeftBar left_bar {
+      get { return _left_bar; }
+    }
+
+    private RightBar _right_bar;
+    public RightBar right_bar {
+      get { return _right_bar; }
+    }
+
+    private StatusBar _status_bar;
+    public StatusBar status_bar {
+      get {return _status_bar;}
+    }
+
+    private HeaderBar _header_bar;
+    public HeaderBar header_bar {
+      get {return _header_bar;}
+    }
+
+    private Terminal terminal;
+    private Replace replace;
+    private Preferences preferences;
+    
+    private Explorer explorer;
     private Gtk.Paned leftPaned;
     private Gtk.Paned rightPaned;
     private Gtk.Paned mainPaned;
@@ -70,15 +95,15 @@ namespace iZiCodeEditor {
 
     public Document current_doc {
       get {
-        return notebook.current_doc;
+        return _notebook.current;
       }
     }
 
-    public ApplicationWindow (Application app) {
+    public Window (Application app) {
       Object (
         application: app,
-        icon_name: ICON,
-        title: NAME
+        icon_name: Constants.ICON,
+        title: Constants.NAME
         );
 
       action_accelerators.set (ACTION_NEXT_PAGE,    "<Control>Tab");
@@ -114,10 +139,9 @@ namespace iZiCodeEditor {
     }
 
     construct {
-      files = new GLib.List<string>();
-
-      // window
-      window_position = Gtk.WindowPosition.CENTER;
+      
+      _header_bar = new HeaderBar (this);
+      this.set_titlebar (header_bar);
 
       Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode"));
 
@@ -125,73 +149,63 @@ namespace iZiCodeEditor {
         Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme", Application.settings_view.get_boolean ("dark-mode"));
       });
 
-      headerbar = new iZiCodeEditor.HeaderBar (this);
-      set_titlebar (headerbar);
-      headerbar.show_all ();
+      _notebook = new Notebook (this);
 
-      notebook = new iZiCodeEditor.Notebook (this);
+      _left_bar = new LeftBar (this);
+
+      _bottom_bar = new BottomBar (this);
+
+      _right_bar = new RightBar (this);
+
+      _status_bar = new StatusBar ();
 
       var content = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
       content.width_request = 200;
-      content.pack_start (notebook, true, true, 0);
-
-      //  // Left Bar
-      leftBar = new Gtk.Notebook ();
-      leftBar.no_show_all = true;
-      leftBar.page_added.connect (() => { on_bars_changed (leftBar); });
-      leftBar.page_removed.connect (() => { on_bars_changed (leftBar); });
-
-      // Bottom Bar
-      bottomBar = new Gtk.Notebook ();
-      bottomBar.no_show_all = true;
-      bottomBar.page_added.connect (() => { on_bars_changed (bottomBar); });
-      bottomBar.page_removed.connect (() => { on_bars_changed (bottomBar); });
+      content.pack_start (_notebook, true, true, 0);
 
       leftPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
       leftPaned.position = 180;
-      leftPaned.pack1 (leftBar, false, false);
+      leftPaned.pack1 (_left_bar, false, false);
       leftPaned.pack2 (content, true, false);
 
       rightPaned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
       rightPaned.pack1 (leftPaned, true, false);
-      // rightPaned.pack2 (rightBar, false, false) ;
+      rightPaned.pack2 (_right_bar, false, false);
 
       mainPaned = new Gtk.Paned (Gtk.Orientation.VERTICAL);
       mainPaned.pack1 (rightPaned, true, false);
-      mainPaned.pack2 (bottomBar, false, false);
+      mainPaned.pack2 (_bottom_bar, false, false);
 
-      explorer = new iZiCodeEditor.Explorer ();
+      explorer = new EasyCode.Explorer ();
       explorer.file_clicked.connect ((path) => {
-        notebook.open_doc (File.new_for_path (path));
+        open_doc (File.new_for_path (path));
       });
 
-      leftBar.append_page (explorer, new Gtk.Label ("Explorer"));
+      _left_bar.append_page (explorer, new Gtk.Label ("Explorer"));
 
-      terminal = new iZiCodeEditor.Terminal ();
+      terminal = new EasyCode.Terminal ();
 
       var label_terminal = new Gtk.Label ("Terminal");
       var scrolled_terminal = (Gtk.Scrollbar)terminal.get_child_at (1, 0);
 
       if (Application.settings_terminal.get_boolean ("terminal")) {
-        bottomBar.append_page (terminal, label_terminal);
+        _bottom_bar.append_page (terminal, label_terminal);
       } else {
-        bottomBar.remove_page (notebook.page_num (scrolled_terminal));
+        _bottom_bar.remove_page (_notebook.page_num (scrolled_terminal));
       }
       Application.settings_terminal.changed["terminal"].connect (() => {
         if (Application.settings_terminal.get_boolean ("terminal")) {
-          bottomBar.append_page (terminal, label_terminal);
+          _bottom_bar.append_page (terminal, label_terminal);
         } else {
-          bottomBar.remove_page (notebook.page_num (scrolled_terminal));
+          _bottom_bar.remove_page (_notebook.page_num (scrolled_terminal));
         }
       });
-
-      status_bar = new iZiCodeEditor.StatusBar ();
 
       var mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
       mainBox.pack_start (mainPaned, false, true, 0);
 
-      mainBox.pack_end (status_bar, false, false, 0);
+      mainBox.pack_end (_status_bar, false, false, 0);
 
       mainBox.show_all ();
 
@@ -203,8 +217,8 @@ namespace iZiCodeEditor {
 
       restore_saved_state ();
 
-      if (notebook.get_n_pages () == 0) {
-        status_bar.hide_buttons ();
+      if (_notebook.get_n_pages () == 0) {
+        _status_bar.hide_buttons ();
       }
 
       delete_event.connect (() => {
@@ -227,7 +241,7 @@ namespace iZiCodeEditor {
         }
 
         foreach (File file in files)
-          notebook.open_doc (file);
+          open_doc (file);
 
         Gtk.drag_finish (dc, true, true, time);
       });
@@ -257,35 +271,47 @@ namespace iZiCodeEditor {
       Zoom.set_default_zoom ();
     }
 
-    private void on_bars_changed (Gtk.Notebook notebook) {
-      var pages = notebook.get_n_pages ();
-      notebook.set_show_tabs (pages > 1);
-      notebook.no_show_all = (pages == 0);
-      notebook.visible = (pages > 0);
-    }
-
     private void next_page () {
-      if ((notebook.get_current_page () + 1) == notebook.get_n_pages ()) {
-        notebook.set_current_page (0);
+      if ((_notebook.get_current_page () + 1) == _notebook.get_n_pages ()) {
+        _notebook.set_current_page (0);
       } else {
-        notebook.next_page ();
+        _notebook.next_page ();
       }
     }
 
     private void action_undo () {
-      if (notebook.get_n_pages () > 0) {
+      if (_notebook.get_n_pages () > 0) {
         current_doc.sourceview.undo ();
       }
     }
 
     private void action_redo () {
-      if (notebook.get_n_pages () > 0) {
+      if (_notebook.get_n_pages () > 0) {
         current_doc.sourceview.redo ();
       }
     }
 
     private void action_open () {
-      notebook.open_doc_dialog ();
+      var chooser = new Gtk.FileChooserDialog (
+        "Select a file to edit", this, Gtk.FileChooserAction.OPEN,
+        "_Cancel",
+        Gtk.ResponseType.CANCEL,
+        "_Open",
+        Gtk.ResponseType.ACCEPT);
+      var filter = new Gtk.FileFilter ();
+      filter.add_mime_type ("text/plain");
+
+      chooser.set_select_multiple (true);
+      chooser.set_modal (true);
+      chooser.set_filter (filter);
+      chooser.show ();
+      if (chooser.run () == Gtk.ResponseType.ACCEPT) {
+        foreach (string uri in chooser.get_uris ()) {
+          var file = File.new_for_uri (uri);
+          open_doc (file);
+        }
+      }
+      chooser.destroy ();
     }
 
     private void action_open_folder () {
@@ -315,20 +341,24 @@ namespace iZiCodeEditor {
     }
 
     private void action_search () {
-      if (notebook.get_n_pages () > 0) {
-        headerbar.search.show ();
+      if (_notebook.get_n_pages () > 0) {
+        _header_bar.search.show ();
       }
     }
 
     private void action_gotoline () {
-      if (notebook.get_n_pages () > 0) {
-        headerbar.gotoline.show ();
+      if (_notebook.get_n_pages () > 0) {
+        _header_bar.gotoline.show ();
       }
     }
 
     private void action_new () {
-      notebook.new_doc ();
-    }
+      File file = generate_temporary_file ();
+      if (file != null) {
+        var doc = new Document (file, _notebook);
+        _notebook.add_tab(doc);
+      }
+   }
 
     private void action_save_as () {
       if (current_doc != null) {
@@ -337,8 +367,8 @@ namespace iZiCodeEditor {
     }
 
     private void action_save_all () {
-      if (notebook.get_n_pages () > 0) {
-        foreach (var doc in notebook.docs) {
+      if (_notebook.get_n_pages () > 0) {
+        foreach (var doc in _notebook.tabs) {
           if (doc != null) {
             if (doc.is_file_temporary == true) {
               action_save_as ();
@@ -351,31 +381,39 @@ namespace iZiCodeEditor {
     }
 
     private void action_replace () {
-      if (notebook.get_n_pages () > 0) {
-        replace = new iZiCodeEditor.Replace (this);
+      if (_notebook.get_n_pages () > 0) {
+        replace = new EasyCode.Replace (this);
         replace.show_all ();
       }
     }
 
     private void action_close () {
-      if (notebook.get_n_pages () > 0)
-        notebook.close (notebook.get_nth_page (notebook.get_current_page ()));
+      if (_notebook.get_n_pages () > 0)
+        _notebook.remove_tab (current_doc);
     }
 
     private void action_close_all () {
-      if (notebook.get_n_pages () > 0) {
-        notebook.close_all ();
+      if (_notebook.get_n_pages () > 0) {
+        _notebook.remove_all_tabs ();
       }
     }
 
     private void action_preferences () {
-      preferences = new iZiCodeEditor.Preferences (this);
+      preferences = new EasyCode.Preferences (this);
       preferences.show_all ();
     }
 
-
     private void action_about () {
-      show_about ();
+      Gtk.show_about_dialog (this,
+                             program_name: Constants.NAME,
+                             version: Constants.APP_VERSION,
+                             comments: Constants.DESCRIPTION,
+                             logo_icon_name: Constants.ICON,
+                             icon_name: Constants.ICON,
+                             authors: Constants.AUTHORS,
+                             copyright: "Copyright \xc2\xa9 2018",
+                             website: Constants.WEBSITE,
+                             license_type: Gtk.License.GPL_3_0);
     }
 
     private void action_quit () {
@@ -418,16 +456,16 @@ namespace iZiCodeEditor {
       Application.saved_state.set_int ("right-paned-size", rightPaned.position);
       Application.saved_state.set_int ("main-paned-size",  mainPaned.position);
 
-      if (notebook.docs.length () > 0) {
-        Application.saved_state.set_uint ("active-tab", notebook.get_current_page ());
+      if (_notebook.tabs.length () > 0) {
+        Application.saved_state.set_uint ("active-tab", _notebook.get_current_page ());
       } else {
         Application.saved_state.reset ("active-tab");
       }
     }
 
     private void save_opened_docs () {
-      if (notebook.docs.length () > 0) {
-        foreach (var doc in notebook.docs) {
+      if (_notebook.tabs.length () > 0) {
+        foreach (var doc in _notebook.tabs) {
           doc.save.begin ();
         }
       }
@@ -436,7 +474,7 @@ namespace iZiCodeEditor {
     private void set_opened_docs () {
       string[] opened_docs = { };
 
-      foreach (var doc in notebook.docs) {
+      foreach (var doc in _notebook.tabs) {
         if (doc.file != null && doc.exists ()) {
           opened_docs += doc.file.get_uri ();
         }
@@ -478,10 +516,10 @@ namespace iZiCodeEditor {
             } else {
               file = File.new_for_commandline_arg (uri);
             }
-            notebook.open_doc (file);
+            open_doc (file);
           }
         }
-        notebook.set_current_page ((int)Application.saved_state.get_uint ("active-tab"));
+        _notebook.set_current_page ((int)Application.saved_state.get_uint ("active-tab"));
       }
     }
 
@@ -510,21 +548,51 @@ namespace iZiCodeEditor {
       }
     }
 
-    private void show_about () {
-      var about = new Gtk.AboutDialog ();
-      about.set_program_name (NAME);
-      about.set_version (VERSION);
-      about.set_comments (DESCRIPTION);
-      about.set_logo_icon_name (ICON);
-      about.set_icon_name (ICON);
-      about.set_authors (AUTHORS);
-      about.set_copyright ("Copyright \xc2\xa9 2017");
-      about.set_website ("https://github.com/danielpinto8zz6");
-      about.set_property ("skip-taskbar-hint", true);
-      about.set_transient_for (this);
-      about.license_type = Gtk.License.GPL_3_0;
-      about.run ();
-      about.hide ();
+    private File generate_temporary_file () {
+      File folder = File.new_for_path (Application.instance.unsaved_files_directory);
+
+      int n = 1;
+
+      File new_file = folder.get_child ("Untitled_%d".printf (n));
+
+      while (new_file.query_exists ()) {
+        new_file = folder.get_child ("Untitled_%d".printf (n));
+        n++;
+      }
+
+      new_file.create_async.begin (0, Priority.DEFAULT, null, (obj, res) => {
+        try {
+          new_file.create_async.end (res);
+        } catch (Error error) {
+          warning (error.message);
+        }
+      });
+
+      return new_file;
+    }
+
+    public void open_doc (File file) {
+      if (file == null) {
+        return;
+      }
+
+      for (int n = 0; n < _notebook.tabs.length (); n++) {
+        var sel_doc = _notebook.tabs.nth_data (n);
+        if (sel_doc == null) {
+          continue;
+        }
+
+        if (sel_doc.file.get_uri () == file.get_uri ()) {
+          _notebook.set_current_page (_notebook.page_num (sel_doc));
+          warning ("This file is already loaded: %s\n", file.get_parse_name ());
+          return;
+        }
+      }
+
+      var doc = new Document (file, _notebook);
+      _notebook.append_page (doc, doc.get_tab_label ());
+      _notebook.set_current_page (_notebook.page_num (doc));
+      _notebook.set_tab_reorderable (doc, true);
     }
   }
 }

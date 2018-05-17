@@ -1,14 +1,14 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class HeaderBar : Gtk.HeaderBar {
     private Gtk.Button searchButton;
-    public iZiCodeEditor.Search search;
-    public iZiCodeEditor.GoToLine gotoline;
+    public EasyCode.Search search;
+    public EasyCode.GoToLine gotoline;
 
     private unowned Document ? doc = null;
 
-    public unowned ApplicationWindow window { get; construct set; }
+    public unowned Window window { get; construct set; }
 
-    public HeaderBar (ApplicationWindow window) {
+    public HeaderBar (Window window) {
       Object (
         window: window,
         show_close_button: true);
@@ -100,18 +100,18 @@ namespace iZiCodeEditor {
       var rightIcons = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
       var openButton = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.BUTTON);
-      openButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_OPEN;
+      openButton.action_name = Window.ACTION_PREFIX + Window.ACTION_OPEN;
 
       var newButton = new Gtk.Button.from_icon_name ("tab-new-symbolic", Gtk.IconSize.BUTTON);
-      newButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_NEW;
+      newButton.action_name = Window.ACTION_PREFIX + Window.ACTION_NEW;
 
       var saveButton = new Gtk.Button.from_icon_name ("document-save-symbolic", Gtk.IconSize.BUTTON);
-      saveButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SAVE;
+      saveButton.action_name = Window.ACTION_PREFIX + Window.ACTION_SAVE;
 
       searchButton = new Gtk.Button.from_icon_name ("edit-find-symbolic", Gtk.IconSize.BUTTON);
-      searchButton.action_name = ApplicationWindow.ACTION_PREFIX + ApplicationWindow.ACTION_SEARCH;
+      searchButton.action_name = Window.ACTION_PREFIX + Window.ACTION_SEARCH;
 
-      search = new iZiCodeEditor.Search (window);
+      search = new EasyCode.Search (window);
       search.set_relative_to (searchButton);
 
       var menuButton = new Gtk.MenuButton ();
@@ -130,13 +130,15 @@ namespace iZiCodeEditor {
       pack_start (leftIcons);
       pack_end (rightIcons);
 
-      gotoline = new iZiCodeEditor.GoToLine (window);
+      gotoline = new EasyCode.GoToLine (window);
       gotoline.set_relative_to (searchButton);
 
       Application.settings_fonts_colors.changed.connect (() => {
         // Default font size = 14, so, (14-4) * 10 = 100% zoom
         zoom_default_button.label = "%.0f%%".printf (Zoom.get_default_zoom ());
       });
+
+      show_all();
     }
 
     public void set_doc (Document ? doc = null) {
@@ -147,7 +149,7 @@ namespace iZiCodeEditor {
         search.set_sourceview (doc.sourceview);
         gotoline.set_sourceview (doc.sourceview);
       } else {
-        title = "iZiCodeEditor";
+        title = "EasyCode";
         subtitle = "";
       }
     }

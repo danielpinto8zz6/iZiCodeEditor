@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Folder : Gtk.TreeView {
     public new string path { get; set construct; }
 

@@ -1,4 +1,4 @@
-namespace iZiCodeEditor {
+namespace EasyCode {
   public class Zoom {
     private static int FONT_SIZE_MAX = 72;
     private static int FONT_SIZE_MIN = 7;
