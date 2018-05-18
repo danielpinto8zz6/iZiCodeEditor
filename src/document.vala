@@ -223,7 +223,16 @@ namespace EasyCode {
       try {
         var source_file_loader = new Gtk.SourceFileLoader (buffer, sourcefile);
         yield source_file_loader.load_async (GLib.Priority.LOW, load_cancellable, null);
-        sourceview.buffer.text = buffer.text;
+
+        var sourcebuffer = sourceview.buffer as Gtk.SourceBuffer;
+        if (sourcebuffer != null) {
+          sourcebuffer.begin_not_undoable_action ();
+          sourcebuffer.text = buffer.text;
+          sourcebuffer.end_not_undoable_action ();
+        } else {
+          sourceview.buffer.text = buffer.text;
+        }
+
         loaded = true;
       } catch (Error e) {
         sourceview.buffer.text = "";
