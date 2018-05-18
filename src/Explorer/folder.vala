@@ -81,7 +81,9 @@ namespace EasyCode {
       text_cell.edited.connect ((path, new_name)=>{
         Gtk.TreeIter iter;
         store.get_iter_from_string (out iter, path);
-        rename (File.new_for_path (get_full_path (iter)), new_name);
+        File file = File.new_for_path (get_full_path (iter));
+        if (file.get_basename() != new_name)
+          rename (file, new_name);
       });
 
       column.pack_start (text_cell, false);
