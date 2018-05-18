@@ -138,7 +138,7 @@ namespace EasyCode {
         zoom_default_button.label = "%.0f%%".printf (Zoom.get_default_zoom ());
       });
 
-      show_all();
+      show_all ();
     }
 
     public void set_doc (Document ? doc = null) {

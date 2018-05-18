@@ -15,8 +15,8 @@ namespace EasyCode {
 
     public Notebook (Window window) {
       Object (expand: true,
-        show_border: false,
-        scrollable: true);
+              show_border: false,
+              scrollable: true);
 
       this.window = window;
 
@@ -69,9 +69,9 @@ namespace EasyCode {
       if (tab == null)
         return;
 
-          window.header_bar.set_doc (tab);
-          window.status_bar.set_doc (tab);
-          tab.sourceview.grab_focus ();
+      window.header_bar.set_doc (tab);
+      window.status_bar.set_doc (tab);
+      tab.sourceview.grab_focus ();
     }
 
     private void on_tabs_changed () {
@@ -97,7 +97,7 @@ namespace EasyCode {
 
       var pos = page_num (tab);
 
-      if (pos != -1){
+      if (pos != -1) {
         tab.close ();
         this.remove_page (pos);
       }

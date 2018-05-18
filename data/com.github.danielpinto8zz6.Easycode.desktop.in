@@ -1,7 +1,9 @@
 [Desktop Entry]
 Name=Easy Code Editor
 Exec=easycode
+Icon=accessories-text-editor
 Terminal=false
 Type=Application
-Categories=GTK;
+Categories=GNOME;GTK;Utility;TextEditor;WebDevelopment;
+MimeType=text/plain;application/x-desktop;application/xml;application/x-shellscript
 StartupNotify=true

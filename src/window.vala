@@ -35,7 +35,7 @@ namespace EasyCode {
     private Terminal terminal;
     private Replace replace;
     private Preferences preferences;
-    
+
     private Explorer explorer;
     private Gtk.Paned leftPaned;
     private Gtk.Paned rightPaned;
@@ -139,7 +139,6 @@ namespace EasyCode {
     }
 
     construct {
-      
       _header_bar = new HeaderBar (this);
       this.set_titlebar (header_bar);
 
@@ -356,9 +355,9 @@ namespace EasyCode {
       File file = generate_temporary_file ();
       if (file != null) {
         var doc = new Document (file, _notebook);
-        _notebook.add_tab(doc);
+        _notebook.add_tab (doc);
       }
-   }
+    }
 
     private void action_save_as () {
       if (current_doc != null) {
